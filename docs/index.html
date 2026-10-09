@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>XTO Pizza | Digital Menu</title>
+<meta name="theme-color" content="#12100a" />
+<link rel="icon" href="images/icon-192.png" />
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',-apple-system,sans-serif;background:#12100a;color:#fff6e9;padding-bottom:60px}
+#splash{position:fixed;inset:0;z-index:99;background:radial-gradient(120% 100% at 50% 0%,#241f14 0%,#12100a 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .45s ease}
+#splash img{width:92px;height:92px;animation:pop .7s cubic-bezier(.2,1.4,.4,1) both}
+#splash .w{font:800 30px Georgia,serif;letter-spacing:2px;animation:fade .8s .2s ease both}
+#splash .w span{color:#f0731d}
+#splash .t{font-size:12px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,246,233,.55);animation:fade .8s .35s ease both}
+#splash .bar{margin-top:10px;width:120px;height:3px;border-radius:99px;background:rgba(255,246,233,.15);overflow:hidden}
+#splash .bar span{display:block;height:100%;width:40%;border-radius:99px;background:#f0731d;animation:load 1.1s .15s ease-in-out both}
+@keyframes pop{from{transform:scale(.4);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes load{from{width:8%}to{width:100%}}
+header{padding:22px 18px 10px;text-align:center;border-bottom:1px solid rgba(255,246,233,.08)}
+header h1{font:800 26px Georgia,serif;letter-spacing:1px}
+header h1 span{color:#f0731d}
+header p{font-size:12px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,246,233,.55);margin-top:4px}
+.modes{display:flex;gap:8px;justify-content:center;margin:14px 0 4px;flex-wrap:wrap}
+.modes span{font:700 12px sans-serif;border:1.5px dashed #f0731d;color:#ffd98a;border-radius:999px;padding:7px 14px}
+.outlets{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:12px 18px}
+.outlets div{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:10px;font-size:12px;line-height:1.6}
+.outlets b{color:#ffd98a;display:block;font-size:12.5px}
+.outlets a{color:#f0731d;text-decoration:none;font-weight:700}
+nav.cats{position:sticky;top:0;background:rgba(18,16,10,.96);backdrop-filter:blur(8px);display:flex;gap:8px;overflow-x:auto;padding:12px 16px;scrollbar-width:none;z-index:5}
+nav.cats::-webkit-scrollbar{display:none}
+nav.cats a{white-space:nowrap;color:#fff6e9;text-decoration:none;font:700 13px sans-serif;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);padding:8px 14px;border-radius:999px}
+nav.cats a:active{background:#f0731d;color:#1c1206}
+main{padding:6px 18px 30px;max-width:680px;margin:0 auto}
+h2{font:800 20px Georgia,serif;margin:26px 0 2px;color:#ffd98a}
+.note{font-size:12px;color:rgba(255,246,233,.5);margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:16px;overflow:hidden}
+.card img{width:100%;height:110px;object-fit:cover;display:block}
+.cb{padding:10px 12px 12px;display:grid;gap:4px}
+.cb b{font-size:13.5px}
+.cb span{font-size:11.5px;color:rgba(255,246,233,.55);line-height:1.5}
+.cb em{font-style:normal;font-weight:800;color:#f0731d;font-size:14px}
+footer{text-align:center;font-size:11.5px;color:rgba(255,246,233,.4);padding:18px;line-height:1.8}
+</style>
+</head>
+<body>
+<div id="splash"><img src="images/mark.svg" alt="" /><div class="w">XTO <span>PIZZA</span></div><div class="t">Pune's Tastiest Pizza</div><div class="bar"><span></span></div></div>
+<header>
+  <h1>XTO <span>PIZZA</span></h1>
+  <p>Digital Menu</p>
+  <div class="modes"><span>🍽 Dine-in</span><span>🥡 Takeaway</span><span>📗 Pure Veg</span></div>
+</header>
+<div class="outlets">
+  <div><b>Shivane (Khadakwasla)</b>NDA Rd, near Add Mart, Shivane, Pune 411023<br><a href="tel:+917030000776">Call 70300 00776</a></div>
+  <div><b>Nanded City</b>Destination Centre, F-65, Sinhagad Rd, Pune 411068<br><a href="tel:+917030000886">Call 70300 00886</a></div>
+</div>
+<nav class="cats"><a href="#cat-pizza">Pizza</a><a href="#cat-burgers">Burgers</a><a href="#cat-sandwich">Sandwich & Panini</a><a href="#cat-pasta">Pasta Mania</a><a href="#cat-sides">Bites & Sides</a><a href="#cat-wraps">Wraps & Salads</a><a href="#cat-combos">Combos</a><a href="#cat-beverages">Beverages</a><a href="#cat-coffee-shakes">Coffee & Shakes</a></nav>
+<main>
+<h2 id="cat-pizza">Pizza</h2><p class="note">Hand-stretched 7" veg pizzas, stone-baked</p><div class="grid">
+<div class="card"><img src="images/pizza-cheese.jpg" alt="Margherita 7"" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Margherita 7"</b><span>Classic cheese, oregano, fresh tomato sauce</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/pizza-cheese.jpg" alt="Tomato & Cheese" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Tomato & Cheese</b><span>Magic Mania classic, loaded mozzarella</span><em>Rs 99</em></div></div>
+<div class="card"><img src="images/pizza-closeup.jpg" alt="Onion & Cheese" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Onion & Cheese</b><span>Caramelised onion, double cheese blend</span><em>Rs 109</em></div></div>
+<div class="card"><img src="images/pizza-closeup.jpg" alt="Dil Desi" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Dil Desi</b><span>Desi masala, onion, capsicum, cheesy blend</span><em>Rs 199</em></div></div>
+<div class="card"><img src="images/farmers-delight.jpg" alt="Farmer's Delight" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Farmer's Delight</b><span>Farm fresh mushroom, tomato, capsicum, onion, sweet corn & delicious cheese</span><em>Rs 209</em></div></div>
+<div class="card"><img src="images/pizza-closeup.jpg" alt="Hawaiian Style" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Hawaiian Style</b><span>Golden corn, juicy pineapple toss, cheese pull</span><em>Rs 219</em></div></div>
+<div class="card"><img src="images/paneer-makhni.jpg" alt="Paneer Makhni" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Paneer Makhni</b><span>Makhni gravy base, soft paneer, butter, cheese</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/tandoori-paneer-tikka.jpg" alt="Tandoori Paneer Tikka" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Tandoori Paneer Tikka</b><span>Black olives, paneer tikka, capsicum, onion, fresh coriander & delicious cheese</span><em>Rs 299</em></div></div>
+<div class="card"><img src="images/chefs-special-paneer-tikka.jpg" alt="Chef's Special Paneer Tikka" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Chef's Special Paneer Tikka</b><span>Signature cheese blend, tandoori spread, capsicum, onion & paneer tikka</span><em>Rs 329</em></div></div>
+<div class="card"><img src="images/tangy-paneer.jpg" alt="Tangy Paneer" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Tangy Paneer</b><span>Grilled paneer, bell pepper, onion, green capsicum, tomato salsa & cheese</span><em>Rs 329</em></div></div>
+<div class="card"><img src="images/veggie-mexican.jpg" alt="Veggie Mexican" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Veggie Mexican</b><span>Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive & delicious cheese</span><em>Rs 329</em></div></div>
+<div class="card"><img src="images/pesto-painting.jpg" alt="Pesto Painting" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Pesto Painting</b><span>Loaded fresh paneer, bell pepper, jalapeno, basil, pesto sauce & cheese</span><em>Rs 329</em></div></div>
+</div>
+<h2 id="cat-burgers">Burgers</h2><p class="note">Stacked, saucy, served hot</p><div class="grid">
+<div class="card"><img src="images/crispy-veg-burger.jpg" alt="Crispy Veg Burger" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Crispy Veg Burger</b><span>Crumb-fried patty, lettuce, house mayo, sesame bun</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/crispy-veg-burger.jpg" alt="Veggie Delight" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Veggie Delight</b><span>Tomatoes, onion seasoned with oregano</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/double-cheese-burger.jpg" alt="Double Cheese Burger" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Double Cheese Burger</b><span>Double cheese slices, tangy sauce, crunchy patty</span><em>Rs 169</em></div></div>
+<div class="card"><img src="images/spicy-paneer-burger.jpg" alt="Spicy Paneer Burger" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Spicy Paneer Burger</b><span>Masala paneer patty, peri mayo, pickled onion</span><em>Rs 179</em></div></div>
+<div class="card"><img src="images/tower-burger.jpg" alt="Tower Burger" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Tower Burger</b><span>Triple-decker stack, cheese, patty, fresh veggies</span><em>Rs 199</em></div></div>
+</div>
+<h2 id="cat-sandwich">Sandwich & Panini</h2><p class="note">Grilled to order</p><div class="grid">
+<div class="card"><img src="images/grilled-sandwich.jpg" alt="Veg Grilled Sandwich" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Veg Grilled Sandwich</b><span>Tomato, onion and capsicum, grilled crisp</span><em>Rs 99</em></div></div>
+<div class="card"><img src="images/grilled-sandwich.jpg" alt="Cheese Corn Sandwich" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Cheese Corn Sandwich</b><span>Three types of cheese & American sweet corn</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/grilled-sandwich.jpg" alt="Mumbai Sandwich" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Mumbai Sandwich</b><span>Street-style masala, chutney, cheese, grilled</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/grilled-sandwich.jpg" alt="Mushroom Melt Panini" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Mushroom Melt Panini</b><span>Buttered mushrooms under a molten cheese melt</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/paneer-tikka-sandwich.jpg" alt="Paneer Bhurji Panini" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Paneer Bhurji Panini</b><span>Spiced paneer bhurji pressed in focaccia</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/paneer-tikka-sandwich.jpg" alt="Paneer Tikka Sandwich" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Paneer Tikka Sandwich</b><span>Paneer tikka, onion, capsicum, and delicious cheese</span><em>Rs 199</em></div></div>
+</div>
+<h2 id="cat-pasta">Pasta Mania</h2><p class="note">Tossed fresh in our sauces</p><div class="grid">
+<div class="card"><img src="images/arabiatta-pasta.jpg" alt="Arabiatta Pasta" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Arabiatta Pasta</b><span>All-time favourite red arabiatta sauce with leeks, celery, olives, garlic & cheese</span><em>Rs 349</em></div></div>
+<div class="card"><img src="images/veg-alfredo.jpg" alt="Veg Alfredo" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Veg Alfredo</b><span>Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, cream, cheddar</span><em>Rs 349</em></div></div>
+<div class="card"><img src="images/arabiatta-pasta.jpg" alt="Penne Rosette" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Penne Rosette</b><span>Rose sauce penne, basil, parmesan dust</span><em>Rs 299</em></div></div>
+<div class="card"><img src="images/veg-alfredo.jpg" alt="Vegetarian Pesto Pasta" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Vegetarian Pesto Pasta</b><span>Basil pesto, toasted pine nuts, veggies, cheese</span><em>Rs 329</em></div></div>
+<div class="card"><img src="images/veg-alfredo.jpg" alt="Chef's Special Pasta" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Chef's Special Pasta</b><span>Red & white sauce, basil, bell pepper, mushroom, zucchini, cheese & cream</span><em>Rs 379</em></div></div>
+</div>
+<h2 id="cat-sides">Bites & Sides</h2><p class="note">Fries, nachos, oven bits, dips</p><div class="grid">
+<div class="card"><img src="images/upload-peri-peri-fries-76.jpg" alt="Peri Peri Fries" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Peri Peri Fries</b><span>Crispy fries tossed in fiery peri peri</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/french-fries.jpg" alt="French Fries" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>French Fries</b><span>Golden, salted, dangerously crisp</span><em>Rs 109</em></div></div>
+<div class="card"><img src="images/french-fries.jpg" alt="Peri Peri French Fries" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Peri Peri French Fries</b><span>Tossed in fiery peri peri dust</span><em>Rs 179</em></div></div>
+<div class="card"><img src="images/cheese-jalapeno-fries.jpg" alt="Cheese Jalapeno French Fries" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Cheese Jalapeno French Fries</b><span>Loaded cheese sauce, jalapeno kick</span><em>Rs 199</em></div></div>
+<div class="card"><img src="images/salsa-nachos.jpg" alt="Creme Cheese Nachos" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Creme Cheese Nachos</b><span>Crunchy nachos under cream cheese sauce</span><em>Rs 229</em></div></div>
+<div class="card"><img src="images/salsa-nachos.jpg" alt="Salsa Nachos" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Salsa Nachos</b><span>House salsa, cheese, crunchy tortillas</span><em>Rs 249</em></div></div>
+<div class="card"><img src="images/garlic-bread.jpg" alt="Garlic Bread" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Garlic Bread</b><span>Ciabatta toasted with roasted garlic, flavoured salted butter</span><em>Rs 109</em></div></div>
+<div class="card"><img src="images/cheesy-garlic-bread.jpg" alt="Cheesy Garlic Bread" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Cheesy Garlic Bread</b><span>Topped with signature cheese, Italian herbs and spices</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/cheesy-cheese-tomato.jpg" alt="Cheesy Cheese Tomato" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Cheesy Cheese Tomato</b><span>Chilli cheese tomato toast, a signature snack</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/cheesy-cheese-tomato.jpg" alt="Bruschetta Traditional" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Bruschetta Traditional</b><span>Rustic cheese bruschetta, the original way</span><em>Rs 129</em></div></div>
+<div class="card"><img src="images/garlic-bread.jpg" alt="Bruschetta Mushroom & Corn" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Bruschetta Mushroom & Corn</b><span>Cheese, olives and jalapenos</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/garlic-bread.jpg" alt="Bruschetta Spinach & Corn" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Bruschetta Spinach & Corn</b><span>Spinach and corn cheesy blend</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/cheesy-cheese-tomato.jpg" alt="Bruschetta Mediterranean" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Bruschetta Mediterranean</b><span>Olives, herbs, sun-dried tomato, cheese</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/cheese-jalapeno-dip.jpg" alt="Cheese Jalapeno Dip" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Cheese Jalapeno Dip</b><span>Creamy dip with jalapeno heat</span><em>Rs 30</em></div></div>
+<div class="card"><img src="images/cheese-jalapeno-dip.jpg" alt="Peri Peri Cheese Dip" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Peri Peri Cheese Dip</b><span>Fiery peri peri folded into cheese</span><em>Rs 30</em></div></div>
+<div class="card"><img src="images/cheese-jalapeno-dip.jpg" alt="Cocktail Mayo Cheese Dip" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Cocktail Mayo Cheese Dip</b><span>Cool, creamy, classic</span><em>Rs 30</em></div></div>
+</div>
+<h2 id="cat-wraps">Wraps & Salads</h2><p class="note">Rolled tight, dressed fresh</p><div class="grid">
+<div class="card"><img src="images/aloo-verona-wrap.jpg" alt="Aloo Verona Wrap" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Aloo Verona Wrap</b><span>Spiced potato, mint mayo, crunch, rolled tight</span><em>Rs 139</em></div></div>
+<div class="card"><img src="images/paneer-fajita-wrap.jpg" alt="Paneer Fajita Wrap" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Paneer Fajita Wrap</b><span>Fajita paneer, peppers, onion, chipotle mayo</span><em>Rs 159</em></div></div>
+<div class="card"><img src="images/paneer-tikka-wrap.jpg" alt="Paneer Tikka Wrap" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Paneer Tikka Wrap</b><span>Char-grilled paneer tikka, onion, mint chutney</span><em>Rs 159</em></div></div>
+<div class="card"><img src="images/mexican-salad.jpg" alt="Mexican Salad" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Mexican Salad</b><span>Kidney beans, sweet corn, tomato, lettuce, cucumber, sweet potato dressing, salsa</span><em>Rs 289</em></div></div>
+<div class="card"><img src="images/mexican-salad.jpg" alt="Hawaiian Salad" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Hawaiian Salad</b><span>Fresh fruits, greens, creamy dressing</span><em>Rs 259</em></div></div>
+</div>
+<h2 id="cat-combos">Combos</h2><p class="note">Full meals, better prices</p><div class="grid">
+<div class="card"><img src="images/combo-delight.jpg" alt="Combo Delight" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Combo Delight</b><span>1 veg burger, 1 french fries, any one 250ml drink (coke / thumbs up / sprite)</span><em>Rs 249</em></div></div>
+<div class="card"><img src="images/combo-crush.jpg" alt="Combo Crush" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Combo Crush</b><span>1 veg burger, 1 french fries, 2 pcs garlic bread</span><em>Rs 249</em></div></div>
+<div class="card"><img src="images/magic-combo.jpg" alt="Magic Combo" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Magic Combo</b><span>2 burgers, 1 Margherita pizza 7", 1 french fries</span><em>Rs 399</em></div></div>
+<div class="card"><img src="images/king-combo.jpg" alt="King Combo" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>King Combo</b><span>Any one 7" pizza, 1 salsa nachos, any one 250ml drink</span><em>Rs 449</em></div></div>
+<div class="card"><img src="images/premium-combo.jpg" alt="Premium Combo" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Premium Combo</b><span>2 veg burgers, any one 7" premium pizza, 3 pc garlic bread</span><em>Rs 499</em></div></div>
+</div>
+<h2 id="cat-beverages">Beverages</h2><p class="note">Mocktails, coolers, soft drinks</p><div class="grid">
+<div class="card"><img src="images/blue-lagoon.jpg" alt="Blue Lagoon" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Blue Lagoon</b><span>Electric blue citrus cooler, 300ml</span><em>Rs 99</em></div></div>
+<div class="card"><img src="images/kiwi-crush.jpg" alt="Kiwi Crush" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Kiwi Crush</b><span>Real kiwi, crushed ice, 300ml</span><em>Rs 79</em></div></div>
+<div class="card"><img src="images/mojito.jpg" alt="Mojito" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Mojito</b><span>Mint, lime, soda, classic refresher, 300ml</span><em>Rs 109</em></div></div>
+<div class="card"><img src="images/kiwi-crush.jpg" alt="Summer Cooler" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Summer Cooler</b><span>Seasonal fruits, sparkling, light, 300ml</span><em>Rs 99</em></div></div>
+<div class="card"><img src="images/soft-drink.jpg" alt="Coke" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Coke</b><span>250ml can</span><em>Rs 40</em></div></div>
+<div class="card"><img src="images/soft-drink.jpg" alt="Diet Coke" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Diet Coke</b><span>250ml can</span><em>Rs 40</em></div></div>
+<div class="card"><img src="images/soft-drink.jpg" alt="Sprite" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Sprite</b><span>250ml can</span><em>Rs 40</em></div></div>
+<div class="card"><img src="images/soft-drink.jpg" alt="Lemon Ice Tea" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Lemon Ice Tea</b><span>Brewed, iced, lemon-kissed, 300ml</span><em>Rs 129</em></div></div>
+<div class="card"><img src="images/soft-drink.jpg" alt="Peach Ice Tea" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Peach Ice Tea</b><span>Peach notes over cold brew, 300ml</span><em>Rs 129</em></div></div>
+</div>
+<h2 id="cat-coffee-shakes">Coffee & Shakes</h2><p class="note">Thick, cold, addictive</p><div class="grid">
+<div class="card"><img src="images/cold-coffee.jpg" alt="Cold Coffee" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Cold Coffee</b><span>Smooth, frothy, timeless</span><em>Rs 99</em></div></div>
+<div class="card"><img src="images/thick-cold-coffee.jpg" alt="Thick Cold Coffee" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Thick Cold Coffee</b><span>Extra thick, extra cold</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/cold-coffee.jpg" alt="Banana Milk Coffee" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Banana Milk Coffee</b><span>Banana blended into creamy cold coffee</span><em>Rs 129</em></div></div>
+<div class="card"><img src="images/thick-cold-coffee.jpg" alt="Iced Caramel Macchiato" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Iced Caramel Macchiato</b><span>Caramel drizzle over iced milk & espresso</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/cold-coffee.jpg" alt="Chocolate-y Iced Mocha" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Chocolate-y Iced Mocha</b><span>Chocolate + coffee, iced and indulgent</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/thick-cold-coffee.jpg" alt="Caramel Coconut Iced Coffee" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Caramel Coconut Iced Coffee</b><span>Coconut milk, caramel, cold coffee</span><em>Rs 149</em></div></div>
+<div class="card"><img src="images/shake-choco.jpg" alt="Brownie Frappe" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Brownie Frappe</b><span>Brownie chunks blended into a frappe</span><em>Rs 159</em></div></div>
+<div class="card"><img src="images/kitkat-shake.jpg" alt="Kitkat Shake" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Kitkat Shake</b><span>Kitkat crunch in a thick shake, 300ml</span><em>Rs 169</em></div></div>
+<div class="card"><img src="images/hazelnut-shake.jpg" alt="Hazelnut Crunchy Shake" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Hazelnut Crunchy Shake</b><span>Roasted hazelnut, chocolate, crunch, 300ml</span><em>Rs 179</em></div></div>
+<div class="card"><img src="images/shake-choco.jpg" alt="Oreo Shake" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Oreo Shake</b><span>Cookies and cream, blended thick, 300ml</span><em>Rs 139</em></div></div>
+<div class="card"><img src="images/strawberry-shake.jpg" alt="Strawberry Shake" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Strawberry Shake</b><span>Real strawberry, creamy, 300ml</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/strawberry-kiwi-shake.jpg" alt="Strawberry Kiwi Shake" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>Strawberry Kiwi Shake</b><span>Strawberry meets kiwi tang, 300ml</span><em>Rs 119</em></div></div>
+<div class="card"><img src="images/xto-special-shake.jpg" alt="XTO Special Shake" loading="lazy" onerror="this.style.visibility='hidden'">
+<div class="cb"><b>XTO Special Shake</b><span>Our signature loaded shake. Ask us why it's special</span><em>Rs 229</em></div></div>
+</div>
+</main>
+<footer>Dine-in and takeaway only. GST and packaging charges extra as applicable.<br>Scan. Crave. Order at the counter or on the app.</footer>
+<script>
+setTimeout(function () { var s = document.getElementById('splash'); s.style.opacity = '0'; setTimeout(function () { s.remove(); }, 480); }, 1400);
+</script>
+</body>
+</html>

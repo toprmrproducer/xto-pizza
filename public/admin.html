@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>XTO Pizza | Central Admin</title>
+<link rel="icon" href="/images/icon-192.png" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+
+<!-- PIN GATE -->
+<div class="gate" id="gate">
+  <div class="gate-card">
+    <img src="/images/mark.svg" alt="" class="gate-logo" />
+    <h1>XTO Central Admin</h1>
+    <p>Order management and dispatch console</p>
+    <div class="pin-dots" id="pinDots"><span></span><span></span><span></span><span></span></div>
+    <div class="pin-pad" id="pinPad">
+      <button>1</button><button>2</button><button>3</button>
+      <button>4</button><button>5</button><button>6</button>
+      <button>7</button><button>8</button><button>9</button>
+      <button class="pin-clear">C</button><button>0</button><button class="pin-back">⌫</button>
+    </div>
+    <div class="gate-err" id="gateErr"></div>
+    <div class="gate-hint">Demo PIN: 4321 (change in data/config.json)</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="shell hidden" id="shell">
+  <header class="topbar">
+    <div class="tb-left">
+      <img src="/images/mark.svg" alt="" />
+      <div>
+        <b>XTO Central Admin</b>
+        <span id="liveDot" class="live-dot">LIVE</span>
+      </div>
+    </div>
+    <div class="tb-stats" id="tbStats"></div>
+    <div class="tb-right"><div class="integrations" id="integrationChip"></div>
+      <label class="sound-toggle"><input type="checkbox" id="soundToggle" checked /> <span>Alert sound</span></label>
+      <nav class="tabs">
+        <button class="tab active" data-tab="orders">Orders</button>
+        <button class="tab" data-tab="menu">Menu</button>
+        <button class="tab" data-tab="riders">Riders</button>
+        <button class="tab" data-tab="offers">Offers</button>
+        <button class="tab" data-tab="notify">Notify</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="board" id="board">
+    <!-- orders kanban injected here -->
+  </main>
+
+  <main class="menu-mgr hidden" id="menuMgr">
+    <div class="mm-head">
+      <h2>Menu manager</h2>
+      <input id="mmSearch" placeholder="Search item..." />
+    </div>
+    <p class="mm-sub">Toggle availability, add new items, change prices. The website and both apps update instantly.</p>
+    <div class="mm-add card-panel">
+      <h3>Add a new item</h3>
+      <div class="mm-add-grid">
+        <label>Name<input id="naName" placeholder="e.g. Peri Peri Fries" /></label>
+        <label>Category<select id="naCat"></select></label>
+        <label>Price (Rs)<input id="naPrice" type="number" min="1" placeholder="149" /></label>
+        <label>Image<input id="naImage" type="file" accept="image/*" /></label>
+      </div>
+      <label class="mm-desc">Description<input id="naDesc" placeholder="Short, tasty line for the menu" /></label>
+      <button class="btn-accent" id="naSubmit">Add item to the live menu</button>
+      <div class="mm-msg" id="naMsg"></div>
+    </div>
+    <div class="mm-grid" id="mmGrid"></div>
+  </main>
+
+  <main class="pane hidden" id="ridersPane">
+    <div class="pane-head">
+      <h2>Rider tracking</h2>
+      <div class="pane-actions">
+        <input id="rName" placeholder="Rider name" />
+        <input id="rPhone" placeholder="10-digit phone" maxlength="10" />
+        <select id="rHome"><option value="shivane">Shivane base</option><option value="nanded">Nanded base</option></select>
+        <button class="btn-accent" id="rAdd">Add rider</button>
+      </div>
+    </div>
+    <p class="mm-sub">Riders with the XTO rider page open stream live GPS here. Demo walk: press Simulate to watch a rider move.</p>
+    <div class="riders-layout">
+      <div id="ridersMap" class="riders-map"></div>
+      <div id="ridersList" class="riders-list"></div>
+    </div>
+  </main>
+
+  <main class="pane hidden" id="offersPane">
+    <div class="pane-head">
+      <h2>Offers and coupons</h2>
+    </div>
+    <p class="mm-sub">Customers apply these codes at checkout on the website and in the app.</p>
+    <div class="mm-add card-panel">
+      <h3>Create an offer</h3>
+      <div class="mm-add-grid">
+        <label>Code<input id="ofCode" placeholder="e.g. PIZZA20" style="text-transform:uppercase" /></label>
+        <label>Type<select id="ofType"><option value="percent">% off</option><option value="flat">Rs off</option></select></label>
+        <label>Value<input id="ofValue" type="number" min="1" placeholder="20" /></label>
+        <label>Min order (Rs)<input id="ofMin" type="number" min="0" placeholder="0" /></label>
+      </div>
+      <label class="mm-desc">Label<input id="ofLabel" placeholder="20% off everything, today only" /></label>
+      <button class="btn-accent" id="ofSubmit">Publish offer</button>
+      <div class="mm-msg" id="ofMsg"></div>
+    </div>
+    <div class="offers-table-wrap card-panel"><div id="offersList"></div></div>
+  </main>
+
+  <main class="pane hidden" id="notifyPane">
+    <div class="pane-head">
+      <h2>Push notifications</h2>
+    </div>
+    <p class="mm-sub">Send a notification to every customer with updates enabled, or to one phone number. They get it on their phone home screen, even with the app closed.</p>
+    <div class="mm-add card-panel">
+      <div class="mm-add-grid">
+        <label>Title<input id="ntTitle" placeholder="XTO Pizza" /></label>
+        <label>To<input id="ntPhone" placeholder="All customers, or one 10-digit phone" maxlength="10" /></label>
+      </div>
+      <label class="mm-desc">Message<textarea id="ntBody" rows="2" placeholder="Today only: 50% off all pizzas above Rs 499. Order now!"></textarea></label>
+      <button class="btn-accent" id="ntSend">Send notification</button>
+      <div class="mm-msg" id="ntMsg"></div>
+    </div>
+    <div class="mm-sub" id="ntStats"></div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<link rel="stylesheet" href="/leaflet/leaflet.css" />
+<script src="/leaflet/leaflet.js"></script>
+<script src="/js/admin.js"></script>
+</body>
+</html>

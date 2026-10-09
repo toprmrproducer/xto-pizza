@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>XTO Pizza | Rider</title>
+<meta name="theme-color" content="#12100a" />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root { --ink:#12100a; --orange:#f0731d; --red:#b3271e; --cream:#fff6e9; --muted:#6f6656; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Inter',sans-serif; background:#1c1812; color:#fff6e9; min-height:100vh; display:grid; place-items:center; padding:20px; }
+  .card { width:100%; max-width:420px; background:var(--ink); border-radius:24px; padding:30px 26px; box-shadow:0 30px 80px rgba(0,0,0,.5); }
+  .brand { display:flex; align-items:center; gap:10px; margin-bottom:18px; }
+  .brand img { width:40px; height:40px; }
+  .brand b { font:800 18px 'Sora'; letter-spacing:1px; }
+  h1 { font:800 22px 'Sora'; margin-bottom:6px; }
+  .sub { font-size:13.5px; color:rgba(255,246,233,.6); margin-bottom:20px; line-height:1.6; }
+  label { display:block; font:600 11px 'Sora'; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,246,233,.55); margin-bottom:6px; }
+  input { width:100%; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); color:#fff6e9; border-radius:12px; padding:13px 14px; font:600 16px 'Inter'; outline:none; margin-bottom:14px; }
+  button.big { width:100%; border:none; background:linear-gradient(120deg,#f0731d,#ff8f3d); color:#1c1206; font:800 15px 'Sora'; padding:15px; border-radius:14px; cursor:pointer; }
+  button.big.stop { background:linear-gradient(120deg,#b3271e,#e8590c); color:#fff4ea; }
+  .status { margin-top:16px; border-radius:14px; padding:14px 16px; font-size:13.5px; line-height:1.7; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); display:none; }
+  .status.live { display:block; border-color:rgba(124,227,139,.4); }
+  .status .live-dot2 { display:inline-block; width:9px; height:9px; border-radius:99px; background:#7ce38b; margin-right:7px; animation:pulse 1.4s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+  .status b { font-family:'Sora'; }
+  .err { color:#ff8b7c; font-size:13px; margin-top:10px; min-height:18px; }
+  .note { margin-top:16px; font-size:12px; color:rgba(255,246,233,.45); text-align:center; line-height:1.6; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="brand"><img src="/images/mark.svg" alt="" /><b>XTO RIDER</b></div>
+  <h1>Share your live location</h1>
+  <p class="sub">Keep this page open while you ride. The kitchen sees you on their map and the customer watches you approach.</p>
+  <label>Your rider phone number</label>
+  <input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel" />
+  <button class="big" id="toggle">Start sharing location</button>
+  <div class="err" id="err"></div>
+  <div class="status" id="status"></div>
+  <p class="note">Location is only used for delivery tracking during your shift. Close the page or press stop to end sharing.</p>
+</div>
+<script>
+  'use strict';
+  const $ = (s) => document.querySelector(s);
+  const KEY = 'xto_rider_phone';
+  $('#phone').value = localStorage.getItem(KEY) || '';
+  let timer = null, watchId = null, currentOrder = null;
+
+  function paint(on, riderName) {
+    const btn = $('#toggle');
+    btn.textContent = on ? 'Stop sharing' : 'Start sharing location';
+    btn.classList.toggle('stop', on);
+    $('#status').className = 'status' + (on ? ' live' : '');
+    if (!on) { $('#status').innerHTML = 'Sharing off.'; return; }
+    $('#status').innerHTML = '<span class="live-dot2"></span><b>LIVE</b> as ' + (riderName || 'rider') +
+      (currentOrder ? '<br>Carrying <b>' + currentOrder.id + '</b> for ' + currentOrder.customer + '<br>' + currentOrder.address : '<br>No delivery assigned yet. The kitchen sees your position.');
+  }
+  async function ping(lat, lng) {
+    try {
+      const r = await fetch('/api/rider/ping', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: $('#phone').value.replace(/\D/g, ''), lat, lng, orderId: currentOrder ? currentOrder.orderId : undefined })
+      }).then((x) => x.json());
+      if (r.error) { $('#err').textContent = r.error; return stop(); }
+      if (r.order) { currentOrder = { id: r.order.id, customer: r.order.customer, address: r.order.address, orderId: r.order.id }; }
+      else if (!currentOrder) currentOrder = null;
+      paint(true, r.rider);
+      $('#err').textContent = '';
+    } catch (e) { $('#err').textContent = 'Network hiccup, retrying...'; }
+  }
+  function start() {
+    const phone = $('#phone').value.replace(/\D/g, '');
+    if (!/^[6-9]\d{9}$/.test(phone)) { $('#err').textContent = 'Enter the 10-digit phone the kitchen registered for you.'; return; }
+    localStorage.setItem(KEY, phone);
+    if (!navigator.geolocation) { $('#err').textContent = 'This browser has no location support.'; return; }
+    $('#err').textContent = '';
+    paint(true);
+    watchId = navigator.geolocation.watchPosition(
+      (p) => ping(p.coords.latitude, p.coords.longitude),
+      (e) => { $('#err').textContent = 'Location blocked: allow location access for this page.'; stop(); },
+      { enableHighAccuracy: true, maximumAge: 4000 }
+    );
+    timer = setInterval(() => { if (watchId !== null && navigator.geolocation) navigator.geolocation.getCurrentPosition((p) => ping(p.coords.latitude, p.coords.longitude), () => {}); }, 8000);
+  }
+  function stop() {
+    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+    clearInterval(timer);
+    currentOrder = null;
+    paint(false);
+  }
+  $('#toggle').addEventListener('click', () => { if (watchId === null) start(); else stop(); });
+  paint(false);
+</script>
+</body>
+</html>

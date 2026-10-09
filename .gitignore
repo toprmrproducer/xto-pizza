@@ -1,0 +1,9 @@
+# secrets and runtime state: never push
+data/db.json
+data/vapid.json
+data/config.json
+data/petpooja-log.json
+_raw/
+node_modules/
+.DS_Store
+*.log
