@@ -71,6 +71,18 @@ section h2{font:800 26px Georgia,serif;margin:34px 0 2px}
 section .note{font-size:13.5px;color:var(--muted);margin-bottom:16px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
 @media (min-width:1600px){.grid{grid-template-columns:repeat(5,1fr)}}
+@media (max-width:1024px){.grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media (max-width:640px){.grid{grid-template-columns:repeat(2,1fr);gap:12px}
+main{padding:10px 14px 30px}
+section h2{font-size:22px}
+.imgwrap{height:128px}
+.cb{padding:10px 12px 12px}
+.cb b{font-size:13.5px}
+.cb span{font-size:11px}
+.cb em{font-size:13.5px}
+header h1{font-size:28px}
+header img{width:54px;height:54px}
+.outlets{padding:0 14px}}
 .card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:transform .2s ease,box-shadow .2s ease}
 .card:hover{transform:translateY(-3px);box-shadow:0 14px 34px rgba(0,0,0,.09)}
 .imgwrap{position:relative;height:160px;background:var(--cream)}

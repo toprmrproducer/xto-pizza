@@ -423,7 +423,7 @@ const server = http.createServer(async (req, res) => {
     return json(res, 200, { categories: menu.categories, items, deliveryFee: menu.deliveryFee, freeDeliveryAbove: menu.freeDeliveryAbove, currency: 'INR' });
   }
   if (p === '/api/outlets' && method === 'GET') return json(res, 200, { outlets });
-  if (p === '/api/config' && method === 'GET') return json(res, 200, { brand: config.brand, razorpay: { keyId: config.razorpay.keyId, live: config.razorpay.live } });
+  if (p === '/api/config' && method === 'GET') return json(res, 200, { brand: config.brand, razorpay: { keyId: config.razorpay.keyId, live: config.razorpay.live }, vapid: vapid.pub, outletsGeo: RIDER_HOME });
 
   if (p === '/api/push/subscribe' && method === 'POST') {
     const body = await readBody(req);
