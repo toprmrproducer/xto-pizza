@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>XTO Pizza - Scan &amp; Order table cards</title>
+<script src="vendor/qrcode.min.js"></script>
+<style>
+  :root {
+    --ink: #12100a;
+    --cream: #fff6e9;
+    --paper: #fffdf8;
+    --orange: #f0731d;
+    --red: #b3271e;
+    --gold: #ffc53d;
+    --muted: #6f6656;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: #efe9dd; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; color: var(--ink); padding: 24px; }
+  .toolbar { max-width: 720px; margin: 0 auto 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .toolbar p { flex: 1 1 300px; font-size: 14px; color: var(--muted); }
+  .toolbar button { border: 2px solid var(--ink); background: var(--orange); color: #fff; font-weight: 700; font-size: 14px; padding: 10px 22px; border-radius: 999px; cursor: pointer; }
+  .toolbar button:hover { background: var(--red); }
+  .sheet { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
+
+  .card {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    border-radius: 24px;
+    padding: 34px 30px 30px;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 0 rgba(18, 16, 10, 0.12);
+  }
+  .brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; }
+  .brand img { width: 44px; height: 44px; }
+  .brand b { font-size: 26px; letter-spacing: 1px; text-transform: uppercase; }
+  .hook {
+    display: inline-block; background: var(--ink); color: var(--gold);
+    font-size: 15px; font-weight: 800; letter-spacing: 4px; text-transform: uppercase;
+    padding: 8px 20px; border-radius: 999px; margin: 10px 0 18px;
+  }
+  .qrbox { display: flex; justify-content: center; margin: 6px 0 16px; }
+  .qrbox .qr { padding: 14px; background: #fff; border: 3px dashed var(--orange); border-radius: 18px; }
+  .outlet { font-size: 20px; font-weight: 800; }
+  .meta { font-size: 14px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+  .meta b { color: var(--ink); }
+  .call { margin-top: 14px; font-size: 14px; font-weight: 700; background: var(--cream); border: 2px solid var(--ink); border-radius: 12px; padding: 9px 12px; display: inline-block; }
+  .call span { color: var(--red); }
+  .foot { margin-top: 14px; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .toolbar { display: none; }
+    .sheet { max-width: none; gap: 0; }
+    .card { box-shadow: none; page-break-inside: avoid; break-inside: avoid; margin-bottom: 14mm; }
+    .card + .card { page-break-before: auto; }
+  }
+</style>
+</head>
+<body>
+  <div class="toolbar">
+    <p>Print this page and stick one card on each table or the counter. The QR code updates itself with the shop's live address after the site goes online.</p>
+    <button onclick="window.print()">Print cards</button>
+  </div>
+  <div class="sheet" id="sheet"></div>
+
+<script>
+  var outlets = [
+    { name: 'XTO Pizza Shivane', area: 'Khadakwasla / Shivane', phone: '+91 70300 00776', hours: '11:00 am - 10:30 pm' },
+    { name: 'XTO Pizza Nanded City', area: 'Destination Centre, Sinhagad Road', phone: '+91 70300 00886', hours: '11:00 am - 11:00 pm' },
+    { name: 'Scan &amp; Order', area: 'Table service', phone: '', hours: '' }
+  ];
+  var params = new URLSearchParams(location.search);
+  var target = params.get('to') || (location.origin + '/');
+
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+  var sheet = document.getElementById('sheet');
+  outlets.forEach(function (o, i) {
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML =
+      '<div class="brand"><img src="images/mark.svg" alt="" /><b>XTO Pizza</b></div>' +
+      '<div class="hook">Scan &middot; Order &middot; Eat</div>' +
+      '<div class="qrbox"><div class="qr" id="qr' + i + '"></div></div>' +
+      '<div class="outlet">' + o.name + '</div>' +
+      '<div class="meta">' + esc(o.area) + (o.hours ? '<br />' + esc(o.hours) : '') + '</div>' +
+      (o.phone ? '<div class="call">Or call to order: <span>' + esc(o.phone) + '</span></div>' : '') +
+      '<div class="foot">Point your phone camera at the code</div>';
+    sheet.appendChild(card);
+    new QRCode(document.getElementById('qr' + i), {
+      text: target, width: 190, height: 190,
+      colorDark: '#12100a', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  });
+</script>
+</body>
+</html>
