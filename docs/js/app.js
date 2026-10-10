@@ -93,7 +93,7 @@ function renderBest() {
   const best = state.menu.items.filter((i) => (i.tags || []).includes('bestseller')).slice(0, 8);
   $('#bestRow').innerHTML = best.map((i) => `
     <div class="bcard">
-      <img src="/images/${i.img}.jpg" alt="" loading="lazy" onerror="this.src='images/pizza-closeup.jpg'" />
+      <img src="images/${i.img}.jpg" alt="" loading="lazy" onerror="this.src='images/pizza-closeup.jpg'" />
       <div><h4>${i.name}</h4><div class="bp"><b>${INR(i.price)}</b><button data-add="${i.id}">ADD</button></div></div>
     </div>`).join('');
   $$('#bestRow [data-add]').forEach((b) => b.addEventListener('click', () => addToCart(b.dataset.add)));
@@ -102,7 +102,7 @@ function renderComboStrip() {
   const combos = state.menu.items.filter((i) => i.cat === 'combos');
   $('#comboStrip').innerHTML = combos.map((c) => `
     <div class="cstrip-card">
-      <img src="/images/${c.img}.jpg" alt="" loading="lazy" />
+      <img src="images/${c.img}.jpg" alt="" loading="lazy" />
       <div class="cstrip-info"><div><h4>${c.name}</h4></div><b>${INR(c.price)}</b></div>
     </div>`).join('');
   $$('.cstrip-card').forEach((el, idx) => el.addEventListener('click', () => { addToCart(combos[idx].id); }));
@@ -132,7 +132,7 @@ function rowHTML(item) {
   const hue = [...item.id].reduce((s, c) => s + c.charCodeAt(0), 0) % 3;
   const grads = ['linear-gradient(135deg,#f0731d,#b3271e)', 'linear-gradient(135deg,#2f7d5b,#173f2e)', 'linear-gradient(135deg,#ffc53d,#f0731d)'];
   const media = item.img
-    ? `<img src="/images/${item.img}.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="r-fallback" style="display:none;background:${grads[hue]}">${item.name[0]}</div>`
+    ? `<img src="images/${item.img}.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="r-fallback" style="display:none;background:${grads[hue]}">${item.name[0]}</div>`
     : `<div class="r-fallback" style="background:${grads[hue]}">${item.name[0]}</div>`;
   const tag = (item.tags || []).includes('bestseller') ? '<span class="tag-mini">Bestseller</span>' :
     (item.tags || []).includes('deal') ? '<span class="tag-mini" style="background:var(--red);color:#fff">Deal</span>' : '';
@@ -201,7 +201,7 @@ function updateCartUI() {
     return;
   }
   body.innerHTML = lines.map((l) => {
-    const media = l.img ? `<img src="/images/${l.img}.jpg" alt="" onerror="this.outerHTML='<div class=\\'r-fallback\\' style=\\'background:linear-gradient(135deg,#f0731d,#b3271e)\\'>${l.name[0]}</div>'" />` : `<div class="r-fallback" style="background:linear-gradient(135deg,#f0731d,#b3271e)">${l.name[0]}</div>`;
+    const media = l.img ? `<img src="images/${l.img}.jpg" alt="" onerror="this.outerHTML='<div class=\\'r-fallback\\' style=\\'background:linear-gradient(135deg,#f0731d,#b3271e)\\'>${l.name[0]}</div>'" />` : `<div class="r-fallback" style="background:linear-gradient(135deg,#f0731d,#b3271e)">${l.name[0]}</div>`;
     return `<div class="cart-line">${media}
       <div><h4>${l.name}</h4><div class="clp">${INR(l.price)} each</div></div>
       <div class="cl-stepper"><button data-cdec="${l.id}">−</button><span>${l.qty}</span><button data-cinc="${l.id}">+</button></div>

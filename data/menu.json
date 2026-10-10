@@ -51,17 +51,6 @@
   ],
   "items": [
     {
-      "id": "peri-peri-fries-76",
-      "cat": "sides",
-      "name": "Peri Peri Fries",
-      "desc": "Crispy fries tossed in fiery peri peri",
-      "price": 149,
-      "img": "upload-peri-peri-fries-76",
-      "tags": [
-        "new"
-      ]
-    },
-    {
       "id": "margherita-7",
       "cat": "pizza",
       "name": "Margherita 7\"",

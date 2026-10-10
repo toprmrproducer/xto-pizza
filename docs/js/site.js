@@ -159,7 +159,7 @@ function renderCombos() {
   const combos = state.menu.items.filter((i) => i.cat === 'combos');
   $('#comboGrid').innerHTML = combos.map((c) => `
     <div class="combo-card">
-      <img src="/images/${c.img}.jpg" alt="${c.name}" loading="lazy" onerror="this.remove()" />
+      <img src="images/${c.img}.jpg" alt="${c.name}" loading="lazy" onerror="this.remove()" />
       <div class="combo-shade"></div>
       <span class="deal-flag">COMBO</span>
       <div class="combo-info">
@@ -216,7 +216,7 @@ function updateCartUI() {
     return;
   }
   box.innerHTML = lines.map((l) => {
-    const media = l.img ? `<img src="/images/${l.img}.jpg" alt="" onerror="this.outerHTML='<div class=cl-fallback style=background:linear-gradient(135deg,#f0731d,#b3271e)></div>'" />` : '<div class="cl-fallback" style="background:linear-gradient(135deg,#f0731d,#b3271e)"></div>';
+    const media = l.img ? `<img src="images/${l.img}.jpg" alt="" onerror="this.outerHTML='<div class=cl-fallback style=background:linear-gradient(135deg,#f0731d,#b3271e)></div>'" />` : '<div class="cl-fallback" style="background:linear-gradient(135deg,#f0731d,#b3271e)"></div>';
     return `<div class="cart-line">
       ${media}
       <div><h4>${l.name}</h4><div class="cl-price">${INR(l.price)} each</div></div>
@@ -508,7 +508,7 @@ async function renderPromos() {
         <div class="promo-sub">${sl.sub}</div>
         <button class="promo-code" data-code="${sl.code}">Use code ${sl.code} <span class="promo-arrow">&rarr;</span></button>
       </div>
-      <div class="promo-art"><img src="/images/pizza-closeup.jpg" alt="" loading="lazy" /></div>
+      <div class="promo-art"><img src="images/pizza-closeup.jpg" alt="" loading="lazy" /></div>
     </div>`).join('');
   $('#promoDots').innerHTML = slides.map((_, i) => `<button data-dot="${i}" class="${i === 0 ? 'on' : ''}"></button>`).join('');
   const show = (i) => {
@@ -548,7 +548,7 @@ function renderCatCircles() {
   $('#catCircles').innerHTML = state.menu.categories.map((c) => {
     const first = state.menu.items.find((i) => i.cat === c.id);
     return `<a class="cat-circle" href="#menu" data-jump-cat="${c.id}">
-      <span class="cat-ring"><img src="/images/${first ? first.img : 'pizza-cheese'}.jpg" alt="${c.name}" loading="lazy" /></span>
+      <span class="cat-ring"><img src="images/${first ? first.img : 'pizza-cheese'}.jpg" alt="${c.name}" loading="lazy" /></span>
       <span class="cat-name">${c.name}</span>
     </a>`;
   }).join('');
@@ -563,7 +563,7 @@ function renderBestsellers() {
   const top = (picks.length ? picks : state.menu.items.slice(0, 6));
   $('#bestRow').innerHTML = top.map((i) => `
     <div class="best-card">
-      <img src="/images/${i.img}.jpg" alt="${i.name}" loading="lazy" />
+      <img src="images/${i.img}.jpg" alt="${i.name}" loading="lazy" />
       <div class="best-body">
         <b>${i.name}</b>
         <span>${INR(i.price)}</span>

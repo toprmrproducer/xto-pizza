@@ -38,8 +38,16 @@ for f in os.listdir(os.path.join(DOCS, 'css')):
 for f in ('site.js', 'app.js'):
     p = os.path.join(DOCS, 'js', f)
     s = open(p).read()
-    s = s.replace('`/images/', '`images/').replace("'/images/", "'images/")
+    s = s.replace('/images/', 'images/')
     open(p, 'w').write(s)
+
+# Leaflet default markers live at leaflet/images/ (resolved relative to leaflet.css)
+li = os.path.join(DOCS, 'leaflet', 'images')
+os.makedirs(li, exist_ok=True)
+for f in ('marker-icon.png', 'marker-icon-2x.png', 'marker-shadow.png'):
+    src = os.path.join(DOCS, 'leaflet', f)
+    if os.path.exists(src):
+        shutil.move(src, os.path.join(li, f))
 
 # ---- demo data ----
 data = {
