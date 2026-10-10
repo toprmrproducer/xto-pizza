@@ -66,3 +66,18 @@ _raw/               original client screenshots (source material)
 Status pipeline: PLACED -> ACCEPTED -> PREPARING -> READY -> OUT_FOR_DELIVERY (delivery only) -> DELIVERED. Pickup orders jump READY -> DELIVERED. Every transition is validated server-side and pushed to the admin over SSE; the customer's track view polls the same API.
 
 Built from the client's real assets: menu board, Justdial photo gallery, Swiggy listing prices, Google Maps outlet data.
+
+
+## Live demo URLs (GitHub Pages)
+
+- Digital menu: https://toprmrproducer.github.io/xto-pizza/
+- Website ordering demo (mock checkout): https://toprmrproducer.github.io/xto-pizza/site.html
+- App demo (phone): https://toprmrproducer.github.io/xto-pizza/app.html
+- Printable table QR cards: https://toprmrproducer.github.io/xto-pizza/qr.html
+
+The demos run fully client-side (demo-data.js + demo-shim.js): cart, coupons,
+mock Razorpay checkout, order history and a live status progression all work
+in the browser. The real admin panel, live orders, rider GPS and push
+notifications need the Node server (`node server.js`), not a static host.
+
+Rebuild after menu changes: `python3 scripts/build-digital-menu.py && python3 scripts/build-site-demo.py`
