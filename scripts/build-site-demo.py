@@ -154,6 +154,17 @@ open(os.path.join(DOCS, 'demo-shim.js'), 'w').write(SHIM)
 INJECT = ('<script src="demo-data.js"></script>\n<script src="demo-shim.js"></script>\n'
           '<style>.hide-in-demo{display:none!important}</style>\n')
 
+import time
+V = str(int(time.time()))
+def bust(s):
+    for pat, rep in (('js/site.js', 'js/site.js?v=' + V), ('js/app.js', 'js/app.js?v=' + V),
+                     ('css/site.css', 'css/site.css?v=' + V), ('css/app.css', 'css/app.css?v=' + V),
+                     ('leaflet/leaflet.css', 'leaflet/leaflet.css?v=' + V), ('leaflet/leaflet.js', 'leaflet/leaflet.js?v=' + V),
+                     ('vendor/qrcode.min.js', 'vendor/qrcode.min.js?v=' + V),
+                     ('demo-data.js', 'demo-data.js?v=' + V), ('demo-shim.js', 'demo-shim.js?v=' + V)):
+        s = s.replace('src="' + pat + '"', 'src="' + rep + '"').replace('href="' + pat + '"', 'href="' + rep + '"')
+    return s
+
 def demotify(src, dst, extra=None):
     s = open(src).read()
     s = s.replace('href="/css/', 'href="css/').replace('src="/js/', 'src="js/')
@@ -167,6 +178,7 @@ def demotify(src, dst, extra=None):
     if '<script src="js/app.js">' in s:
         s = s.replace('<script src="js/app.js">', INJECT + '<script src="js/app.js">')
     if extra: s = extra(s)
+    s = bust(s)
     open(dst, 'w').write(s)
     print('wrote', dst)
 
