@@ -232,7 +232,10 @@ function paintMenuMgr() {
     <div class="mm-card">
       ${i.img ? `<img src="/images/${i.img}.jpg" alt="" onerror="this.style.visibility='hidden'" />` : '<img alt="" />'}
       <div class="mmc-body"><h4>${i.name}</h4><p>${INR(i.price)} &bull; ${i.cat}</p></div>
-      <div class="toggle ${i.available ? 'on' : ''}" data-toggle="${i.id}" title="Toggle availability"></div>
+      <div class="mmc-actions">
+        <button class="rr-btn" data-edit="${i.id}">Edit</button>
+        <div class="toggle ${i.available ? 'on' : ''}" data-toggle="${i.id}" title="Toggle availability"></div>
+      </div>
     </div>`).join('');
   $$('[data-toggle]').forEach((t) => t.addEventListener('click', async () => {
     const id = t.dataset.toggle;
@@ -293,7 +296,7 @@ if (state.pin) {
 }
 
 /* ---------------- riders pane ---------------- */
-const RIDER_HOME_GEO = { shivane: [18.4649, 73.8078], nanded: [18.4720, 73.8093] };
+const RIDER_HOME_GEO = { shivane: [18.4637, 73.8090], nanded: [18.4572, 73.8029] };
 let ridersMap = null, ridersLoaded = false;
 function initRidersPane() {
   if (ridersMap || !window.L) return;
@@ -436,3 +439,53 @@ $('#naSubmit')?.addEventListener('click', async () => {
   menuItems = [];
   renderMenuMgr();
 });
+
+
+/* ---------------- item edit modal ---------------- */
+let editingItem = null;
+function openItemEdit(id) {
+  editingItem = menuItems.find((i) => i.id === id);
+  if (!editingItem) return;
+  $('#eiTitle').textContent = 'Edit ' + editingItem.name;
+  $('#eiName').value = editingItem.name;
+  $('#eiPrice').value = editingItem.price;
+  $('#eiDesc').value = editingItem.desc || '';
+  const sel = $('#eiCat');
+  sel.innerHTML = menuCategories.map((c) => `<option value="${c.id}" ${c.id === editingItem.cat ? 'selected' : ''}>${c.name}</option>`).join('');
+  $('#eiAvail').value = editingItem.available ? '1' : '0';
+  $('#eiMsg').textContent = '';
+  $('#editItemModal').classList.remove('hidden');
+}
+async function saveItemEdit() {
+  if (!editingItem) return;
+  $('#eiMsg').textContent = 'Saving...';
+  const r = await api(`/api/admin/menu/${editingItem.id}`, { method: 'POST', body: JSON.stringify({
+    name: $('#eiName').value, price: $('#eiPrice').value, desc: $('#eiDesc').value,
+    cat: $('#eiCat').value
+  }) }).catch((e) => ({ error: e.message }));
+  if (r.error) { $('#eiMsg').textContent = r.error; $('#eiMsg').className = 'mm-msg bad'; return; }
+  const wantAvail = $('#eiAvail').value === '1';
+  if (wantAvail !== editingItem.available) {
+    await api(`/api/admin/menu/${editingItem.id}/availability`, { method: 'POST', body: JSON.stringify({ available: wantAvail }) });
+  }
+  $('#eiMsg').textContent = 'Saved. Site and app updated live.';
+  $('#eiMsg').className = 'mm-msg good';
+  menuItems = [];
+  setTimeout(() => { $('#editItemModal').classList.add('hidden'); renderMenuMgr(); }, 700);
+}
+async function deleteItem() {
+  if (!editingItem || !confirm('Delete ' + editingItem.name + ' from the menu permanently?')) return;
+  const r = await api(`/api/admin/menu/${editingItem.id}`, { method: 'DELETE' }).catch((e) => ({ error: e.message }));
+  if (r.error) { $('#eiMsg').textContent = r.error; $('#eiMsg').className = 'mm-msg bad'; return; }
+  $('#editItemModal').classList.add('hidden');
+  toast(editingItem.name + ' removed from the menu.');
+  menuItems = [];
+  renderMenuMgr();
+}
+document.addEventListener('click', (e) => {
+  const ed = e.target.closest('[data-edit]');
+  if (ed) openItemEdit(ed.dataset.edit);
+});
+$('#eiClose')?.addEventListener('click', () => $('#editItemModal').classList.add('hidden'));
+$('#eiSave')?.addEventListener('click', saveItemEdit);
+$('#eiDelete')?.addEventListener('click', deleteItem);

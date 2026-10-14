@@ -196,7 +196,7 @@
       "name": "Double Cheese Burger",
       "desc": "Double cheese slices, tangy sauce, crunchy patty",
       "price": 169,
-      "img": "double-cheese-burger",
+      "img": "ai/double-cheese-burger",
       "tags": []
     },
     {
@@ -205,7 +205,7 @@
       "name": "Spicy Paneer Burger",
       "desc": "Masala paneer patty, peri mayo, pickled onion",
       "price": 179,
-      "img": "spicy-paneer-burger",
+      "img": "ai/spicy-paneer-burger",
       "tags": [
         "spicy"
       ]
@@ -216,7 +216,7 @@
       "name": "Tower Burger",
       "desc": "Triple-decker stack, cheese, patty, fresh veggies",
       "price": 199,
-      "img": "tower-burger",
+      "img": "ai/tower-burger",
       "tags": [
         "premium"
       ]
@@ -267,8 +267,9 @@
       "name": "Paneer Bhurji Panini",
       "desc": "Spiced paneer bhurji pressed in focaccia",
       "price": 149,
-      "img": "paneer-tikka-sandwich",
-      "tags": []
+      "img": "ai/veg-grilled-sandwich",
+      "tags": [],
+      "needsPhoto": true
     },
     {
       "id": "paneer-tikka-sandwich",
@@ -276,7 +277,7 @@
       "name": "Paneer Tikka Sandwich",
       "desc": "Paneer tikka, onion, capsicum, and delicious cheese",
       "price": 199,
-      "img": "paneer-tikka-sandwich",
+      "img": "ai/paneer-tikka-sandwich",
       "tags": [
         "bestseller"
       ]
@@ -336,7 +337,7 @@
       "name": "French Fries",
       "desc": "Golden, salted, dangerously crisp",
       "price": 109,
-      "img": "french-fries",
+      "img": "ai/french-fries",
       "tags": [
         "bestseller"
       ]
@@ -347,7 +348,7 @@
       "name": "Peri Peri French Fries",
       "desc": "Tossed in fiery peri peri dust",
       "price": 179,
-      "img": "french-fries",
+      "img": "ai/peri-peri-fries",
       "tags": [
         "spicy"
       ]
@@ -358,7 +359,7 @@
       "name": "Cheese Jalapeno French Fries",
       "desc": "Loaded cheese sauce, jalapeno kick",
       "price": 199,
-      "img": "cheese-jalapeno-fries",
+      "img": "ai/cheese-jalapeno-fries",
       "tags": [
         "spicy"
       ]
@@ -369,7 +370,7 @@
       "name": "Creme Cheese Nachos",
       "desc": "Crunchy nachos under cream cheese sauce",
       "price": 229,
-      "img": "salsa-nachos",
+      "img": "ai/creme-cheese-nachos",
       "tags": []
     },
     {
@@ -378,7 +379,7 @@
       "name": "Salsa Nachos",
       "desc": "House salsa, cheese, crunchy tortillas",
       "price": 249,
-      "img": "salsa-nachos",
+      "img": "ai/salsa-nachos",
       "tags": []
     },
     {
@@ -387,7 +388,7 @@
       "name": "Garlic Bread",
       "desc": "Ciabatta toasted with roasted garlic, flavoured salted butter",
       "price": 109,
-      "img": "garlic-bread",
+      "img": "ai/garlic-bread",
       "tags": []
     },
     {
@@ -396,7 +397,7 @@
       "name": "Cheesy Garlic Bread",
       "desc": "Topped with signature cheese, Italian herbs and spices",
       "price": 119,
-      "img": "cheesy-garlic-bread",
+      "img": "ai/cheesy-garlic-bread",
       "tags": [
         "bestseller"
       ]
@@ -404,44 +405,8 @@
     {
       "id": "cheesy-cheese-tomato",
       "cat": "sides",
-      "name": "Cheesy Cheese Tomato",
+      "name": "Cheese Chilli Tost",
       "desc": "Chilli cheese tomato toast, a signature snack",
-      "price": 149,
-      "img": "cheesy-cheese-tomato",
-      "tags": []
-    },
-    {
-      "id": "bruschetta-traditional",
-      "cat": "sides",
-      "name": "Bruschetta Traditional",
-      "desc": "Rustic cheese bruschetta, the original way",
-      "price": 129,
-      "img": "cheesy-cheese-tomato",
-      "tags": []
-    },
-    {
-      "id": "bruschetta-mushroom-corn",
-      "cat": "sides",
-      "name": "Bruschetta Mushroom & Corn",
-      "desc": "Cheese, olives and jalapenos",
-      "price": 149,
-      "img": "garlic-bread",
-      "tags": []
-    },
-    {
-      "id": "bruschetta-spinach-corn",
-      "cat": "sides",
-      "name": "Bruschetta Spinach & Corn",
-      "desc": "Spinach and corn cheesy blend",
-      "price": 149,
-      "img": "garlic-bread",
-      "tags": []
-    },
-    {
-      "id": "bruschetta-mediterranean",
-      "cat": "sides",
-      "name": "Bruschetta Mediterranean",
-      "desc": "Olives, herbs, sun-dried tomato, cheese",
       "price": 149,
       "img": "cheesy-cheese-tomato",
       "tags": []
@@ -452,7 +417,7 @@
       "name": "Cheese Jalapeno Dip",
       "desc": "Creamy dip with jalapeno heat",
       "price": 30,
-      "img": "cheese-jalapeno-dip",
+      "img": "ai/cheese-jalapeno-dip",
       "tags": []
     },
     {
@@ -470,7 +435,7 @@
       "name": "Cocktail Mayo Cheese Dip",
       "desc": "Cool, creamy, classic",
       "price": 30,
-      "img": "cheese-jalapeno-dip",
+      "img": "ai/cocktail-mayo-dip",
       "tags": []
     },
     {
@@ -508,7 +473,7 @@
       "name": "Mexican Salad",
       "desc": "Kidney beans, sweet corn, tomato, lettuce, cucumber, sweet potato dressing, salsa",
       "price": 289,
-      "img": "mexican-salad",
+      "img": "ai/mexican-salad",
       "tags": []
     },
     {
@@ -517,8 +482,9 @@
       "name": "Hawaiian Salad",
       "desc": "Fresh fruits, greens, creamy dressing",
       "price": 259,
-      "img": "mexican-salad",
-      "tags": []
+      "img": "ai/mexican-salad",
+      "tags": [],
+      "needsPhoto": true
     },
     {
       "id": "combo-delight",
@@ -526,10 +492,11 @@
       "name": "Combo Delight",
       "desc": "1 veg burger, 1 french fries, any one 250ml drink (coke / thumbs up / sprite)",
       "price": 249,
-      "img": "combo-delight",
+      "img": "ai/combo-crush",
       "tags": [
         "deal"
-      ]
+      ],
+      "needsPhoto": true
     },
     {
       "id": "combo-crush",
@@ -537,7 +504,7 @@
       "name": "Combo Crush",
       "desc": "1 veg burger, 1 french fries, 2 pcs garlic bread",
       "price": 249,
-      "img": "combo-crush",
+      "img": "ai/combo-crush",
       "tags": [
         "deal"
       ]
@@ -559,10 +526,11 @@
       "name": "King Combo",
       "desc": "Any one 7\" pizza, 1 salsa nachos, any one 250ml drink",
       "price": 449,
-      "img": "king-combo",
+      "img": "ai/combo-crush",
       "tags": [
         "deal"
-      ]
+      ],
+      "needsPhoto": true
     },
     {
       "id": "premium-combo",
@@ -570,10 +538,11 @@
       "name": "Premium Combo",
       "desc": "2 veg burgers, any one 7\" premium pizza, 3 pc garlic bread",
       "price": 499,
-      "img": "premium-combo",
+      "img": "ai/combo-crush",
       "tags": [
         "deal"
-      ]
+      ],
+      "needsPhoto": true
     },
     {
       "id": "blue-lagoon",

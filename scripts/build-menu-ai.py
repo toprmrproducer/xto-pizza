@@ -47,6 +47,9 @@ for item in menu['items']:
         shutil.copy2(src, dst)
         item['_ai'] = 'images/ai/' + item['id'] + '.jpg'
         matched.append(item['name'])
+    elif item['img'].startswith('ai/'):
+        item['_ai'] = 'images/' + item['img'] + '.jpg'  # already an AI category placeholder
+        matched.append(item['name'] + ' (placeholder)')
     else:
         item['_ai'] = 'images/' + item['img'] + '.jpg'
         fallback.append(item['name'])

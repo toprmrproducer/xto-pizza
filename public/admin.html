@@ -131,6 +131,23 @@
   </main>
 </div>
 
+<div class="modal-mini hidden" id="editItemModal">
+  <div class="mini-card">
+    <div class="mini-head"><h3 id="eiTitle">Edit item</h3><button class="rr-btn" id="eiClose">Close</button></div>
+    <label class="mm-add-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <span>Name<input id="eiName" /></span>
+      <span>Price (Rs)<input id="eiPrice" type="number" min="1" /></span>
+      <span>Category<select id="eiCat"></select></span>
+      <span>Available<select id="eiAvail"><option value="1">On menu</option><option value="0">Sold out</option></select></span>
+    </label>
+    <label class="mm-desc" style="margin-top:12px">Description<input id="eiDesc" /></label>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn-accent" id="eiSave">Save changes</button>
+      <button class="rr-btn danger" id="eiDelete">Delete item</button>
+    </div>
+    <div class="mm-msg" id="eiMsg"></div>
+  </div>
+</div>
 <div class="toast" id="toast"></div>
 
 <link rel="stylesheet" href="/leaflet/leaflet.css" />

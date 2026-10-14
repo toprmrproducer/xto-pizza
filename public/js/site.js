@@ -599,7 +599,7 @@ function haversine(lat1, lng1, lat2, lng2) {
 }
 function outletCoords(o) {
   // outlets carry no coords in the API; fall back to the known Sinhagad Road pair
-  const map = { shivane: [18.4649, 73.8078], nanded: [18.4720, 73.8093] };
+  const map = { shivane: [18.4637, 73.8090], nanded: [18.4572, 73.8029] };
   return map[o.id] || map.shivane;
 }
 function renderOutletList(me) {

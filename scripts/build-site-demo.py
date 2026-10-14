@@ -56,7 +56,7 @@ data = {
     "outlets": OUTLETS,
     "offers": offers,
     "config": {"brand": {"name": "XTO Pizza", "tagline": "Pune's Tastiest Pizza"},
-               "outletsGeo": {"shivane": [18.4649, 73.8078], "nanded": [18.4720, 73.8093]}}
+               "outletsGeo": {"shivane": [18.4637, 73.8090], "nanded": [18.4572, 73.8029]}}
 }
 open(os.path.join(DOCS, 'demo-data.js'), 'w').write(
     'window.__XTO_DEMO__ = ' + json.dumps(data, ensure_ascii=False) + ';\n')

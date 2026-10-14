@@ -539,7 +539,7 @@ function haversine(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 function outletCoords(o) {
-  const map = { shivane: [18.4649, 73.8078], nanded: [18.4720, 73.8093] };
+  const map = { shivane: [18.4637, 73.8090], nanded: [18.4572, 73.8029] };
   return map[o.id] || map.shivane;
 }
 function appLocate() {

@@ -1,7 +1,7 @@
 {
   "name": "XTO Pizza",
   "short_name": "XTO Pizza",
-  "description": "Order Pune's tastiest pure veg pizza. Khadakwasla and Nanded City outlets.",
+  "description": "Pune's tastiest pizza. Dine-in and takeaway ordering.",
   "start_url": "/app",
   "scope": "/",
   "display": "standalone",
@@ -12,9 +12,5 @@
     { "src": "/images/icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "/images/icon-512.png", "sizes": "512x512", "type": "image/png" },
     { "src": "/images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
-  ],
-  "shortcuts": [
-    { "name": "Order Now", "url": "/app#menu" },
-    { "name": "Track Order", "url": "/app#orders" }
   ]
 }

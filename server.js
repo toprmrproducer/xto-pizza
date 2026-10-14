@@ -349,9 +349,9 @@ function INR(n) { return '\u20B9' + Number(n || 0).toLocaleString('en-IN'); }
 
 // ---------------------------------------------------------------------------
 // Riders: managed in admin, live GPS from the /rider page, or demo simulation.
-// Coordinates: Shivane outlet 18.4649,73.8078 / Nanded City 18.4720,73.8093 (approx).
+// Coordinates: Shivane outlet 18.4637,73.8090 / Nanded City 18.4572,73.8029 (approx).
 // ---------------------------------------------------------------------------
-const RIDER_HOME = { shivane: [18.4649, 73.8078], nanded: [18.4720, 73.8093] };
+const RIDER_HOME = { shivane: [18.4637, 73.8090], nanded: [18.4572, 73.8029] };
 function riderState() { db.riderPos = db.riderPos || {}; return db.riderPos; }
 function setRiderPos(id, lat, lng, orderId) {
   riderState()[id] = { lat, lng, at: new Date().toISOString(), orderId: orderId || null };
@@ -687,6 +687,16 @@ const server = http.createServer(async (req, res) => {
       broadcast('menu:update', { id: item.id, available: true, newItem: item });
       return json(res, 201, { ok: true, item });
     }
+    if ((m = p.match(/^\/api\/admin\/menu\/([^/]+)$/)) && method === 'DELETE') {
+      const idx = menu.items.findIndex((i) => i.id === m[1]);
+      if (idx === -1) return json(res, 404, { error: 'Item not found' });
+      const [gone] = menu.items.splice(idx, 1);
+      db.unavailable = db.unavailable.filter((x) => x !== gone.id);
+      saveDb();
+      writeJSON(path.join(DATA, 'menu.json'), menu);
+      broadcast('menu:update', { removed: gone.id });
+      return json(res, 200, { ok: true, removed: gone.id });
+    }
     if ((m = p.match(/^\/api\/admin\/menu\/([^/]+)$/)) && method === 'POST') {
       const item = menu.items.find((i) => i.id === m[1]);
       if (!item) return json(res, 404, { error: 'Item not found' });
@@ -694,6 +704,7 @@ const server = http.createServer(async (req, res) => {
       if (body.price !== undefined) { const pr = Math.round(Number(body.price)); if (!(pr > 0)) return json(res, 400, { error: 'Price must be positive' }); item.price = pr; }
       if (body.name !== undefined && String(body.name).trim().length >= 2) item.name = String(body.name).trim();
       if (body.desc !== undefined) item.desc = String(body.desc).trim();
+      if (body.cat !== undefined && menu.categories.some((c) => c.id === body.cat)) item.cat = body.cat;
       writeJSON(path.join(DATA, 'menu.json'), menu);
       broadcast('menu:update', { id: item.id, available: isAvailable(item.id) });
       return json(res, 200, { ok: true, item });

@@ -170,3 +170,11 @@ h1, h2, h3 { font-family: 'Sora', sans-serif; letter-spacing: -.01em; }
 .orr-main span { font-size: 12.5px; color: rgba(255,246,233,.65); }
 .orr-label { flex: 1; text-align: right; font-size: 13px; color: rgba(255,246,233,.75); }
 @media (max-width: 980px) { .riders-layout { grid-template-columns: 1fr; } .riders-map { height: 340px; } }
+
+/* item edit modal */
+.modal-mini{position:fixed;inset:0;background:rgba(0,0,0,.6);display:grid;place-items:center;z-index:50}
+.modal-mini.hidden{display:none}
+.mini-card{background:#1c1812;border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:22px;width:min(480px,92vw)}
+.mini-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.mini-head h3{font:700 16px 'Sora';color:#ffd98a}
+.mmc-actions{display:flex;gap:10px;align-items:center}
