@@ -3,9 +3,10 @@
 # data/ (orders, offers, menu edits) or persist-images/ (uploaded photos).
 set -e
 rsync -a --delete --exclude data --exclude persist-images --exclude _keys /tmp/xto-src/ /opt/xto-pizza/
-# menu catalog updates travel with the repo, orders do not
+# the menu catalog travels with deploys; db.json (orders) never does
+mkdir -p /opt/xto-pizza/data
 cp /tmp/xto-src/data/menu.json /opt/xto-pizza/data/menu.json
-# fresh build images into the persisted volume
+# menu catalog already copied above; fresh build images into the persisted volume
 mkdir -p /opt/xto-pizza/persist-images/ai /opt/xto-pizza/persist-images/pdfmenu
 cp -rf /tmp/xto-src/public/images/ai/. /opt/xto-pizza/persist-images/ai/ || true
 cp -rf /tmp/xto-src/public/images/pdfmenu/. /opt/xto-pizza/persist-images/pdfmenu/ || true
