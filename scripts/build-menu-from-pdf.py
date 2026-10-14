@@ -89,22 +89,22 @@ items = []
 items += [one("magic-mania", "Tomato & Cheese (6 in)", "Classic cheese, oregano, fresh tomato sauce", 59, img_for("tomato-cheese"))]
 items += [one("magic-mania", "Onion & Cheese (6 in)", "Caramelised onion, double cheese blend", 69, img_for("onion-cheese"))]
 # Premium
-items += pizza("premium", "Margherita", "Fresh tomato and cheddar cheese", 99, 199, 399, img_for("Margherita"))
+items += pizza("premium", "Margherita", "Fresh tomato and cheddar cheese", 99, 199, 399, img_for("margherita"))
 items += pizza("premium", "Corn & Cheese", "Red onion, sweet corn and mozzarella cheese", 139, 299, 439, img_for("corn-cheese"))
-items += pizza("premium", "Paneer Makhani", "Paneer, onion, capsicum, paprika and special makhni sauce", 149, 349, 459, img_for("Paneer Makhani"))
-items += pizza("premium", "Dil Desi", "Capsicum, onion, tomato and delicious cheese", 189, 369, 449, img_for("Dil Desi"))
-items += pizza("premium", "Farmer's Delight", "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese", 209, 379, 489, img_for("Farmers Delight"))
+items += pizza("premium", "Paneer Makhani", "Paneer, onion, capsicum, paprika and special makhni sauce", 149, 349, 459, img_for("paneer-makhani"))
+items += pizza("premium", "Dil Desi", "Capsicum, onion, tomato and delicious cheese", 189, 369, 449, img_for("dil-desi"))
+items += pizza("premium", "Farmer's Delight", "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese", 209, 379, 489, img_for("farmers-delight"))
 # Legend
-items += pizza("legend", "Tandoori Paneer Tikka", "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese", 229, 389, 509, img_for("Tandoori Paneer Tikka"))
-items += pizza("legend", "Tangy Paneer Pizza", "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese", 239, 379, 509, img_for("Tangy Paneer Pizza"))
+items += pizza("legend", "Tandoori Paneer Tikka", "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese", 229, 389, 509, img_for("tandoori-paneer-tikka"))
+items += pizza("legend", "Tangy Paneer Pizza", "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese", 239, 379, 509, img_for("tangy-paneer-pizza"))
 # Gourmet Selection
-items += pizza("gourmet", "Veggie Mexican", "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese", 249, 399, 579, img_for("Veggie Mexican"))
-items += pizza("gourmet", "Pesto Painting", "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese", 259, 429, 599, img_for("Pesto Painting"))
-items += pizza("gourmet", "Chef's Special Paneer Tikka", "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese", 239, 429, 599, img_for("Chefs Special Paneer Tikka"))
+items += pizza("gourmet", "Veggie Mexican", "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese", 249, 399, 579, img_for("veggie-mexican"))
+items += pizza("gourmet", "Pesto Painting", "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese", 259, 429, 599, img_for("pesto-painting"))
+items += pizza("gourmet", "Chef's Special Paneer Tikka", "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese", 239, 429, 599, img_for("chefs-special-paneer-tikka"))
 # Pasta Mania
-items += duo("pasta", "Arabiatta Pasta", "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese", 169, 269, img_for("Arabiatta Pasta"))
-items += duo("pasta", "Veg Alfredo", "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese", 169, 269, img_for("Veg Alfredo"))
-items += duo("pasta", "Tandoori Pasta", "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours", 189, 289, img_for("Tandoori Pasta"))
+items += duo("pasta", "Arabiatta Pasta", "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese", 169, 269, img_for("arabiatta-pasta"))
+items += duo("pasta", "Veg Alfredo", "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese", 169, 269, img_for("veg-alfredo"))
+items += duo("pasta", "Tandoori Pasta", "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours", 189, 289, img_for("tandoori-pasta"))
 items += [one("pasta", "Chef's Special Pasta", "Two sauce, red and white, basil, bell pepper, mushroom, zucchini and delicious cheese and cream", 299, img_for("chefs-special-pasta"))]
 # The Oven Bits
 items += [one("oven-bits", "Garlic Bread", "Ciabatta toasted with generous dose of roasted garlic, flavoured salted butter", 99, img_for("garlic-bread"))]
@@ -160,12 +160,12 @@ items += [one("mocktails", "Mojito", "Mint, lime, soda, classic refresher, 300ml
 # Shakes
 items += [one("shakes", "Strawberry Shake", "Real strawberry, creamy, 300ml", 89, img_for("strawberry-shake"))]
 items += [one("shakes", "Strawberry Kiwi Shake", "Strawberry meets kiwi tang, 300ml", 89, img_for("strawberry-kiwi-shake"))]
-items += [one("shakes", "Mango Shake", "Alphonso mango blended thick, 300ml", 89, img_for("Shakes SHARED"))]
-items += [one("shakes", "Banana Shake", "Creamy banana, 300ml", 89, img_for("Shakes SHARED"))]
+items += [one("shakes", "Mango Shake", "Alphonso mango blended thick, 300ml", 89, img_for("shakes-shared"))]
+items += [one("shakes", "Banana Shake", "Creamy banana, 300ml", 89, img_for("shakes-shared"))]
 items += [one("shakes", "Oreo Shake", "Cookies and cream, blended thick, 300ml", 99, img_for("oreo-shake"))]
 items += [one("shakes", "Hazelnut Shake", "Roasted hazelnut, chocolate, crunch, 300ml", 129, img_for("hazelnut-shake"))]
 items += [one("shakes", "Kitkat Shake", "Kitkat crunch in a thick shake, 300ml", 129, img_for("kitkat-shake"))]
-items += [one("shakes", "XTO Special Shake", "Our signature loaded shake. Ask us why it is special", 149, img_for("Shakes SHARED"))]
+items += [one("shakes", "XTO Special Shake", "Our signature loaded shake. Ask us why it is special", 149, img_for("shakes-shared"))]
 # Ice Tea
 items += [one("ice-tea", "Ice Tea", "Brewed, iced, 300ml", 49, img_for("ice-tea-shared"))]
 items += [one("ice-tea", "Peach Ice Tea", "Peach notes over cold brew, 300ml", 69, img_for("ice-tea-shared"))]

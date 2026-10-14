@@ -516,7 +516,7 @@
       "name": "Chef's Special Pasta",
       "desc": "Two sauce, red and white, basil, bell pepper, mushroom, zucchini and delicious cheese and cream",
       "price": 299,
-      "img": "pdfmenu/margherita.jpg",
+      "img": "pdfmenu/chefs-special-pasta",
       "tags": [
         "menu-card"
       ]
@@ -758,7 +758,7 @@
       "name": "Aloo Verona Wrap",
       "desc": "Spiced potato, mint mayo, crunch, rolled tight",
       "price": 139,
-      "img": "pdfmenu/margherita.jpg",
+      "img": "pdfmenu/aloo-verona-wrap",
       "tags": [
         "menu-card"
       ]
@@ -769,7 +769,7 @@
       "name": "Paneer Fajita Wrap",
       "desc": "Fajita paneer, peppers, onion, chipotle mayo",
       "price": 159,
-      "img": "pdfmenu/margherita.jpg",
+      "img": "pdfmenu/paneer-fajita-wrap",
       "tags": [
         "menu-card"
       ]
@@ -780,7 +780,7 @@
       "name": "Paneer Tikka Wrap",
       "desc": "Char-grilled paneer tikka, onion, mint chutney",
       "price": 159,
-      "img": "pdfmenu/margherita.jpg",
+      "img": "pdfmenu/paneer-tikka-wrap",
       "tags": [
         "menu-card"
       ]

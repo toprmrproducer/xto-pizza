@@ -120,7 +120,7 @@
       "name": "Margherita (Regular)",
       "desc": "Fresh tomato and cheddar cheese",
       "price": 99,
-      "img": "pdfmenu/Margherita",
+      "img": "pdfmenu/margherita",
       "tags": [
         "menu-card"
       ]
@@ -131,7 +131,7 @@
       "name": "Margherita (Medium)",
       "desc": "Fresh tomato and cheddar cheese",
       "price": 199,
-      "img": "pdfmenu/Margherita",
+      "img": "pdfmenu/margherita",
       "tags": [
         "menu-card"
       ]
@@ -142,7 +142,7 @@
       "name": "Margherita (Large)",
       "desc": "Fresh tomato and cheddar cheese",
       "price": 399,
-      "img": "pdfmenu/Margherita",
+      "img": "pdfmenu/margherita",
       "tags": [
         "menu-card"
       ]
@@ -186,7 +186,7 @@
       "name": "Paneer Makhani (Regular)",
       "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
       "price": 149,
-      "img": "pdfmenu/Paneer Makhani",
+      "img": "pdfmenu/paneer-makhani",
       "tags": [
         "menu-card"
       ]
@@ -197,7 +197,7 @@
       "name": "Paneer Makhani (Medium)",
       "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
       "price": 349,
-      "img": "pdfmenu/Paneer Makhani",
+      "img": "pdfmenu/paneer-makhani",
       "tags": [
         "menu-card"
       ]
@@ -208,7 +208,7 @@
       "name": "Paneer Makhani (Large)",
       "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
       "price": 459,
-      "img": "pdfmenu/Paneer Makhani",
+      "img": "pdfmenu/paneer-makhani",
       "tags": [
         "menu-card"
       ]
@@ -219,7 +219,7 @@
       "name": "Dil Desi (Regular)",
       "desc": "Capsicum, onion, tomato and delicious cheese",
       "price": 189,
-      "img": "pdfmenu/Dil Desi",
+      "img": "pdfmenu/dil-desi",
       "tags": [
         "menu-card"
       ]
@@ -230,7 +230,7 @@
       "name": "Dil Desi (Medium)",
       "desc": "Capsicum, onion, tomato and delicious cheese",
       "price": 369,
-      "img": "pdfmenu/Dil Desi",
+      "img": "pdfmenu/dil-desi",
       "tags": [
         "menu-card"
       ]
@@ -241,7 +241,7 @@
       "name": "Dil Desi (Large)",
       "desc": "Capsicum, onion, tomato and delicious cheese",
       "price": 449,
-      "img": "pdfmenu/Dil Desi",
+      "img": "pdfmenu/dil-desi",
       "tags": [
         "menu-card"
       ]
@@ -252,7 +252,7 @@
       "name": "Farmer's Delight (Regular)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
       "price": 209,
-      "img": "pdfmenu/Farmers Delight",
+      "img": "pdfmenu/farmers-delight",
       "tags": [
         "menu-card"
       ]
@@ -263,7 +263,7 @@
       "name": "Farmer's Delight (Medium)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
       "price": 379,
-      "img": "pdfmenu/Farmers Delight",
+      "img": "pdfmenu/farmers-delight",
       "tags": [
         "menu-card"
       ]
@@ -274,7 +274,7 @@
       "name": "Farmer's Delight (Large)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
       "price": 489,
-      "img": "pdfmenu/Farmers Delight",
+      "img": "pdfmenu/farmers-delight",
       "tags": [
         "menu-card"
       ]
@@ -285,7 +285,7 @@
       "name": "Tandoori Paneer Tikka (Regular)",
       "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
       "price": 229,
-      "img": "pdfmenu/Tandoori Paneer Tikka",
+      "img": "pdfmenu/tandoori-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -296,7 +296,7 @@
       "name": "Tandoori Paneer Tikka (Medium)",
       "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
       "price": 389,
-      "img": "pdfmenu/Tandoori Paneer Tikka",
+      "img": "pdfmenu/tandoori-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -307,7 +307,7 @@
       "name": "Tandoori Paneer Tikka (Large)",
       "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
       "price": 509,
-      "img": "pdfmenu/Tandoori Paneer Tikka",
+      "img": "pdfmenu/tandoori-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -318,7 +318,7 @@
       "name": "Tangy Paneer Pizza (Regular)",
       "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
       "price": 239,
-      "img": "pdfmenu/Tangy Paneer Pizza",
+      "img": "pdfmenu/tangy-paneer-pizza",
       "tags": [
         "menu-card"
       ]
@@ -329,7 +329,7 @@
       "name": "Tangy Paneer Pizza (Medium)",
       "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
       "price": 379,
-      "img": "pdfmenu/Tangy Paneer Pizza",
+      "img": "pdfmenu/tangy-paneer-pizza",
       "tags": [
         "menu-card"
       ]
@@ -340,7 +340,7 @@
       "name": "Tangy Paneer Pizza (Large)",
       "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
       "price": 509,
-      "img": "pdfmenu/Tangy Paneer Pizza",
+      "img": "pdfmenu/tangy-paneer-pizza",
       "tags": [
         "menu-card"
       ]
@@ -351,7 +351,7 @@
       "name": "Veggie Mexican (Regular)",
       "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
       "price": 249,
-      "img": "pdfmenu/Veggie Mexican",
+      "img": "pdfmenu/veggie-mexican",
       "tags": [
         "menu-card"
       ]
@@ -362,7 +362,7 @@
       "name": "Veggie Mexican (Medium)",
       "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
       "price": 399,
-      "img": "pdfmenu/Veggie Mexican",
+      "img": "pdfmenu/veggie-mexican",
       "tags": [
         "menu-card"
       ]
@@ -373,7 +373,7 @@
       "name": "Veggie Mexican (Large)",
       "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
       "price": 579,
-      "img": "pdfmenu/Veggie Mexican",
+      "img": "pdfmenu/veggie-mexican",
       "tags": [
         "menu-card"
       ]
@@ -384,7 +384,7 @@
       "name": "Pesto Painting (Regular)",
       "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
       "price": 259,
-      "img": "pdfmenu/Pesto Painting",
+      "img": "pdfmenu/pesto-painting",
       "tags": [
         "menu-card"
       ]
@@ -395,7 +395,7 @@
       "name": "Pesto Painting (Medium)",
       "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
       "price": 429,
-      "img": "pdfmenu/Pesto Painting",
+      "img": "pdfmenu/pesto-painting",
       "tags": [
         "menu-card"
       ]
@@ -406,7 +406,7 @@
       "name": "Pesto Painting (Large)",
       "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
       "price": 599,
-      "img": "pdfmenu/Pesto Painting",
+      "img": "pdfmenu/pesto-painting",
       "tags": [
         "menu-card"
       ]
@@ -417,7 +417,7 @@
       "name": "Chef's Special Paneer Tikka (Regular)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
       "price": 239,
-      "img": "pdfmenu/Chefs Special Paneer Tikka",
+      "img": "pdfmenu/chefs-special-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -428,7 +428,7 @@
       "name": "Chef's Special Paneer Tikka (Medium)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
       "price": 429,
-      "img": "pdfmenu/Chefs Special Paneer Tikka",
+      "img": "pdfmenu/chefs-special-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -439,7 +439,7 @@
       "name": "Chef's Special Paneer Tikka (Large)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
       "price": 599,
-      "img": "pdfmenu/Chefs Special Paneer Tikka",
+      "img": "pdfmenu/chefs-special-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -450,7 +450,7 @@
       "name": "Arabiatta Pasta (Half)",
       "desc": "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese",
       "price": 169,
-      "img": "pdfmenu/Arabiatta Pasta",
+      "img": "pdfmenu/arabiatta-pasta",
       "tags": [
         "menu-card"
       ]
@@ -461,7 +461,7 @@
       "name": "Arabiatta Pasta (Full)",
       "desc": "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese",
       "price": 269,
-      "img": "pdfmenu/Arabiatta Pasta",
+      "img": "pdfmenu/arabiatta-pasta",
       "tags": [
         "menu-card"
       ]
@@ -472,7 +472,7 @@
       "name": "Veg Alfredo (Half)",
       "desc": "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese",
       "price": 169,
-      "img": "pdfmenu/Veg Alfredo",
+      "img": "pdfmenu/veg-alfredo",
       "tags": [
         "menu-card"
       ]
@@ -483,7 +483,7 @@
       "name": "Veg Alfredo (Full)",
       "desc": "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese",
       "price": 269,
-      "img": "pdfmenu/Veg Alfredo",
+      "img": "pdfmenu/veg-alfredo",
       "tags": [
         "menu-card"
       ]
@@ -494,7 +494,7 @@
       "name": "Tandoori Pasta (Half)",
       "desc": "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours",
       "price": 189,
-      "img": "pdfmenu/Tandoori Pasta",
+      "img": "pdfmenu/tandoori-pasta",
       "tags": [
         "menu-card"
       ]
@@ -505,7 +505,7 @@
       "name": "Tandoori Pasta (Full)",
       "desc": "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours",
       "price": 289,
-      "img": "pdfmenu/Tandoori Pasta",
+      "img": "pdfmenu/tandoori-pasta",
       "tags": [
         "menu-card"
       ]
@@ -1000,7 +1000,7 @@
       "name": "Mango Shake",
       "desc": "Alphonso mango blended thick, 300ml",
       "price": 89,
-      "img": "pdfmenu/Shakes SHARED",
+      "img": "pdfmenu/shakes-shared",
       "tags": [
         "menu-card"
       ]
@@ -1011,7 +1011,7 @@
       "name": "Banana Shake",
       "desc": "Creamy banana, 300ml",
       "price": 89,
-      "img": "pdfmenu/Shakes SHARED",
+      "img": "pdfmenu/shakes-shared",
       "tags": [
         "menu-card"
       ]
@@ -1055,7 +1055,7 @@
       "name": "XTO Special Shake",
       "desc": "Our signature loaded shake. Ask us why it is special",
       "price": 149,
-      "img": "pdfmenu/Shakes SHARED",
+      "img": "pdfmenu/shakes-shared",
       "tags": [
         "menu-card"
       ]
