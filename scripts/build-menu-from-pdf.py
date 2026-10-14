@@ -177,6 +177,11 @@ items += [one("soft-drinks", "Diet Coke", "250ml, charged at MRP", 40, img_for("
 
 # integrity
 ids = [i["id"] for i in items]
+# prefer the AI-generated shot whenever one exists for this item id
+_ai = os.path.join(ROOT, 'docs', 'images', 'ai')
+for it in items:
+    if os.path.exists(os.path.join(_ai, it['id'] + '.jpg')):
+        it['img'] = 'ai/' + it['id']
 assert len(ids) == len(set(ids)), "duplicate ids"
 assert all(0 < i["price"] < 2000 for i in items)
 blob = json.dumps(items, ensure_ascii=False)
