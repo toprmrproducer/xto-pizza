@@ -120,7 +120,7 @@
       "name": "Margherita (Regular)",
       "desc": "Fresh tomato and cheddar cheese",
       "price": 99,
-      "img": "pdfmenu/margherita.jpg",
+      "img": "pdfmenu/margherita",
       "tags": [
         "menu-card"
       ]
@@ -131,7 +131,7 @@
       "name": "Margherita (Medium)",
       "desc": "Fresh tomato and cheddar cheese",
       "price": 199,
-      "img": "pdfmenu/margherita.jpg",
+      "img": "pdfmenu/margherita",
       "tags": [
         "menu-card"
       ]
@@ -142,7 +142,7 @@
       "name": "Margherita (Large)",
       "desc": "Fresh tomato and cheddar cheese",
       "price": 399,
-      "img": "pdfmenu/margherita.jpg",
+      "img": "pdfmenu/margherita",
       "tags": [
         "menu-card"
       ]
@@ -186,7 +186,7 @@
       "name": "Paneer Makhani (Regular)",
       "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
       "price": 149,
-      "img": "pdfmenu/paneer-makhani.jpg",
+      "img": "pdfmenu/paneer-makhani",
       "tags": [
         "menu-card"
       ]
@@ -197,7 +197,7 @@
       "name": "Paneer Makhani (Medium)",
       "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
       "price": 349,
-      "img": "pdfmenu/paneer-makhani.jpg",
+      "img": "pdfmenu/paneer-makhani",
       "tags": [
         "menu-card"
       ]
@@ -208,7 +208,7 @@
       "name": "Paneer Makhani (Large)",
       "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
       "price": 459,
-      "img": "pdfmenu/paneer-makhani.jpg",
+      "img": "pdfmenu/paneer-makhani",
       "tags": [
         "menu-card"
       ]
@@ -219,7 +219,7 @@
       "name": "Dil Desi (Regular)",
       "desc": "Capsicum, onion, tomato and delicious cheese",
       "price": 189,
-      "img": "pdfmenu/dil-desi.jpg",
+      "img": "pdfmenu/dil-desi",
       "tags": [
         "menu-card"
       ]
@@ -230,7 +230,7 @@
       "name": "Dil Desi (Medium)",
       "desc": "Capsicum, onion, tomato and delicious cheese",
       "price": 369,
-      "img": "pdfmenu/dil-desi.jpg",
+      "img": "pdfmenu/dil-desi",
       "tags": [
         "menu-card"
       ]
@@ -241,7 +241,7 @@
       "name": "Dil Desi (Large)",
       "desc": "Capsicum, onion, tomato and delicious cheese",
       "price": 449,
-      "img": "pdfmenu/dil-desi.jpg",
+      "img": "pdfmenu/dil-desi",
       "tags": [
         "menu-card"
       ]
@@ -252,7 +252,7 @@
       "name": "Farmer's Delight (Regular)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
       "price": 209,
-      "img": "pdfmenu/farmers-delight.jpg",
+      "img": "pdfmenu/farmers-delight",
       "tags": [
         "menu-card"
       ]
@@ -263,7 +263,7 @@
       "name": "Farmer's Delight (Medium)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
       "price": 379,
-      "img": "pdfmenu/farmers-delight.jpg",
+      "img": "pdfmenu/farmers-delight",
       "tags": [
         "menu-card"
       ]
@@ -274,7 +274,7 @@
       "name": "Farmer's Delight (Large)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
       "price": 489,
-      "img": "pdfmenu/farmers-delight.jpg",
+      "img": "pdfmenu/farmers-delight",
       "tags": [
         "menu-card"
       ]
@@ -285,7 +285,7 @@
       "name": "Tandoori Paneer Tikka (Regular)",
       "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
       "price": 229,
-      "img": "pdfmenu/tandoori-paneer-tikka.jpg",
+      "img": "pdfmenu/tandoori-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -296,7 +296,7 @@
       "name": "Tandoori Paneer Tikka (Medium)",
       "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
       "price": 389,
-      "img": "pdfmenu/tandoori-paneer-tikka.jpg",
+      "img": "pdfmenu/tandoori-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -307,7 +307,7 @@
       "name": "Tandoori Paneer Tikka (Large)",
       "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
       "price": 509,
-      "img": "pdfmenu/tandoori-paneer-tikka.jpg",
+      "img": "pdfmenu/tandoori-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -318,7 +318,7 @@
       "name": "Tangy Paneer Pizza (Regular)",
       "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
       "price": 239,
-      "img": "pdfmenu/tangy-paneer-pizza.jpg",
+      "img": "pdfmenu/tangy-paneer-pizza",
       "tags": [
         "menu-card"
       ]
@@ -329,7 +329,7 @@
       "name": "Tangy Paneer Pizza (Medium)",
       "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
       "price": 379,
-      "img": "pdfmenu/tangy-paneer-pizza.jpg",
+      "img": "pdfmenu/tangy-paneer-pizza",
       "tags": [
         "menu-card"
       ]
@@ -340,7 +340,7 @@
       "name": "Tangy Paneer Pizza (Large)",
       "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
       "price": 509,
-      "img": "pdfmenu/tangy-paneer-pizza.jpg",
+      "img": "pdfmenu/tangy-paneer-pizza",
       "tags": [
         "menu-card"
       ]
@@ -351,7 +351,7 @@
       "name": "Veggie Mexican (Regular)",
       "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
       "price": 249,
-      "img": "pdfmenu/veggie-mexican.jpg",
+      "img": "pdfmenu/veggie-mexican",
       "tags": [
         "menu-card"
       ]
@@ -362,7 +362,7 @@
       "name": "Veggie Mexican (Medium)",
       "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
       "price": 399,
-      "img": "pdfmenu/veggie-mexican.jpg",
+      "img": "pdfmenu/veggie-mexican",
       "tags": [
         "menu-card"
       ]
@@ -373,7 +373,7 @@
       "name": "Veggie Mexican (Large)",
       "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
       "price": 579,
-      "img": "pdfmenu/veggie-mexican.jpg",
+      "img": "pdfmenu/veggie-mexican",
       "tags": [
         "menu-card"
       ]
@@ -384,7 +384,7 @@
       "name": "Pesto Painting (Regular)",
       "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
       "price": 259,
-      "img": "pdfmenu/pesto-painting.jpg",
+      "img": "pdfmenu/pesto-painting",
       "tags": [
         "menu-card"
       ]
@@ -395,7 +395,7 @@
       "name": "Pesto Painting (Medium)",
       "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
       "price": 429,
-      "img": "pdfmenu/pesto-painting.jpg",
+      "img": "pdfmenu/pesto-painting",
       "tags": [
         "menu-card"
       ]
@@ -406,7 +406,7 @@
       "name": "Pesto Painting (Large)",
       "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
       "price": 599,
-      "img": "pdfmenu/pesto-painting.jpg",
+      "img": "pdfmenu/pesto-painting",
       "tags": [
         "menu-card"
       ]
@@ -417,7 +417,7 @@
       "name": "Chef's Special Paneer Tikka (Regular)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
       "price": 239,
-      "img": "pdfmenu/chefs-special-paneer-tikka.jpg",
+      "img": "pdfmenu/chefs-special-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -428,7 +428,7 @@
       "name": "Chef's Special Paneer Tikka (Medium)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
       "price": 429,
-      "img": "pdfmenu/chefs-special-paneer-tikka.jpg",
+      "img": "pdfmenu/chefs-special-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -439,7 +439,7 @@
       "name": "Chef's Special Paneer Tikka (Large)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
       "price": 599,
-      "img": "pdfmenu/chefs-special-paneer-tikka.jpg",
+      "img": "pdfmenu/chefs-special-paneer-tikka",
       "tags": [
         "menu-card"
       ]
@@ -450,7 +450,7 @@
       "name": "Arabiatta Pasta (Half)",
       "desc": "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese",
       "price": 169,
-      "img": "pdfmenu/arabiatta-pasta.jpg",
+      "img": "pdfmenu/arabiatta-pasta",
       "tags": [
         "menu-card"
       ]
@@ -461,7 +461,7 @@
       "name": "Arabiatta Pasta (Full)",
       "desc": "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese",
       "price": 269,
-      "img": "pdfmenu/arabiatta-pasta.jpg",
+      "img": "pdfmenu/arabiatta-pasta",
       "tags": [
         "menu-card"
       ]
@@ -472,7 +472,7 @@
       "name": "Veg Alfredo (Half)",
       "desc": "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese",
       "price": 169,
-      "img": "pdfmenu/veg-alfredo.jpg",
+      "img": "pdfmenu/veg-alfredo",
       "tags": [
         "menu-card"
       ]
@@ -483,7 +483,7 @@
       "name": "Veg Alfredo (Full)",
       "desc": "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese",
       "price": 269,
-      "img": "pdfmenu/veg-alfredo.jpg",
+      "img": "pdfmenu/veg-alfredo",
       "tags": [
         "menu-card"
       ]
@@ -494,7 +494,7 @@
       "name": "Tandoori Pasta (Half)",
       "desc": "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours",
       "price": 189,
-      "img": "pdfmenu/tandoori-pasta.jpg",
+      "img": "pdfmenu/tandoori-pasta",
       "tags": [
         "menu-card"
       ]
@@ -505,7 +505,7 @@
       "name": "Tandoori Pasta (Full)",
       "desc": "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours",
       "price": 289,
-      "img": "pdfmenu/tandoori-pasta.jpg",
+      "img": "pdfmenu/tandoori-pasta",
       "tags": [
         "menu-card"
       ]
@@ -527,7 +527,7 @@
       "name": "Garlic Bread",
       "desc": "Ciabatta toasted with generous dose of roasted garlic, flavoured salted butter",
       "price": 99,
-      "img": "pdfmenu/garlic-bread.jpg",
+      "img": "pdfmenu/garlic-bread",
       "tags": [
         "menu-card"
       ]
@@ -538,7 +538,7 @@
       "name": "Cheese Chilli Tost",
       "desc": "Cheesy chilli toast, a signature snack",
       "price": 149,
-      "img": "pdfmenu/cheese-chilli-tost.jpg",
+      "img": "pdfmenu/cheese-chilli-tost",
       "tags": [
         "menu-card"
       ]
@@ -560,7 +560,7 @@
       "name": "Veg Grilled Sandwich",
       "desc": "Tomato, onion and capsicum",
       "price": 89,
-      "img": "pdfmenu/veg-grilled-sandwich.jpg",
+      "img": "pdfmenu/veg-grilled-sandwich",
       "tags": [
         "menu-card"
       ]
@@ -571,7 +571,7 @@
       "name": "Cheese Corn Sandwich",
       "desc": "Three types of cheese and american sweet corn",
       "price": 139,
-      "img": "pdfmenu/cheese-corn-sandwich.jpg",
+      "img": "pdfmenu/cheese-corn-sandwich",
       "tags": [
         "menu-card"
       ]
@@ -582,7 +582,7 @@
       "name": "Paneer Tikka Sandwich",
       "desc": "Paneer tikka, onion, capsicum and delicious cheese",
       "price": 169,
-      "img": "pdfmenu/paneer-tikka-sandwich.jpg",
+      "img": "pdfmenu/paneer-tikka-sandwich",
       "tags": [
         "menu-card"
       ]
@@ -593,7 +593,7 @@
       "name": "Veg Burger",
       "desc": "Classic veg patty, fresh veggies, house sauce",
       "price": 59,
-      "img": "pdfmenu/burgers-shared.jpg",
+      "img": "pdfmenu/burgers-shared",
       "tags": [
         "menu-card"
       ]
@@ -615,7 +615,7 @@
       "name": "Cheese Veg Burger",
       "desc": "Cheese slice, veg patty, mayo, fresh veggies",
       "price": 119,
-      "img": "pdfmenu/burgers-shared.jpg",
+      "img": "pdfmenu/burgers-shared",
       "tags": [
         "menu-card"
       ]
@@ -637,7 +637,7 @@
       "name": "Tandoori Paneer Burger",
       "desc": "Tandoori paneer patty, mint mayo, onions",
       "price": 149,
-      "img": "pdfmenu/burgers-shared.jpg",
+      "img": "pdfmenu/burgers-shared",
       "tags": [
         "menu-card"
       ]
@@ -703,7 +703,7 @@
       "name": "Salsa Nachos",
       "desc": "House salsa, cheese, crunchy tortillas",
       "price": 159,
-      "img": "pdfmenu/nachos-shared.jpg",
+      "img": "pdfmenu/nachos-shared",
       "tags": [
         "menu-card"
       ]
@@ -714,7 +714,7 @@
       "name": "Creme Cheese Nachos",
       "desc": "Creme cheese, jalapenos, crunchy tortillas",
       "price": 189,
-      "img": "pdfmenu/creme-cheese-nachos.jpg",
+      "img": "pdfmenu/creme-cheese-nachos",
       "tags": [
         "menu-card"
       ]
@@ -791,7 +791,7 @@
       "name": "Mexican Salad",
       "desc": "Kidney beans, sweet corn, tomato, lettuce, cucumber, dressing, salsa sauce",
       "price": 289,
-      "img": "pdfmenu/mexican-salad.jpg",
+      "img": "pdfmenu/mexican-salad",
       "tags": [
         "menu-card"
       ]
@@ -802,7 +802,7 @@
       "name": "Combo Crush",
       "desc": "1 veg burger, 1 french fries, 2 pcs garlic bread / any one 250ml (coke, thums up or sprite)",
       "price": 159,
-      "img": "pdfmenu/combo-crush.jpg",
+      "img": "pdfmenu/combo-crush",
       "tags": [
         "menu-card"
       ]
@@ -813,7 +813,7 @@
       "name": "Magic Combo",
       "desc": "2 veg burgers, 1 margherita pizza 7 inch, 1 french fries",
       "price": 289,
-      "img": "pdfmenu/magic-combo.jpg",
+      "img": "pdfmenu/magic-combo",
       "tags": [
         "menu-card"
       ]
@@ -824,7 +824,7 @@
       "name": "King Combo",
       "desc": "Any one 7 inch pizza (onion cheese, tomato cheese, margherita, sweet corn), 1 salsa nachos, any one 250ml drink",
       "price": 329,
-      "img": "pdfmenu/king-combo.jpg",
+      "img": "pdfmenu/king-combo",
       "tags": [
         "menu-card"
       ]
@@ -835,7 +835,7 @@
       "name": "Combo Magambo",
       "desc": "2 veg burgers, any one 7 inch premium pizza, 2 pcs garlic bread or 1 french fries, any two 250ml drinks",
       "price": 429,
-      "img": "pdfmenu/combo-magambo.jpg",
+      "img": "pdfmenu/combo-magambo",
       "tags": [
         "menu-card"
       ]
@@ -846,7 +846,7 @@
       "name": "Party Combo 1",
       "desc": "1 veg grilled sandwich, 1 premium pizza (regular), 1 french fries, 2 frooti",
       "price": 449,
-      "img": "pdfmenu/party-combo-1.jpg",
+      "img": "pdfmenu/party-combo-1",
       "tags": [
         "menu-card"
       ]
@@ -857,7 +857,7 @@
       "name": "Party Combo 2",
       "desc": "2 medium pizzas (any), 2 blue lagoon / summer cooler",
       "price": 899,
-      "img": "pdfmenu/party-combo-2.jpg",
+      "img": "pdfmenu/party-combo-2",
       "tags": [
         "menu-card"
       ]
@@ -912,7 +912,7 @@
       "name": "Strawberry Margherta",
       "desc": "Strawberry sparkle, 300ml",
       "price": 79,
-      "img": "pdfmenu/mocktails-shared.jpg",
+      "img": "pdfmenu/mocktails-shared",
       "tags": [
         "menu-card"
       ]
@@ -923,7 +923,7 @@
       "name": "Mango Mojito",
       "desc": "Mango, mint, lime, 300ml",
       "price": 79,
-      "img": "pdfmenu/mocktails-shared.jpg",
+      "img": "pdfmenu/mocktails-shared",
       "tags": [
         "menu-card"
       ]
@@ -934,7 +934,7 @@
       "name": "Kiwi Crush",
       "desc": "Real kiwi, crushed ice, 300ml",
       "price": 79,
-      "img": "pdfmenu/mocktails-shared.jpg",
+      "img": "pdfmenu/mocktails-shared",
       "tags": [
         "menu-card"
       ]
@@ -945,7 +945,7 @@
       "name": "Summer Cooler",
       "desc": "Seasonal fruits, sparkling, light, 300ml",
       "price": 89,
-      "img": "pdfmenu/mocktails-shared.jpg",
+      "img": "pdfmenu/mocktails-shared",
       "tags": [
         "menu-card"
       ]
@@ -956,7 +956,7 @@
       "name": "Blue Lagoon",
       "desc": "Electric blue citrus cooler, 300ml",
       "price": 99,
-      "img": "pdfmenu/mocktails-shared.jpg",
+      "img": "pdfmenu/mocktails-shared",
       "tags": [
         "menu-card"
       ]
@@ -967,7 +967,7 @@
       "name": "Mojito",
       "desc": "Mint, lime, soda, classic refresher, 300ml",
       "price": 109,
-      "img": "pdfmenu/mocktails-shared.jpg",
+      "img": "pdfmenu/mocktails-shared",
       "tags": [
         "menu-card"
       ]
@@ -1000,7 +1000,7 @@
       "name": "Mango Shake",
       "desc": "Alphonso mango blended thick, 300ml",
       "price": 89,
-      "img": "pdfmenu/shakes-shared.jpg",
+      "img": "pdfmenu/shakes-shared",
       "tags": [
         "menu-card"
       ]
@@ -1011,7 +1011,7 @@
       "name": "Banana Shake",
       "desc": "Creamy banana, 300ml",
       "price": 89,
-      "img": "pdfmenu/shakes-shared.jpg",
+      "img": "pdfmenu/shakes-shared",
       "tags": [
         "menu-card"
       ]
@@ -1055,7 +1055,7 @@
       "name": "XTO Special Shake",
       "desc": "Our signature loaded shake. Ask us why it is special",
       "price": 149,
-      "img": "pdfmenu/shakes-shared.jpg",
+      "img": "pdfmenu/shakes-shared",
       "tags": [
         "menu-card"
       ]
@@ -1066,7 +1066,7 @@
       "name": "Ice Tea",
       "desc": "Brewed, iced, 300ml",
       "price": 49,
-      "img": "pdfmenu/ice-tea-shared.jpg",
+      "img": "pdfmenu/ice-tea-shared",
       "tags": [
         "menu-card"
       ]
@@ -1077,7 +1077,7 @@
       "name": "Peach Ice Tea",
       "desc": "Peach notes over cold brew, 300ml",
       "price": 69,
-      "img": "pdfmenu/ice-tea-shared.jpg",
+      "img": "pdfmenu/ice-tea-shared",
       "tags": [
         "menu-card"
       ]
@@ -1088,7 +1088,7 @@
       "name": "Coke",
       "desc": "250ml, charged at MRP",
       "price": 40,
-      "img": "pdfmenu/soft-drinks-shared.jpg",
+      "img": "pdfmenu/soft-drinks-shared",
       "tags": [
         "menu-card"
       ]
@@ -1099,7 +1099,7 @@
       "name": "Sprite",
       "desc": "250ml, charged at MRP",
       "price": 40,
-      "img": "pdfmenu/soft-drinks-shared.jpg",
+      "img": "pdfmenu/soft-drinks-shared",
       "tags": [
         "menu-card"
       ]
@@ -1110,7 +1110,7 @@
       "name": "Thums Up",
       "desc": "250ml, charged at MRP",
       "price": 40,
-      "img": "pdfmenu/soft-drinks-shared.jpg",
+      "img": "pdfmenu/soft-drinks-shared",
       "tags": [
         "menu-card"
       ]
@@ -1121,7 +1121,7 @@
       "name": "Diet Coke",
       "desc": "250ml, charged at MRP",
       "price": 40,
-      "img": "pdfmenu/soft-drinks-shared.jpg",
+      "img": "pdfmenu/soft-drinks-shared",
       "tags": [
         "menu-card"
       ]

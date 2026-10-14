@@ -38,7 +38,7 @@ def img_for(*candidates):
                     if slug not in used or base == PDF_IMG:
                         shutil.copy2(p, dst)
                         used.add(slug)
-                    return 'pdfmenu/' + out
+                    return 'pdfmenu/' + slug  # no extension: site templates append .jpg
     return 'pdfmenu/margherita.jpg'  # safe fallback
 
 # seed: make sure every needed source lands in pdfmenu

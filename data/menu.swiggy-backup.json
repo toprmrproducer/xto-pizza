@@ -247,7 +247,7 @@
       ]
     },
     {
-      "id": "farmer-s-delight-regular",
+      "id": "farmers-delight-regular",
       "cat": "premium",
       "name": "Farmer's Delight (Regular)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
@@ -258,7 +258,7 @@
       ]
     },
     {
-      "id": "farmer-s-delight-medium",
+      "id": "farmers-delight-medium",
       "cat": "premium",
       "name": "Farmer's Delight (Medium)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
@@ -269,7 +269,7 @@
       ]
     },
     {
-      "id": "farmer-s-delight-large",
+      "id": "farmers-delight-large",
       "cat": "premium",
       "name": "Farmer's Delight (Large)",
       "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
@@ -412,7 +412,7 @@
       ]
     },
     {
-      "id": "chef-s-special-paneer-tikka-regular",
+      "id": "chefs-special-paneer-tikka-regular",
       "cat": "gourmet",
       "name": "Chef's Special Paneer Tikka (Regular)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
@@ -423,7 +423,7 @@
       ]
     },
     {
-      "id": "chef-s-special-paneer-tikka-medium",
+      "id": "chefs-special-paneer-tikka-medium",
       "cat": "gourmet",
       "name": "Chef's Special Paneer Tikka (Medium)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
@@ -434,7 +434,7 @@
       ]
     },
     {
-      "id": "chef-s-special-paneer-tikka-large",
+      "id": "chefs-special-paneer-tikka-large",
       "cat": "gourmet",
       "name": "Chef's Special Paneer Tikka (Large)",
       "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
@@ -511,7 +511,7 @@
       ]
     },
     {
-      "id": "chef-s-special-pasta",
+      "id": "chefs-special-pasta",
       "cat": "pasta",
       "name": "Chef's Special Pasta",
       "desc": "Two sauce, red and white, basil, bell pepper, mushroom, zucchini and delicious cheese and cream",
