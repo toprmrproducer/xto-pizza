@@ -12,8 +12,10 @@ img_src = os.path.join(ROOT, 'public', 'images')
 img_dst = os.path.join(ROOT, 'docs', 'images')
 os.makedirs(img_dst, exist_ok=True)
 for f in os.listdir(img_src):
-    if f.startswith('upload-'): continue
-    shutil.copy2(os.path.join(img_src, f), os.path.join(img_dst, f))
+    if f.startswith('upload-') or f == 'ai': continue  # ai handled by build-menu-ai.py
+    src = os.path.join(img_src, f)
+    if not os.path.isfile(src): continue
+    shutil.copy2(src, os.path.join(img_dst, f))
 
 items, cats = menu['items'], menu['categories']
 cards = []

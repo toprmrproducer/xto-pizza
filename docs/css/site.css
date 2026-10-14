@@ -401,3 +401,7 @@ h1, h2, h3, h4 { font-family: 'Sora', sans-serif; line-height: 1.05; letter-spac
   .best-row { grid-auto-columns: minmax(200px, 72%); }
   .cat-circles { grid-template-columns: repeat(3, 1fr); gap: 16px 8px; }
 }
+
+/* ghost buttons must stay readable on light sections */
+.best-section .btn-ghost, #outlets .btn-ghost, .modal .btn-ghost, .story .btn-ghost { color: var(--ink); border-color: rgba(18,16,10,.4); background: #fff; }
+.best-section .btn-ghost:hover, #outlets .btn-ghost:hover, .modal .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
