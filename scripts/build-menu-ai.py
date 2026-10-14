@@ -42,10 +42,10 @@ def find_ai(item):
 matched, fallback = [], []
 for item in menu['items']:
     src = find_ai(item)
-    dst = os.path.join(AI_DIR, item['id'] + '.png')
+    dst = os.path.join(AI_DIR, item['id'] + '.png')  # converted to .jpg below
     if src:
         shutil.copy2(src, dst)
-        item['_ai'] = 'images/ai/' + item['id'] + '.png'
+        item['_ai'] = 'images/ai/' + item['id'] + '.jpg'
         matched.append(item['name'])
     else:
         item['_ai'] = 'images/' + item['img'] + '.jpg'
@@ -69,6 +69,15 @@ if 'menu-ai.html' not in s:
     s = s.replace('<a href="site.html">Ordering demo (website)</a>',
                   '<a href="menu-ai.html">Menu with AI food shots</a> &nbsp;&middot;&nbsp; <a href="site.html">Ordering demo (website)</a>')
     open(idx, 'w').write(s)
+
+# convert every copied png to a lean 800px jpg and drop the png
+from PIL import Image as _Im
+for item in menu['items']:
+    p = os.path.join(AI_DIR, item['id'] + '.png')
+    if os.path.exists(p):
+        im = _Im.open(p).convert('RGB'); im.thumbnail((800, 800))
+        im.save(os.path.join(AI_DIR, item['id'] + '.jpg'), quality=82, optimize=True)
+        os.remove(p)
 
 print(f'AI menu built: {len(matched)} dishes with AI photos, {len(fallback)} on fallback photos')
 print('no AI shot yet:', ', '.join(fallback))
