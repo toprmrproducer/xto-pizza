@@ -18,7 +18,7 @@ os.makedirs(PUB_PDF, exist_ok=True)
 os.makedirs(PUB_AI, exist_ok=True)
 
 def slugify(s):
-    s = s.replace('&', 'and')
+    s = s.replace('&', 'and').replace("'", "").replace('’', '')
     return re.sub(r'[^a-z0-9]+', '-', s.lower()).strip('-')
 
 import re

@@ -1,752 +1,1132 @@
 {
-  "currency": "INR",
-  "deliveryFee": 29,
-  "freeDeliveryAbove": 499,
   "categories": [
     {
-      "id": "pizza",
-      "name": "Pizza",
-      "note": "Hand-stretched 7\" veg pizzas, stone-baked"
+      "id": "magic-mania",
+      "name": "Magic Mania",
+      "note": "6-inch classics, 59 onwards"
     },
     {
-      "id": "burgers",
-      "name": "Burgers",
-      "note": "Stacked, saucy, served hot"
+      "id": "premium",
+      "name": "Premium Pizzas",
+      "note": "Regular / Medium / Large"
     },
     {
-      "id": "sandwich",
-      "name": "Sandwich & Panini",
-      "note": "Grilled to order"
+      "id": "legend",
+      "name": "Legend Pizzas",
+      "note": "Regular / Medium / Large"
+    },
+    {
+      "id": "gourmet",
+      "name": "Gourmet Selection",
+      "note": "Regular / Medium / Large"
     },
     {
       "id": "pasta",
       "name": "Pasta Mania",
-      "note": "Tossed fresh in our sauces"
+      "note": "Half / Full"
     },
     {
-      "id": "sides",
-      "name": "Bites & Sides",
-      "note": "Fries, nachos, oven bits, dips"
+      "id": "oven-bits",
+      "name": "The Oven Bits",
+      "note": "Garlic bread, tosts and bruschetta bakes"
     },
     {
-      "id": "wraps",
-      "name": "Wraps & Salads",
+      "id": "sandwich",
+      "name": "Sandwich",
+      "note": "From the chef's table"
+    },
+    {
+      "id": "burger",
+      "name": "Burger",
+      "note": "Stacked, saucy, served hot"
+    },
+    {
+      "id": "light-bite",
+      "name": "Light Bite",
+      "note": "Fries, nachos and crispy bites"
+    },
+    {
+      "id": "cheese-dip",
+      "name": "Cheese Dip",
+      "note": "30 each. Pure indulgence"
+    },
+    {
+      "id": "wrap",
+      "name": "Wrap",
       "note": "Rolled tight, dressed fresh"
     },
     {
-      "id": "combos",
-      "name": "Combos",
+      "id": "salad",
+      "name": "Salad",
+      "note": "Fresh and loaded"
+    },
+    {
+      "id": "combo",
+      "name": "Combo",
       "note": "Full meals, better prices"
     },
     {
-      "id": "beverages",
-      "name": "Beverages",
-      "note": "Mocktails, coolers, soft drinks"
+      "id": "cold-coffee",
+      "name": "Cold Coffee",
+      "note": "Classic and thick"
     },
     {
-      "id": "coffee-shakes",
-      "name": "Coffee & Shakes",
-      "note": "Thick, cold, addictive"
+      "id": "mocktails",
+      "name": "Mocktails",
+      "note": "300ml refreshers"
+    },
+    {
+      "id": "shakes",
+      "name": "Shakes",
+      "note": "Thick, cold, addictive. 300ml"
+    },
+    {
+      "id": "ice-tea",
+      "name": "Ice Tea",
+      "note": "300ml, brewed and iced"
+    },
+    {
+      "id": "soft-drinks",
+      "name": "Soft Drinks",
+      "note": "250ml, charged at MRP"
     }
   ],
   "items": [
     {
-      "id": "margherita-7",
-      "cat": "pizza",
-      "name": "Margherita 7\"",
+      "id": "tomato-and-cheese-6-in",
+      "cat": "magic-mania",
+      "name": "Tomato & Cheese (6 in)",
       "desc": "Classic cheese, oregano, fresh tomato sauce",
-      "price": 119,
-      "img": "pizza-cheese",
+      "price": 59,
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "value"
+        "menu-card"
       ]
     },
     {
-      "id": "tomato-cheese",
-      "cat": "pizza",
-      "name": "Tomato & Cheese",
-      "desc": "Magic Mania classic, loaded mozzarella",
-      "price": 99,
-      "img": "pizza-cheese",
-      "tags": []
-    },
-    {
-      "id": "onion-cheese",
-      "cat": "pizza",
-      "name": "Onion & Cheese",
+      "id": "onion-and-cheese-6-in",
+      "cat": "magic-mania",
+      "name": "Onion & Cheese (6 in)",
       "desc": "Caramelised onion, double cheese blend",
-      "price": 109,
-      "img": "pizza-closeup",
-      "tags": []
+      "price": 69,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
-      "id": "dil-desi",
-      "cat": "pizza",
-      "name": "Dil Desi",
-      "desc": "Desi masala, onion, capsicum, cheesy blend",
+      "id": "margherita-regular",
+      "cat": "premium",
+      "name": "Margherita (Regular)",
+      "desc": "Fresh tomato and cheddar cheese",
+      "price": 99,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "margherita-medium",
+      "cat": "premium",
+      "name": "Margherita (Medium)",
+      "desc": "Fresh tomato and cheddar cheese",
       "price": 199,
-      "img": "pizza-closeup",
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "spicy"
+        "menu-card"
       ]
     },
     {
-      "id": "farmers-delight",
-      "cat": "pizza",
-      "name": "Farmer's Delight",
-      "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn & delicious cheese",
-      "price": 209,
-      "img": "farmers-delight",
+      "id": "margherita-large",
+      "cat": "premium",
+      "name": "Margherita (Large)",
+      "desc": "Fresh tomato and cheddar cheese",
+      "price": 399,
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
-      "id": "hawaiian-style",
-      "cat": "pizza",
-      "name": "Hawaiian Style",
-      "desc": "Golden corn, juicy pineapple toss, cheese pull",
-      "price": 219,
-      "img": "pizza-closeup",
-      "tags": []
+      "id": "corn-and-cheese-regular",
+      "cat": "premium",
+      "name": "Corn & Cheese (Regular)",
+      "desc": "Red onion, sweet corn and mozzarella cheese",
+      "price": 139,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
-      "id": "paneer-makhni",
-      "cat": "pizza",
-      "name": "Paneer Makhni",
-      "desc": "Makhni gravy base, soft paneer, butter, cheese",
-      "price": 149,
-      "img": "paneer-makhni",
-      "tags": []
-    },
-    {
-      "id": "tandoori-paneer-tikka",
-      "cat": "pizza",
-      "name": "Tandoori Paneer Tikka",
-      "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander & delicious cheese",
+      "id": "corn-and-cheese-medium",
+      "cat": "premium",
+      "name": "Corn & Cheese (Medium)",
+      "desc": "Red onion, sweet corn and mozzarella cheese",
       "price": 299,
-      "img": "tandoori-paneer-tikka",
-      "tags": []
-    },
-    {
-      "id": "chefs-special-paneer-tikka",
-      "cat": "pizza",
-      "name": "Chef's Special Paneer Tikka",
-      "desc": "Signature cheese blend, tandoori spread, capsicum, onion & paneer tikka",
-      "price": 329,
-      "img": "chefs-special-paneer-tikka",
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "premium"
+        "menu-card"
       ]
     },
     {
-      "id": "tangy-paneer",
-      "cat": "pizza",
-      "name": "Tangy Paneer",
-      "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato salsa & cheese",
-      "price": 329,
-      "img": "tangy-paneer",
-      "tags": []
-    },
-    {
-      "id": "veggie-mexican",
-      "cat": "pizza",
-      "name": "Veggie Mexican",
-      "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive & delicious cheese",
-      "price": 329,
-      "img": "veggie-mexican",
+      "id": "corn-and-cheese-large",
+      "cat": "premium",
+      "name": "Corn & Cheese (Large)",
+      "desc": "Red onion, sweet corn and mozzarella cheese",
+      "price": 439,
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "spicy"
+        "menu-card"
       ]
     },
     {
-      "id": "pesto-painting",
-      "cat": "pizza",
-      "name": "Pesto Painting",
-      "desc": "Loaded fresh paneer, bell pepper, jalapeno, basil, pesto sauce & cheese",
-      "price": 329,
-      "img": "pesto-painting",
+      "id": "paneer-makhani-regular",
+      "cat": "premium",
+      "name": "Paneer Makhani (Regular)",
+      "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
+      "price": 149,
+      "img": "pdfmenu/paneer-makhani.jpg",
       "tags": [
-        "premium"
+        "menu-card"
       ]
     },
     {
-      "id": "crispy-veg-burger",
-      "cat": "burgers",
-      "name": "Crispy Veg Burger",
-      "desc": "Crumb-fried patty, lettuce, house mayo, sesame bun",
-      "price": 119,
-      "img": "crispy-veg-burger",
+      "id": "paneer-makhani-medium",
+      "cat": "premium",
+      "name": "Paneer Makhani (Medium)",
+      "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
+      "price": 349,
+      "img": "pdfmenu/paneer-makhani.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
-      "id": "veggie-delight-burger",
-      "cat": "burgers",
-      "name": "Veggie Delight",
-      "desc": "Tomatoes, onion seasoned with oregano",
-      "price": 119,
-      "img": "crispy-veg-burger",
-      "tags": []
+      "id": "paneer-makhani-large",
+      "cat": "premium",
+      "name": "Paneer Makhani (Large)",
+      "desc": "Paneer, onion, capsicum, paprika and special makhni sauce",
+      "price": 459,
+      "img": "pdfmenu/paneer-makhani.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
-      "id": "double-cheese-burger",
-      "cat": "burgers",
-      "name": "Double Cheese Burger",
-      "desc": "Double cheese slices, tangy sauce, crunchy patty",
+      "id": "dil-desi-regular",
+      "cat": "premium",
+      "name": "Dil Desi (Regular)",
+      "desc": "Capsicum, onion, tomato and delicious cheese",
+      "price": 189,
+      "img": "pdfmenu/dil-desi.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "dil-desi-medium",
+      "cat": "premium",
+      "name": "Dil Desi (Medium)",
+      "desc": "Capsicum, onion, tomato and delicious cheese",
+      "price": 369,
+      "img": "pdfmenu/dil-desi.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "dil-desi-large",
+      "cat": "premium",
+      "name": "Dil Desi (Large)",
+      "desc": "Capsicum, onion, tomato and delicious cheese",
+      "price": 449,
+      "img": "pdfmenu/dil-desi.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "farmer-s-delight-regular",
+      "cat": "premium",
+      "name": "Farmer's Delight (Regular)",
+      "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
+      "price": 209,
+      "img": "pdfmenu/farmers-delight.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "farmer-s-delight-medium",
+      "cat": "premium",
+      "name": "Farmer's Delight (Medium)",
+      "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
+      "price": 379,
+      "img": "pdfmenu/farmers-delight.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "farmer-s-delight-large",
+      "cat": "premium",
+      "name": "Farmer's Delight (Large)",
+      "desc": "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese",
+      "price": 489,
+      "img": "pdfmenu/farmers-delight.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tandoori-paneer-tikka-regular",
+      "cat": "legend",
+      "name": "Tandoori Paneer Tikka (Regular)",
+      "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
+      "price": 229,
+      "img": "pdfmenu/tandoori-paneer-tikka.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tandoori-paneer-tikka-medium",
+      "cat": "legend",
+      "name": "Tandoori Paneer Tikka (Medium)",
+      "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
+      "price": 389,
+      "img": "pdfmenu/tandoori-paneer-tikka.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tandoori-paneer-tikka-large",
+      "cat": "legend",
+      "name": "Tandoori Paneer Tikka (Large)",
+      "desc": "Black olives, paneer tikka, capsicum, onion, fresh coriander leaves and delicious cheese",
+      "price": 509,
+      "img": "pdfmenu/tandoori-paneer-tikka.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tangy-paneer-pizza-regular",
+      "cat": "legend",
+      "name": "Tangy Paneer Pizza (Regular)",
+      "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
+      "price": 239,
+      "img": "pdfmenu/tangy-paneer-pizza.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tangy-paneer-pizza-medium",
+      "cat": "legend",
+      "name": "Tangy Paneer Pizza (Medium)",
+      "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
+      "price": 379,
+      "img": "pdfmenu/tangy-paneer-pizza.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tangy-paneer-pizza-large",
+      "cat": "legend",
+      "name": "Tangy Paneer Pizza (Large)",
+      "desc": "Grilled paneer, bell pepper, onion, green capsicum, tomato, diced tomato salsa sauce and delicious cheese",
+      "price": 509,
+      "img": "pdfmenu/tangy-paneer-pizza.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "veggie-mexican-regular",
+      "cat": "gourmet",
+      "name": "Veggie Mexican (Regular)",
+      "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
+      "price": 249,
+      "img": "pdfmenu/veggie-mexican.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "veggie-mexican-medium",
+      "cat": "gourmet",
+      "name": "Veggie Mexican (Medium)",
+      "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
+      "price": 399,
+      "img": "pdfmenu/veggie-mexican.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "veggie-mexican-large",
+      "cat": "gourmet",
+      "name": "Veggie Mexican (Large)",
+      "desc": "Bell pepper, sweet corn, jalapeno, paprika, tomato, black olive and delicious cheese",
+      "price": 579,
+      "img": "pdfmenu/veggie-mexican.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "pesto-painting-regular",
+      "cat": "gourmet",
+      "name": "Pesto Painting (Regular)",
+      "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
+      "price": 259,
+      "img": "pdfmenu/pesto-painting.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "pesto-painting-medium",
+      "cat": "gourmet",
+      "name": "Pesto Painting (Medium)",
+      "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
+      "price": 429,
+      "img": "pdfmenu/pesto-painting.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "pesto-painting-large",
+      "cat": "gourmet",
+      "name": "Pesto Painting (Large)",
+      "desc": "Loaded fresh paneer, bell pepper, well chopped jalapeno, basil, pesto sauce and delicious cheese",
+      "price": 599,
+      "img": "pdfmenu/pesto-painting.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "chef-s-special-paneer-tikka-regular",
+      "cat": "gourmet",
+      "name": "Chef's Special Paneer Tikka (Regular)",
+      "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
+      "price": 239,
+      "img": "pdfmenu/chefs-special-paneer-tikka.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "chef-s-special-paneer-tikka-medium",
+      "cat": "gourmet",
+      "name": "Chef's Special Paneer Tikka (Medium)",
+      "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
+      "price": 429,
+      "img": "pdfmenu/chefs-special-paneer-tikka.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "chef-s-special-paneer-tikka-large",
+      "cat": "gourmet",
+      "name": "Chef's Special Paneer Tikka (Large)",
+      "desc": "IFP cheese blend, tandoori spread, bell pepper, black olives, chopped jalapeno, paprika, onion and paneer tikka and delicious cheese",
+      "price": 599,
+      "img": "pdfmenu/chefs-special-paneer-tikka.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "arabiatta-pasta-half",
+      "cat": "pasta",
+      "name": "Arabiatta Pasta (Half)",
+      "desc": "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese",
       "price": 169,
-      "img": "ai/double-cheese-burger",
-      "tags": []
-    },
-    {
-      "id": "spicy-paneer-burger",
-      "cat": "burgers",
-      "name": "Spicy Paneer Burger",
-      "desc": "Masala paneer patty, peri mayo, pickled onion",
-      "price": 179,
-      "img": "ai/spicy-paneer-burger",
+      "img": "pdfmenu/arabiatta-pasta.jpg",
       "tags": [
-        "spicy"
+        "menu-card"
       ]
     },
     {
-      "id": "tower-burger",
-      "cat": "burgers",
-      "name": "Tower Burger",
-      "desc": "Triple-decker stack, cheese, patty, fresh veggies",
-      "price": 199,
-      "img": "ai/tower-burger",
+      "id": "arabiatta-pasta-full",
+      "cat": "pasta",
+      "name": "Arabiatta Pasta (Full)",
+      "desc": "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese",
+      "price": 269,
+      "img": "pdfmenu/arabiatta-pasta.jpg",
       "tags": [
-        "premium"
+        "menu-card"
+      ]
+    },
+    {
+      "id": "veg-alfredo-half",
+      "cat": "pasta",
+      "name": "Veg Alfredo (Half)",
+      "desc": "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese",
+      "price": 169,
+      "img": "pdfmenu/veg-alfredo.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "veg-alfredo-full",
+      "cat": "pasta",
+      "name": "Veg Alfredo (Full)",
+      "desc": "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese",
+      "price": 269,
+      "img": "pdfmenu/veg-alfredo.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tandoori-pasta-half",
+      "cat": "pasta",
+      "name": "Tandoori Pasta (Half)",
+      "desc": "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours",
+      "price": 189,
+      "img": "pdfmenu/tandoori-pasta.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tandoori-pasta-full",
+      "cat": "pasta",
+      "name": "Tandoori Pasta (Full)",
+      "desc": "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours",
+      "price": 289,
+      "img": "pdfmenu/tandoori-pasta.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "chef-s-special-pasta",
+      "cat": "pasta",
+      "name": "Chef's Special Pasta",
+      "desc": "Two sauce, red and white, basil, bell pepper, mushroom, zucchini and delicious cheese and cream",
+      "price": 299,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "garlic-bread",
+      "cat": "oven-bits",
+      "name": "Garlic Bread",
+      "desc": "Ciabatta toasted with generous dose of roasted garlic, flavoured salted butter",
+      "price": 99,
+      "img": "pdfmenu/garlic-bread.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "cheese-chilli-tost",
+      "cat": "oven-bits",
+      "name": "Cheese Chilli Tost",
+      "desc": "Cheesy chilli toast, a signature snack",
+      "price": 149,
+      "img": "pdfmenu/cheese-chilli-tost.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "cheesy-garlic-bread",
+      "cat": "oven-bits",
+      "name": "Cheesy Garlic Bread",
+      "desc": "Garlic bread topped with signature cheese, italian herbs and spices",
+      "price": 159,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
       ]
     },
     {
       "id": "veg-grilled-sandwich",
       "cat": "sandwich",
       "name": "Veg Grilled Sandwich",
-      "desc": "Tomato, onion and capsicum, grilled crisp",
-      "price": 99,
-      "img": "grilled-sandwich",
+      "desc": "Tomato, onion and capsicum",
+      "price": 89,
+      "img": "pdfmenu/veg-grilled-sandwich.jpg",
       "tags": [
-        "value"
+        "menu-card"
       ]
     },
     {
       "id": "cheese-corn-sandwich",
       "cat": "sandwich",
       "name": "Cheese Corn Sandwich",
-      "desc": "Three types of cheese & American sweet corn",
-      "price": 119,
-      "img": "grilled-sandwich",
-      "tags": []
-    },
-    {
-      "id": "mumbai-sandwich",
-      "cat": "sandwich",
-      "name": "Mumbai Sandwich",
-      "desc": "Street-style masala, chutney, cheese, grilled",
-      "price": 119,
-      "img": "grilled-sandwich",
+      "desc": "Three types of cheese and american sweet corn",
+      "price": 139,
+      "img": "pdfmenu/cheese-corn-sandwich.jpg",
       "tags": [
-        "spicy"
+        "menu-card"
       ]
-    },
-    {
-      "id": "mushroom-melt",
-      "cat": "sandwich",
-      "name": "Mushroom Melt Panini",
-      "desc": "Buttered mushrooms under a molten cheese melt",
-      "price": 149,
-      "img": "grilled-sandwich",
-      "tags": []
-    },
-    {
-      "id": "paneer-bhurji-panini",
-      "cat": "sandwich",
-      "name": "Paneer Bhurji Panini",
-      "desc": "Spiced paneer bhurji pressed in focaccia",
-      "price": 149,
-      "img": "ai/veg-grilled-sandwich",
-      "tags": [],
-      "needsPhoto": true
     },
     {
       "id": "paneer-tikka-sandwich",
       "cat": "sandwich",
       "name": "Paneer Tikka Sandwich",
-      "desc": "Paneer tikka, onion, capsicum, and delicious cheese",
-      "price": 199,
-      "img": "ai/paneer-tikka-sandwich",
+      "desc": "Paneer tikka, onion, capsicum and delicious cheese",
+      "price": 169,
+      "img": "pdfmenu/paneer-tikka-sandwich.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
-      "id": "arabiatta-pasta",
-      "cat": "pasta",
-      "name": "Arabiatta Pasta",
-      "desc": "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic & cheese",
-      "price": 349,
-      "img": "arabiatta-pasta",
+      "id": "veg-burger",
+      "cat": "burger",
+      "name": "Veg Burger",
+      "desc": "Classic veg patty, fresh veggies, house sauce",
+      "price": 59,
+      "img": "pdfmenu/burgers-shared.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
-      "id": "veg-alfredo",
-      "cat": "pasta",
-      "name": "Veg Alfredo",
-      "desc": "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, cream, cheddar",
-      "price": 349,
-      "img": "veg-alfredo",
-      "tags": []
-    },
-    {
-      "id": "penne-rosette",
-      "cat": "pasta",
-      "name": "Penne Rosette",
-      "desc": "Rose sauce penne, basil, parmesan dust",
-      "price": 299,
-      "img": "arabiatta-pasta",
-      "tags": []
-    },
-    {
-      "id": "pesto-pasta",
-      "cat": "pasta",
-      "name": "Vegetarian Pesto Pasta",
-      "desc": "Basil pesto, toasted pine nuts, veggies, cheese",
-      "price": 329,
-      "img": "veg-alfredo",
-      "tags": []
-    },
-    {
-      "id": "chefs-special-pasta",
-      "cat": "pasta",
-      "name": "Chef's Special Pasta",
-      "desc": "Red & white sauce, basil, bell pepper, mushroom, zucchini, cheese & cream",
-      "price": 379,
-      "img": "veg-alfredo",
+      "id": "crispy-veg-burger",
+      "cat": "burger",
+      "name": "Crispy Veg Burger",
+      "desc": "Crumb-fried patty, lettuce, house mayo, sesame bun",
+      "price": 99,
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "premium"
+        "menu-card"
+      ]
+    },
+    {
+      "id": "cheese-veg-burger",
+      "cat": "burger",
+      "name": "Cheese Veg Burger",
+      "desc": "Cheese slice, veg patty, mayo, fresh veggies",
+      "price": 119,
+      "img": "pdfmenu/burgers-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "double-cheese-veg-burger",
+      "cat": "burger",
+      "name": "Double Cheese Veg Burger",
+      "desc": "Double cheese slices, tangy sauce, crunchy patty",
+      "price": 139,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tandoori-paneer-burger",
+      "cat": "burger",
+      "name": "Tandoori Paneer Burger",
+      "desc": "Tandoori paneer patty, mint mayo, onions",
+      "price": 149,
+      "img": "pdfmenu/burgers-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "spicy-paneer-veg-burger",
+      "cat": "burger",
+      "name": "Spicy Paneer Veg Burger",
+      "desc": "Masala paneer patty, peri mayo, pickled onion",
+      "price": 149,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "tower-veg-burger",
+      "cat": "burger",
+      "name": "Tower Veg Burger",
+      "desc": "Triple-decker stack, cheese, patty, fresh veggies",
+      "price": 169,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
       ]
     },
     {
       "id": "french-fries",
-      "cat": "sides",
+      "cat": "light-bite",
       "name": "French Fries",
       "desc": "Golden, salted, dangerously crisp",
-      "price": 109,
-      "img": "ai/french-fries",
+      "price": 89,
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
       "id": "peri-peri-fries",
-      "cat": "sides",
-      "name": "Peri Peri French Fries",
+      "cat": "light-bite",
+      "name": "Peri Peri Fries",
       "desc": "Tossed in fiery peri peri dust",
-      "price": 179,
-      "img": "ai/peri-peri-fries",
+      "price": 139,
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "spicy"
+        "menu-card"
       ]
     },
     {
-      "id": "cheese-jalapeno-fries",
-      "cat": "sides",
+      "id": "cheese-jalapeno-french-fries",
+      "cat": "light-bite",
       "name": "Cheese Jalapeno French Fries",
       "desc": "Loaded cheese sauce, jalapeno kick",
-      "price": 199,
-      "img": "ai/cheese-jalapeno-fries",
+      "price": 169,
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "spicy"
+        "menu-card"
+      ]
+    },
+    {
+      "id": "salsa-nachos",
+      "cat": "light-bite",
+      "name": "Salsa Nachos",
+      "desc": "House salsa, cheese, crunchy tortillas",
+      "price": 159,
+      "img": "pdfmenu/nachos-shared.jpg",
+      "tags": [
+        "menu-card"
       ]
     },
     {
       "id": "creme-cheese-nachos",
-      "cat": "sides",
+      "cat": "light-bite",
       "name": "Creme Cheese Nachos",
-      "desc": "Crunchy nachos under cream cheese sauce",
-      "price": 229,
-      "img": "ai/creme-cheese-nachos",
-      "tags": []
-    },
-    {
-      "id": "salsa-nachos",
-      "cat": "sides",
-      "name": "Salsa Nachos",
-      "desc": "House salsa, cheese, crunchy tortillas",
-      "price": 249,
-      "img": "ai/salsa-nachos",
-      "tags": []
-    },
-    {
-      "id": "garlic-bread",
-      "cat": "sides",
-      "name": "Garlic Bread",
-      "desc": "Ciabatta toasted with roasted garlic, flavoured salted butter",
-      "price": 109,
-      "img": "ai/garlic-bread",
-      "tags": []
-    },
-    {
-      "id": "cheesy-garlic-bread",
-      "cat": "sides",
-      "name": "Cheesy Garlic Bread",
-      "desc": "Topped with signature cheese, Italian herbs and spices",
-      "price": 119,
-      "img": "ai/cheesy-garlic-bread",
+      "desc": "Creme cheese, jalapenos, crunchy tortillas",
+      "price": 189,
+      "img": "pdfmenu/creme-cheese-nachos.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
-      "id": "cheesy-cheese-tomato",
-      "cat": "sides",
-      "name": "Cheese Chilli Tost",
-      "desc": "Chilli cheese tomato toast, a signature snack",
-      "price": 149,
-      "img": "cheesy-cheese-tomato",
-      "tags": []
+      "id": "cocktail-mayo-dip",
+      "cat": "cheese-dip",
+      "name": "Cocktail Mayo Dip",
+      "desc": "Cool, creamy, classic",
+      "price": 30,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "cheese-jalapeno-dip",
-      "cat": "sides",
+      "cat": "cheese-dip",
       "name": "Cheese Jalapeno Dip",
       "desc": "Creamy dip with jalapeno heat",
       "price": 30,
-      "img": "ai/cheese-jalapeno-dip",
-      "tags": []
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "peri-peri-dip",
-      "cat": "sides",
-      "name": "Peri Peri Cheese Dip",
+      "cat": "cheese-dip",
+      "name": "Peri Peri Dip",
       "desc": "Fiery peri peri folded into cheese",
       "price": 30,
-      "img": "cheese-jalapeno-dip",
-      "tags": []
-    },
-    {
-      "id": "cocktail-mayo-dip",
-      "cat": "sides",
-      "name": "Cocktail Mayo Cheese Dip",
-      "desc": "Cool, creamy, classic",
-      "price": 30,
-      "img": "ai/cocktail-mayo-dip",
-      "tags": []
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "aloo-verona-wrap",
-      "cat": "wraps",
+      "cat": "wrap",
       "name": "Aloo Verona Wrap",
       "desc": "Spiced potato, mint mayo, crunch, rolled tight",
       "price": 139,
-      "img": "aloo-verona-wrap",
-      "tags": []
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "paneer-fajita-wrap",
-      "cat": "wraps",
+      "cat": "wrap",
       "name": "Paneer Fajita Wrap",
       "desc": "Fajita paneer, peppers, onion, chipotle mayo",
       "price": 159,
-      "img": "paneer-fajita-wrap",
-      "tags": []
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "paneer-tikka-wrap",
-      "cat": "wraps",
+      "cat": "wrap",
       "name": "Paneer Tikka Wrap",
       "desc": "Char-grilled paneer tikka, onion, mint chutney",
       "price": 159,
-      "img": "paneer-tikka-wrap",
+      "img": "pdfmenu/margherita.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
       "id": "mexican-salad",
-      "cat": "wraps",
+      "cat": "salad",
       "name": "Mexican Salad",
-      "desc": "Kidney beans, sweet corn, tomato, lettuce, cucumber, sweet potato dressing, salsa",
+      "desc": "Kidney beans, sweet corn, tomato, lettuce, cucumber, dressing, salsa sauce",
       "price": 289,
-      "img": "ai/mexican-salad",
-      "tags": []
-    },
-    {
-      "id": "hawaiian-salad",
-      "cat": "wraps",
-      "name": "Hawaiian Salad",
-      "desc": "Fresh fruits, greens, creamy dressing",
-      "price": 259,
-      "img": "ai/mexican-salad",
-      "tags": [],
-      "needsPhoto": true
-    },
-    {
-      "id": "combo-delight",
-      "cat": "combos",
-      "name": "Combo Delight",
-      "desc": "1 veg burger, 1 french fries, any one 250ml drink (coke / thumbs up / sprite)",
-      "price": 249,
-      "img": "ai/combo-crush",
+      "img": "pdfmenu/mexican-salad.jpg",
       "tags": [
-        "deal"
-      ],
-      "needsPhoto": true
+        "menu-card"
+      ]
     },
     {
       "id": "combo-crush",
-      "cat": "combos",
+      "cat": "combo",
       "name": "Combo Crush",
-      "desc": "1 veg burger, 1 french fries, 2 pcs garlic bread",
-      "price": 249,
-      "img": "ai/combo-crush",
+      "desc": "1 veg burger, 1 french fries, 2 pcs garlic bread / any one 250ml (coke, thums up or sprite)",
+      "price": 159,
+      "img": "pdfmenu/combo-crush.jpg",
       "tags": [
-        "deal"
+        "menu-card"
       ]
     },
     {
       "id": "magic-combo",
-      "cat": "combos",
+      "cat": "combo",
       "name": "Magic Combo",
-      "desc": "2 burgers, 1 Margherita pizza 7\", 1 french fries",
-      "price": 399,
-      "img": "magic-combo",
+      "desc": "2 veg burgers, 1 margherita pizza 7 inch, 1 french fries",
+      "price": 289,
+      "img": "pdfmenu/magic-combo.jpg",
       "tags": [
-        "deal"
+        "menu-card"
       ]
     },
     {
       "id": "king-combo",
-      "cat": "combos",
+      "cat": "combo",
       "name": "King Combo",
-      "desc": "Any one 7\" pizza, 1 salsa nachos, any one 250ml drink",
+      "desc": "Any one 7 inch pizza (onion cheese, tomato cheese, margherita, sweet corn), 1 salsa nachos, any one 250ml drink",
+      "price": 329,
+      "img": "pdfmenu/king-combo.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "combo-magambo",
+      "cat": "combo",
+      "name": "Combo Magambo",
+      "desc": "2 veg burgers, any one 7 inch premium pizza, 2 pcs garlic bread or 1 french fries, any two 250ml drinks",
+      "price": 429,
+      "img": "pdfmenu/combo-magambo.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "party-combo-1",
+      "cat": "combo",
+      "name": "Party Combo 1",
+      "desc": "1 veg grilled sandwich, 1 premium pizza (regular), 1 french fries, 2 frooti",
       "price": 449,
-      "img": "ai/combo-crush",
+      "img": "pdfmenu/party-combo-1.jpg",
       "tags": [
-        "deal"
-      ],
-      "needsPhoto": true
+        "menu-card"
+      ]
     },
     {
-      "id": "premium-combo",
-      "cat": "combos",
-      "name": "Premium Combo",
-      "desc": "2 veg burgers, any one 7\" premium pizza, 3 pc garlic bread",
-      "price": 499,
-      "img": "ai/combo-crush",
+      "id": "party-combo-2",
+      "cat": "combo",
+      "name": "Party Combo 2",
+      "desc": "2 medium pizzas (any), 2 blue lagoon / summer cooler",
+      "price": 899,
+      "img": "pdfmenu/party-combo-2.jpg",
       "tags": [
-        "deal"
-      ],
-      "needsPhoto": true
+        "menu-card"
+      ]
     },
     {
-      "id": "blue-lagoon",
-      "cat": "beverages",
-      "name": "Blue Lagoon",
-      "desc": "Electric blue citrus cooler, 300ml",
+      "id": "cold-coffee",
+      "cat": "cold-coffee",
+      "name": "Cold Coffee",
+      "desc": "Smooth, frothy, timeless",
+      "price": 49,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "thick-cold-coffee",
+      "cat": "cold-coffee",
+      "name": "Thick Cold Coffee",
+      "desc": "Extra thick, extra cold",
+      "price": 89,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "chocolate-y-iced-mocha",
+      "cat": "cold-coffee",
+      "name": "Chocolate-y Iced Mocha",
+      "desc": "Chocolate and coffee, iced and indulgent",
       "price": 99,
-      "img": "blue-lagoon",
-      "tags": []
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "thick-cold-coffee-with-chocolate-crush",
+      "cat": "cold-coffee",
+      "name": "Thick Cold Coffee with Chocolate Crush",
+      "desc": "Thick cold coffee loaded with chocolate crush",
+      "price": 109,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "strawberry-margherta",
+      "cat": "mocktails",
+      "name": "Strawberry Margherta",
+      "desc": "Strawberry sparkle, 300ml",
+      "price": 79,
+      "img": "pdfmenu/mocktails-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "mango-mojito",
+      "cat": "mocktails",
+      "name": "Mango Mojito",
+      "desc": "Mango, mint, lime, 300ml",
+      "price": 79,
+      "img": "pdfmenu/mocktails-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "kiwi-crush",
-      "cat": "beverages",
+      "cat": "mocktails",
       "name": "Kiwi Crush",
       "desc": "Real kiwi, crushed ice, 300ml",
       "price": 79,
-      "img": "kiwi-crush",
-      "tags": []
-    },
-    {
-      "id": "mojito",
-      "cat": "beverages",
-      "name": "Mojito",
-      "desc": "Mint, lime, soda, classic refresher, 300ml",
-      "price": 109,
-      "img": "mojito",
+      "img": "pdfmenu/mocktails-shared.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
       "id": "summer-cooler",
-      "cat": "beverages",
+      "cat": "mocktails",
       "name": "Summer Cooler",
       "desc": "Seasonal fruits, sparkling, light, 300ml",
-      "price": 99,
-      "img": "kiwi-crush",
-      "tags": []
-    },
-    {
-      "id": "coke",
-      "cat": "beverages",
-      "name": "Coke",
-      "desc": "250ml can",
-      "price": 40,
-      "img": "soft-drink",
-      "tags": []
-    },
-    {
-      "id": "diet-coke",
-      "cat": "beverages",
-      "name": "Diet Coke",
-      "desc": "250ml can",
-      "price": 40,
-      "img": "soft-drink",
-      "tags": []
-    },
-    {
-      "id": "sprite",
-      "cat": "beverages",
-      "name": "Sprite",
-      "desc": "250ml can",
-      "price": 40,
-      "img": "soft-drink",
-      "tags": []
-    },
-    {
-      "id": "lemon-ice-tea",
-      "cat": "beverages",
-      "name": "Lemon Ice Tea",
-      "desc": "Brewed, iced, lemon-kissed, 300ml",
-      "price": 129,
-      "img": "soft-drink",
-      "tags": []
-    },
-    {
-      "id": "peach-ice-tea",
-      "cat": "beverages",
-      "name": "Peach Ice Tea",
-      "desc": "Peach notes over cold brew, 300ml",
-      "price": 129,
-      "img": "soft-drink",
-      "tags": []
-    },
-    {
-      "id": "cold-coffee",
-      "cat": "coffee-shakes",
-      "name": "Cold Coffee",
-      "desc": "Smooth, frothy, timeless",
-      "price": 99,
-      "img": "cold-coffee",
-      "tags": []
-    },
-    {
-      "id": "thick-cold-coffee",
-      "cat": "coffee-shakes",
-      "name": "Thick Cold Coffee",
-      "desc": "Extra thick, extra cold",
-      "price": 119,
-      "img": "thick-cold-coffee",
+      "price": 89,
+      "img": "pdfmenu/mocktails-shared.jpg",
       "tags": [
-        "bestseller"
+        "menu-card"
       ]
     },
     {
-      "id": "banana-milk-coffee",
-      "cat": "coffee-shakes",
-      "name": "Banana Milk Coffee",
-      "desc": "Banana blended into creamy cold coffee",
-      "price": 129,
-      "img": "cold-coffee",
-      "tags": []
+      "id": "blue-lagoon",
+      "cat": "mocktails",
+      "name": "Blue Lagoon",
+      "desc": "Electric blue citrus cooler, 300ml",
+      "price": 99,
+      "img": "pdfmenu/mocktails-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
-      "id": "iced-caramel-macchiato",
-      "cat": "coffee-shakes",
-      "name": "Iced Caramel Macchiato",
-      "desc": "Caramel drizzle over iced milk & espresso",
-      "price": 149,
-      "img": "thick-cold-coffee",
-      "tags": []
-    },
-    {
-      "id": "chocolatey-iced-mocha",
-      "cat": "coffee-shakes",
-      "name": "Chocolate-y Iced Mocha",
-      "desc": "Chocolate + coffee, iced and indulgent",
-      "price": 149,
-      "img": "cold-coffee",
-      "tags": []
-    },
-    {
-      "id": "caramel-coconut-iced-coffee",
-      "cat": "coffee-shakes",
-      "name": "Caramel Coconut Iced Coffee",
-      "desc": "Coconut milk, caramel, cold coffee",
-      "price": 149,
-      "img": "thick-cold-coffee",
-      "tags": []
-    },
-    {
-      "id": "brownie-frappe",
-      "cat": "coffee-shakes",
-      "name": "Brownie Frappe",
-      "desc": "Brownie chunks blended into a frappe",
-      "price": 159,
-      "img": "shake-choco",
-      "tags": []
-    },
-    {
-      "id": "kitkat-shake",
-      "cat": "coffee-shakes",
-      "name": "Kitkat Shake",
-      "desc": "Kitkat crunch in a thick shake, 300ml",
-      "price": 169,
-      "img": "kitkat-shake",
-      "tags": []
-    },
-    {
-      "id": "hazelnut-crunchy-shake",
-      "cat": "coffee-shakes",
-      "name": "Hazelnut Crunchy Shake",
-      "desc": "Roasted hazelnut, chocolate, crunch, 300ml",
-      "price": 179,
-      "img": "hazelnut-shake",
-      "tags": []
-    },
-    {
-      "id": "oreo-shake",
-      "cat": "coffee-shakes",
-      "name": "Oreo Shake",
-      "desc": "Cookies and cream, blended thick, 300ml",
-      "price": 139,
-      "img": "shake-choco",
-      "tags": []
+      "id": "mojito",
+      "cat": "mocktails",
+      "name": "Mojito",
+      "desc": "Mint, lime, soda, classic refresher, 300ml",
+      "price": 109,
+      "img": "pdfmenu/mocktails-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "strawberry-shake",
-      "cat": "coffee-shakes",
+      "cat": "shakes",
       "name": "Strawberry Shake",
       "desc": "Real strawberry, creamy, 300ml",
-      "price": 119,
-      "img": "strawberry-shake",
-      "tags": []
+      "price": 89,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "strawberry-kiwi-shake",
-      "cat": "coffee-shakes",
+      "cat": "shakes",
       "name": "Strawberry Kiwi Shake",
       "desc": "Strawberry meets kiwi tang, 300ml",
-      "price": 119,
-      "img": "strawberry-kiwi-shake",
-      "tags": []
+      "price": 89,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "mango-shake",
+      "cat": "shakes",
+      "name": "Mango Shake",
+      "desc": "Alphonso mango blended thick, 300ml",
+      "price": 89,
+      "img": "pdfmenu/shakes-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "banana-shake",
+      "cat": "shakes",
+      "name": "Banana Shake",
+      "desc": "Creamy banana, 300ml",
+      "price": 89,
+      "img": "pdfmenu/shakes-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "oreo-shake",
+      "cat": "shakes",
+      "name": "Oreo Shake",
+      "desc": "Cookies and cream, blended thick, 300ml",
+      "price": 99,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "hazelnut-shake",
+      "cat": "shakes",
+      "name": "Hazelnut Shake",
+      "desc": "Roasted hazelnut, chocolate, crunch, 300ml",
+      "price": 129,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "kitkat-shake",
+      "cat": "shakes",
+      "name": "Kitkat Shake",
+      "desc": "Kitkat crunch in a thick shake, 300ml",
+      "price": 129,
+      "img": "pdfmenu/margherita.jpg",
+      "tags": [
+        "menu-card"
+      ]
     },
     {
       "id": "xto-special-shake",
-      "cat": "coffee-shakes",
+      "cat": "shakes",
       "name": "XTO Special Shake",
-      "desc": "Our signature loaded shake. Ask us why it's special",
-      "price": 229,
-      "img": "xto-special-shake",
+      "desc": "Our signature loaded shake. Ask us why it is special",
+      "price": 149,
+      "img": "pdfmenu/shakes-shared.jpg",
       "tags": [
-        "premium"
+        "menu-card"
+      ]
+    },
+    {
+      "id": "ice-tea",
+      "cat": "ice-tea",
+      "name": "Ice Tea",
+      "desc": "Brewed, iced, 300ml",
+      "price": 49,
+      "img": "pdfmenu/ice-tea-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "peach-ice-tea",
+      "cat": "ice-tea",
+      "name": "Peach Ice Tea",
+      "desc": "Peach notes over cold brew, 300ml",
+      "price": 69,
+      "img": "pdfmenu/ice-tea-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "coke",
+      "cat": "soft-drinks",
+      "name": "Coke",
+      "desc": "250ml, charged at MRP",
+      "price": 40,
+      "img": "pdfmenu/soft-drinks-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "sprite",
+      "cat": "soft-drinks",
+      "name": "Sprite",
+      "desc": "250ml, charged at MRP",
+      "price": 40,
+      "img": "pdfmenu/soft-drinks-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "thums-up",
+      "cat": "soft-drinks",
+      "name": "Thums Up",
+      "desc": "250ml, charged at MRP",
+      "price": 40,
+      "img": "pdfmenu/soft-drinks-shared.jpg",
+      "tags": [
+        "menu-card"
+      ]
+    },
+    {
+      "id": "diet-coke",
+      "cat": "soft-drinks",
+      "name": "Diet Coke",
+      "desc": "250ml, charged at MRP",
+      "price": 40,
+      "img": "pdfmenu/soft-drinks-shared.jpg",
+      "tags": [
+        "menu-card"
       ]
     }
-  ]
+  ],
+  "deliveryFee": 29,
+  "freeDeliveryAbove": 499
 }
