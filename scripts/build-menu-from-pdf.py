@@ -24,21 +24,20 @@ def slugify(s):
 import re
 
 # pull pdf crops and ai shots into public/images/pdfmenu with clean names
-used = set()
+
 def img_for(*candidates):
-    """first existing source: pdf crop dir, ai dir, public root"""
+    """first existing source: exact pdfmenu stem, then ai dir, then public root"""
     for c in candidates:
-        slug = slugify(c)
-        for base in (PDF_IMG, AI_IMG, os.path.join(ROOT, 'public', 'images')):
+        stem = c
+        for base in (PUB_PDF, PDF_IMG, AI_IMG, os.path.join(ROOT, 'public', 'images')):
             for ext in ('.jpg', '.png'):
-                p = os.path.join(base, c + ext)
+                p = os.path.join(base, stem + ext)
                 if os.path.exists(p):
-                    out = slug + '.jpg'
+                    out = stem + '.jpg'
                     dst = os.path.join(PUB_PDF, out)
-                    if slug not in used or base == PDF_IMG:
+                    if not os.path.exists(dst) or base == PDF_IMG:
                         shutil.copy2(p, dst)
-                        used.add(slug)
-                    return 'pdfmenu/' + slug  # no extension: site templates append .jpg
+                    return 'pdfmenu/' + stem  # no extension: site templates append .jpg
     return 'pdfmenu/margherita.jpg'  # safe fallback
 
 # seed: make sure every needed source lands in pdfmenu
@@ -87,11 +86,11 @@ def one(cat, name, desc, price, img):
 
 items = []
 # Magic Mania (6 inches)
-items += [one("magic-mania", "Tomato & Cheese (6 in)", "Classic cheese, oregano, fresh tomato sauce", 59, img_for("Tomato Cheese"))]
-items += [one("magic-mania", "Onion & Cheese (6 in)", "Caramelised onion, double cheese blend", 69, img_for("Onion Cheese"))]
+items += [one("magic-mania", "Tomato & Cheese (6 in)", "Classic cheese, oregano, fresh tomato sauce", 59, img_for("tomato-cheese"))]
+items += [one("magic-mania", "Onion & Cheese (6 in)", "Caramelised onion, double cheese blend", 69, img_for("onion-cheese"))]
 # Premium
 items += pizza("premium", "Margherita", "Fresh tomato and cheddar cheese", 99, 199, 399, img_for("Margherita"))
-items += pizza("premium", "Corn & Cheese", "Red onion, sweet corn and mozzarella cheese", 139, 299, 439, img_for("Corn Cheese"))
+items += pizza("premium", "Corn & Cheese", "Red onion, sweet corn and mozzarella cheese", 139, 299, 439, img_for("corn-cheese"))
 items += pizza("premium", "Paneer Makhani", "Paneer, onion, capsicum, paprika and special makhni sauce", 149, 349, 459, img_for("Paneer Makhani"))
 items += pizza("premium", "Dil Desi", "Capsicum, onion, tomato and delicious cheese", 189, 369, 449, img_for("Dil Desi"))
 items += pizza("premium", "Farmer's Delight", "Farm fresh mushroom, tomato, capsicum, onion, sweet corn and delicious cheese", 209, 379, 489, img_for("Farmers Delight"))
@@ -108,73 +107,73 @@ items += duo("pasta", "Veg Alfredo", "Cheesy white alfredo sauce with mushrooms,
 items += duo("pasta", "Tandoori Pasta", "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours", 189, 289, img_for("Tandoori Pasta"))
 items += [one("pasta", "Chef's Special Pasta", "Two sauce, red and white, basil, bell pepper, mushroom, zucchini and delicious cheese and cream", 299, img_for("Chef's Special Pasta"))]
 # The Oven Bits
-items += [one("oven-bits", "Garlic Bread", "Ciabatta toasted with generous dose of roasted garlic, flavoured salted butter", 99, img_for("Garlic Bread"))]
-items += [one("oven-bits", "Cheese Chilli Tost", "Cheesy chilli toast, a signature snack", 149, img_for("Cheese Chilli Tost"))]
-items += [one("oven-bits", "Cheesy Garlic Bread", "Garlic bread topped with signature cheese, italian herbs and spices", 159, img_for("Cheesy Garlic Bread"))]
+items += [one("oven-bits", "Garlic Bread", "Ciabatta toasted with generous dose of roasted garlic, flavoured salted butter", 99, img_for("garlic-bread"))]
+items += [one("oven-bits", "Cheese Chilli Tost", "Cheesy chilli toast, a signature snack", 149, img_for("cheese-chilli-tost"))]
+items += [one("oven-bits", "Cheesy Garlic Bread", "Garlic bread topped with signature cheese, italian herbs and spices", 159, img_for("cheesy-garlic-bread"))]
 # Sandwich
-items += [one("sandwich", "Veg Grilled Sandwich", "Tomato, onion and capsicum", 89, img_for("Veg Grilled Sandwich"))]
-items += [one("sandwich", "Cheese Corn Sandwich", "Three types of cheese and american sweet corn", 139, img_for("Cheese Corn Sandwich"))]
-items += [one("sandwich", "Paneer Tikka Sandwich", "Paneer tikka, onion, capsicum and delicious cheese", 169, img_for("Paneer Tikka Sandwich"))]
+items += [one("sandwich", "Veg Grilled Sandwich", "Tomato, onion and capsicum", 89, img_for("veg-grilled-sandwich"))]
+items += [one("sandwich", "Cheese Corn Sandwich", "Three types of cheese and american sweet corn", 139, img_for("cheese-corn-sandwich"))]
+items += [one("sandwich", "Paneer Tikka Sandwich", "Paneer tikka, onion, capsicum and delicious cheese", 169, img_for("paneer-tikka-sandwich"))]
 # Burger
-items += [one("burger", "Veg Burger", "Classic veg patty, fresh veggies, house sauce", 59, img_for("Burgers SHARED"))]
-items += [one("burger", "Crispy Veg Burger", "Crumb-fried patty, lettuce, house mayo, sesame bun", 99, img_for("Crispy Veg Burger"))]
-items += [one("burger", "Cheese Veg Burger", "Cheese slice, veg patty, mayo, fresh veggies", 119, img_for("Burgers SHARED"))]
-items += [one("burger", "Double Cheese Veg Burger", "Double cheese slices, tangy sauce, crunchy patty", 139, img_for("Double Cheese Veg Burger"))]
-items += [one("burger", "Tandoori Paneer Burger", "Tandoori paneer patty, mint mayo, onions", 149, img_for("Burgers SHARED"))]
-items += [one("burger", "Spicy Paneer Veg Burger", "Masala paneer patty, peri mayo, pickled onion", 149, img_for("Spicy Paneer Veg Burger"))]
-items += [one("burger", "Tower Veg Burger", "Triple-decker stack, cheese, patty, fresh veggies", 169, img_for("Tower Veg Burger"))]
+items += [one("burger", "Veg Burger", "Classic veg patty, fresh veggies, house sauce", 59, img_for("burgers-shared"))]
+items += [one("burger", "Crispy Veg Burger", "Crumb-fried patty, lettuce, house mayo, sesame bun", 99, img_for("crispy-veg-burger"))]
+items += [one("burger", "Cheese Veg Burger", "Cheese slice, veg patty, mayo, fresh veggies", 119, img_for("burgers-shared"))]
+items += [one("burger", "Double Cheese Veg Burger", "Double cheese slices, tangy sauce, crunchy patty", 139, img_for("double-cheese-veg-burger"))]
+items += [one("burger", "Tandoori Paneer Burger", "Tandoori paneer patty, mint mayo, onions", 149, img_for("burgers-shared"))]
+items += [one("burger", "Spicy Paneer Veg Burger", "Masala paneer patty, peri mayo, pickled onion", 149, img_for("spicy-paneer-veg-burger"))]
+items += [one("burger", "Tower Veg Burger", "Triple-decker stack, cheese, patty, fresh veggies", 169, img_for("tower-veg-burger"))]
 # Light Bite
-items += [one("light-bite", "French Fries", "Golden, salted, dangerously crisp", 89, img_for("French Fries"))]
-items += [one("light-bite", "Peri Peri Fries", "Tossed in fiery peri peri dust", 139, img_for("Peri Peri Fries"))]
-items += [one("light-bite", "Cheese Jalapeno French Fries", "Loaded cheese sauce, jalapeno kick", 169, img_for("Cheese Jalapeno French Fries"))]
-items += [one("light-bite", "Salsa Nachos", "House salsa, cheese, crunchy tortillas", 159, img_for("Nachos SHARED"))]
-items += [one("light-bite", "Creme Cheese Nachos", "Creme cheese, jalapenos, crunchy tortillas", 189, img_for("Creme Cheese Nachos"))]
+items += [one("light-bite", "French Fries", "Golden, salted, dangerously crisp", 89, img_for("french-fries"))]
+items += [one("light-bite", "Peri Peri Fries", "Tossed in fiery peri peri dust", 139, img_for("peri-peri-fries"))]
+items += [one("light-bite", "Cheese Jalapeno French Fries", "Loaded cheese sauce, jalapeno kick", 169, img_for("cheese-jalapeno-fries"))]
+items += [one("light-bite", "Salsa Nachos", "House salsa, cheese, crunchy tortillas", 159, img_for("nachos-shared"))]
+items += [one("light-bite", "Creme Cheese Nachos", "Creme cheese, jalapenos, crunchy tortillas", 189, img_for("creme-cheese-nachos"))]
 # Cheese Dip
-items += [one("cheese-dip", "Cocktail Mayo Dip", "Cool, creamy, classic", 30, img_for("Cocktail Mayo"))]
-items += [one("cheese-dip", "Cheese Jalapeno Dip", "Creamy dip with jalapeno heat", 30, img_for("Cheese Jalapeno"))]
-items += [one("cheese-dip", "Peri Peri Dip", "Fiery peri peri folded into cheese", 30, img_for("Peri Peri"))]
+items += [one("cheese-dip", "Cocktail Mayo Dip", "Cool, creamy, classic", 30, img_for("cocktail-mayo-dip"))]
+items += [one("cheese-dip", "Cheese Jalapeno Dip", "Creamy dip with jalapeno heat", 30, img_for("cheese-jalapeno-dip"))]
+items += [one("cheese-dip", "Peri Peri Dip", "Fiery peri peri folded into cheese", 30, img_for("peri-peri-dip"))]
 # Wrap
 items += [one("wrap", "Aloo Verona Wrap", "Spiced potato, mint mayo, crunch, rolled tight", 139, img_for("Aloo Verona Wrap"))]
 items += [one("wrap", "Paneer Fajita Wrap", "Fajita paneer, peppers, onion, chipotle mayo", 159, img_for("Paneer Fajita Wrap"))]
 items += [one("wrap", "Paneer Tikka Wrap", "Char-grilled paneer tikka, onion, mint chutney", 159, img_for("Paneer Tikka Wrap"))]
 # Salad
-items += [one("salad", "Mexican Salad", "Kidney beans, sweet corn, tomato, lettuce, cucumber, dressing, salsa sauce", 289, img_for("Mexican Salad"))]
+items += [one("salad", "Mexican Salad", "Kidney beans, sweet corn, tomato, lettuce, cucumber, dressing, salsa sauce", 289, img_for("mexican-salad"))]
 # Combo
-items += [one("combo", "Combo Crush", "1 veg burger, 1 french fries, 2 pcs garlic bread / any one 250ml (coke, thums up or sprite)", 159, img_for("Combo Crush"))]
-items += [one("combo", "Magic Combo", "2 veg burgers, 1 margherita pizza 7 inch, 1 french fries", 289, img_for("Magic Combo"))]
-items += [one("combo", "King Combo", "Any one 7 inch pizza (onion cheese, tomato cheese, margherita, sweet corn), 1 salsa nachos, any one 250ml drink", 329, img_for("King Combo"))]
-items += [one("combo", "Combo Magambo", "2 veg burgers, any one 7 inch premium pizza, 2 pcs garlic bread or 1 french fries, any two 250ml drinks", 429, img_for("Combo Magambo"))]
-items += [one("combo", "Party Combo 1", "1 veg grilled sandwich, 1 premium pizza (regular), 1 french fries, 2 frooti", 449, img_for("Party Combo-1"))]
-items += [one("combo", "Party Combo 2", "2 medium pizzas (any), 2 blue lagoon / summer cooler", 899, img_for("Party Combo-2"))]
+items += [one("combo", "Combo Crush", "1 veg burger, 1 french fries, 2 pcs garlic bread / any one 250ml (coke, thums up or sprite)", 159, img_for("combo-crush"))]
+items += [one("combo", "Magic Combo", "2 veg burgers, 1 margherita pizza 7 inch, 1 french fries", 289, img_for("magic-combo"))]
+items += [one("combo", "King Combo", "Any one 7 inch pizza (onion cheese, tomato cheese, margherita, sweet corn), 1 salsa nachos, any one 250ml drink", 329, img_for("king-combo"))]
+items += [one("combo", "Combo Magambo", "2 veg burgers, any one 7 inch premium pizza, 2 pcs garlic bread or 1 french fries, any two 250ml drinks", 429, img_for("combo-magambo"))]
+items += [one("combo", "Party Combo 1", "1 veg grilled sandwich, 1 premium pizza (regular), 1 french fries, 2 frooti", 449, img_for("party-combo-1"))]
+items += [one("combo", "Party Combo 2", "2 medium pizzas (any), 2 blue lagoon / summer cooler", 899, img_for("party-combo-2"))]
 # Cold Coffee
-items += [one("cold-coffee", "Cold Coffee", "Smooth, frothy, timeless", 49, img_for("Cold Coffee"))]
-items += [one("cold-coffee", "Thick Cold Coffee", "Extra thick, extra cold", 89, img_for("Thick Cold Coffee"))]
-items += [one("cold-coffee", "Chocolate-y Iced Mocha", "Chocolate and coffee, iced and indulgent", 99, img_for("Chocolate-y Iced Mocha"))]
-items += [one("cold-coffee", "Thick Cold Coffee with Chocolate Crush", "Thick cold coffee loaded with chocolate crush", 109, img_for("Cold Coffee"))]
+items += [one("cold-coffee", "Cold Coffee", "Smooth, frothy, timeless", 49, img_for("cold-coffee"))]
+items += [one("cold-coffee", "Thick Cold Coffee", "Extra thick, extra cold", 89, img_for("thick-cold-coffee"))]
+items += [one("cold-coffee", "Chocolate-y Iced Mocha", "Chocolate and coffee, iced and indulgent", 99, img_for("chocolatey-iced-mocha"))]
+items += [one("cold-coffee", "Thick Cold Coffee with Chocolate Crush", "Thick cold coffee loaded with chocolate crush", 109, img_for("cold-coffee"))]
 # Mocktails
-items += [one("mocktails", "Strawberry Margherta", "Strawberry sparkle, 300ml", 79, img_for("Mocktails SHARED"))]
-items += [one("mocktails", "Mango Mojito", "Mango, mint, lime, 300ml", 79, img_for("Mocktails SHARED"))]
-items += [one("mocktails", "Kiwi Crush", "Real kiwi, crushed ice, 300ml", 79, img_for("Mocktails SHARED"))]
-items += [one("mocktails", "Summer Cooler", "Seasonal fruits, sparkling, light, 300ml", 89, img_for("Mocktails SHARED"))]
-items += [one("mocktails", "Blue Lagoon", "Electric blue citrus cooler, 300ml", 99, img_for("Mocktails SHARED"))]
-items += [one("mocktails", "Mojito", "Mint, lime, soda, classic refresher, 300ml", 109, img_for("Mocktails SHARED"))]
+items += [one("mocktails", "Strawberry Margherta", "Strawberry sparkle, 300ml", 79, img_for("mocktails-shared"))]
+items += [one("mocktails", "Mango Mojito", "Mango, mint, lime, 300ml", 79, img_for("mocktails-shared"))]
+items += [one("mocktails", "Kiwi Crush", "Real kiwi, crushed ice, 300ml", 79, img_for("mocktails-shared"))]
+items += [one("mocktails", "Summer Cooler", "Seasonal fruits, sparkling, light, 300ml", 89, img_for("mocktails-shared"))]
+items += [one("mocktails", "Blue Lagoon", "Electric blue citrus cooler, 300ml", 99, img_for("mocktails-shared"))]
+items += [one("mocktails", "Mojito", "Mint, lime, soda, classic refresher, 300ml", 109, img_for("mocktails-shared"))]
 # Shakes
-items += [one("shakes", "Strawberry Shake", "Real strawberry, creamy, 300ml", 89, img_for("Strawberry Shake"))]
-items += [one("shakes", "Strawberry Kiwi Shake", "Strawberry meets kiwi tang, 300ml", 89, img_for("Strawberry Kiwi Shake"))]
+items += [one("shakes", "Strawberry Shake", "Real strawberry, creamy, 300ml", 89, img_for("strawberry-shake"))]
+items += [one("shakes", "Strawberry Kiwi Shake", "Strawberry meets kiwi tang, 300ml", 89, img_for("strawberry-kiwi-shake"))]
 items += [one("shakes", "Mango Shake", "Alphonso mango blended thick, 300ml", 89, img_for("Shakes SHARED"))]
 items += [one("shakes", "Banana Shake", "Creamy banana, 300ml", 89, img_for("Shakes SHARED"))]
-items += [one("shakes", "Oreo Shake", "Cookies and cream, blended thick, 300ml", 99, img_for("Oreo Shake"))]
-items += [one("shakes", "Hazelnut Shake", "Roasted hazelnut, chocolate, crunch, 300ml", 129, img_for("Hazelnut Shake"))]
-items += [one("shakes", "Kitkat Shake", "Kitkat crunch in a thick shake, 300ml", 129, img_for("Kitkat Shake"))]
+items += [one("shakes", "Oreo Shake", "Cookies and cream, blended thick, 300ml", 99, img_for("oreo-shake"))]
+items += [one("shakes", "Hazelnut Shake", "Roasted hazelnut, chocolate, crunch, 300ml", 129, img_for("hazelnut-shake"))]
+items += [one("shakes", "Kitkat Shake", "Kitkat crunch in a thick shake, 300ml", 129, img_for("kitkat-shake"))]
 items += [one("shakes", "XTO Special Shake", "Our signature loaded shake. Ask us why it is special", 149, img_for("Shakes SHARED"))]
 # Ice Tea
-items += [one("ice-tea", "Ice Tea", "Brewed, iced, 300ml", 49, img_for("Ice Tea SHARED"))]
-items += [one("ice-tea", "Peach Ice Tea", "Peach notes over cold brew, 300ml", 69, img_for("Ice Tea SHARED"))]
+items += [one("ice-tea", "Ice Tea", "Brewed, iced, 300ml", 49, img_for("ice-tea-shared"))]
+items += [one("ice-tea", "Peach Ice Tea", "Peach notes over cold brew, 300ml", 69, img_for("ice-tea-shared"))]
 # Soft Drinks (MRP)
-items += [one("soft-drinks", "Coke", "250ml, charged at MRP", 40, img_for("Soft Drinks SHARED"))]
-items += [one("soft-drinks", "Sprite", "250ml, charged at MRP", 40, img_for("Soft Drinks SHARED"))]
-items += [one("soft-drinks", "Thums Up", "250ml, charged at MRP", 40, img_for("Soft Drinks SHARED"))]
-items += [one("soft-drinks", "Diet Coke", "250ml, charged at MRP", 40, img_for("Soft Drinks SHARED"))]
+items += [one("soft-drinks", "Coke", "250ml, charged at MRP", 40, img_for("soft-drinks-shared"))]
+items += [one("soft-drinks", "Sprite", "250ml, charged at MRP", 40, img_for("soft-drinks-shared"))]
+items += [one("soft-drinks", "Thums Up", "250ml, charged at MRP", 40, img_for("soft-drinks-shared"))]
+items += [one("soft-drinks", "Diet Coke", "250ml, charged at MRP", 40, img_for("soft-drinks-shared"))]
 
 # integrity
 ids = [i["id"] for i in items]
