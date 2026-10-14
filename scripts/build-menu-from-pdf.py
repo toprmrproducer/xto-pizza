@@ -105,7 +105,7 @@ items += pizza("gourmet", "Chef's Special Paneer Tikka", "IFP cheese blend, tand
 items += duo("pasta", "Arabiatta Pasta", "All-time favourite red arabiatta sauce with leeks, celery, olives, garlic and delicious cheese", 169, 269, img_for("Arabiatta Pasta"))
 items += duo("pasta", "Veg Alfredo", "Cheesy white alfredo sauce with mushrooms, leeks, celery, onion, garlic, cream, cheddar cheese", 169, 269, img_for("Veg Alfredo"))
 items += duo("pasta", "Tandoori Pasta", "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours", 189, 289, img_for("Tandoori Pasta"))
-items += [one("pasta", "Chef's Special Pasta", "Two sauce, red and white, basil, bell pepper, mushroom, zucchini and delicious cheese and cream", 299, img_for("Chef's Special Pasta"))]
+items += [one("pasta", "Chef's Special Pasta", "Two sauce, red and white, basil, bell pepper, mushroom, zucchini and delicious cheese and cream", 299, img_for("chefs-special-pasta"))]
 # The Oven Bits
 items += [one("oven-bits", "Garlic Bread", "Ciabatta toasted with generous dose of roasted garlic, flavoured salted butter", 99, img_for("garlic-bread"))]
 items += [one("oven-bits", "Cheese Chilli Tost", "Cheesy chilli toast, a signature snack", 149, img_for("cheese-chilli-tost"))]
@@ -133,9 +133,9 @@ items += [one("cheese-dip", "Cocktail Mayo Dip", "Cool, creamy, classic", 30, im
 items += [one("cheese-dip", "Cheese Jalapeno Dip", "Creamy dip with jalapeno heat", 30, img_for("cheese-jalapeno-dip"))]
 items += [one("cheese-dip", "Peri Peri Dip", "Fiery peri peri folded into cheese", 30, img_for("peri-peri-dip"))]
 # Wrap
-items += [one("wrap", "Aloo Verona Wrap", "Spiced potato, mint mayo, crunch, rolled tight", 139, img_for("Aloo Verona Wrap"))]
-items += [one("wrap", "Paneer Fajita Wrap", "Fajita paneer, peppers, onion, chipotle mayo", 159, img_for("Paneer Fajita Wrap"))]
-items += [one("wrap", "Paneer Tikka Wrap", "Char-grilled paneer tikka, onion, mint chutney", 159, img_for("Paneer Tikka Wrap"))]
+items += [one("wrap", "Aloo Verona Wrap", "Spiced potato, mint mayo, crunch, rolled tight", 139, img_for("aloo-verona-wrap"))]
+items += [one("wrap", "Paneer Fajita Wrap", "Fajita paneer, peppers, onion, chipotle mayo", 159, img_for("paneer-fajita-wrap"))]
+items += [one("wrap", "Paneer Tikka Wrap", "Char-grilled paneer tikka, onion, mint chutney", 159, img_for("paneer-tikka-wrap"))]
 # Salad
 items += [one("salad", "Mexican Salad", "Kidney beans, sweet corn, tomato, lettuce, cucumber, dressing, salsa sauce", 289, img_for("mexican-salad"))]
 # Combo
