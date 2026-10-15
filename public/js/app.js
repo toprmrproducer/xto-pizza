@@ -77,7 +77,8 @@ function installHint() {
   const isStandalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
   const dismissed = localStorage.getItem('xto_install_dismissed');
-  if (isStandalone || dismissed) return;
+  const inStoreApp = /XTOPizzaApp/.test(navigator.userAgent); // the Play/App Store wrapper is already installed
+  if (isStandalone || dismissed || inStoreApp) return;
   window.addEventListener('beforeinstallprompt', (e) => { deferred = e; });
   setTimeout(() => {
     if (isStandalone) return;
@@ -276,7 +277,6 @@ function updateCartUI() {
   }).join('') + `
     <div class="bill-card">
       <div class="bill-row"><span>Item total</span><span>${INR(itemTotal)}</span></div>
-      <div class="bill-row"><span>Delivery fee</span><span>${deliveryFee === 0 ? 'FREE' : INR(deliveryFee)}</span></div>
       <div class="bill-row big"><span>To pay</span><span>${INR(total)}</span></div>
     </div>
     <button class="btn-primary block" id="ckOpenBtn">Checkout ${INR(total)}</button>`;
