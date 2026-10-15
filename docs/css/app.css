@@ -274,3 +274,24 @@ h1, h3 { font-family: 'Sora', sans-serif; letter-spacing: -0.02em; }
 .fresh-rail { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -18px; padding: 2px 18px 10px; scrollbar-width: none; }
 .fresh-rail::-webkit-scrollbar { display: none; }
 .fresh-rail img { flex: 0 0 74%; max-width: 320px; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 20px; scroll-snap-align: start; }
+
+/* grouped sizes + option sheet */
+.m-chips { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 2px; }
+.m-chip { border: 1.5px solid var(--line); background: #fff; border-radius: 10px; padding: 5px 9px; font: 600 .74rem 'Inter'; text-align: center; line-height: 1.2; color: var(--ink); cursor: pointer; }
+.m-chip small { display: block; font-weight: 700; color: #6f6656; }
+.m-chip.on { border-color: var(--orange); background: #fff1e3; }
+.m-chip.on small { color: var(--orange); }
+.m-chip:disabled { opacity: .45; }
+.qthumb { display: block; width: 54px; height: 54px; border-radius: 50%; overflow: hidden; margin: 0 auto 6px; }
+.qthumb img { width: 100%; height: 100%; object-fit: cover; }
+.opt-head { display: flex; gap: 12px; align-items: center; }
+.opt-head img { width: 70px; height: 70px; border-radius: 14px; object-fit: cover; }
+.opt-head h4 { font-size: 1.1rem; } .opt-head p { font-size: .8rem; color: #6f6656; margin-top: 3px; }
+.opt-h { font: 700 .7rem 'Inter'; letter-spacing: .14em; text-transform: uppercase; color: #6f6656; margin-top: 4px; }
+.opt-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 12px; border: 1.5px solid var(--line); border-radius: 12px; margin-bottom: 8px; font: 600 .92rem 'Inter'; background: #fff; }
+.opt-row input { accent-color: var(--orange); width: 18px; height: 18px; vertical-align: -3px; margin-right: 6px; }
+.opt-foot { display: flex; gap: 12px; align-items: center; margin-top: 8px; }
+.opt-foot .btn-primary { flex: 1; }
+.opt-qty { display: inline-flex; align-items: center; border: 1.5px solid var(--line); border-radius: 12px; }
+.opt-qty button { background: none; border: 0; width: 38px; height: 42px; font: 800 1.1rem 'Inter'; cursor: pointer; }
+.opt-qty span { min-width: 22px; text-align: center; font-weight: 800; }

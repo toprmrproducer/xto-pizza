@@ -47,6 +47,7 @@
         <button class="tab" data-tab="riders">Riders</button>
         <button class="tab" data-tab="offers">Offers</button>
         <button class="tab" data-tab="notify">Notify</button>
+        <button class="tab" data-tab="enquiries">Enquiries <span id="enqBadge" class="meta-chip" style="display:none"></span></button>
       </nav>
     </div>
   </header>
@@ -111,6 +112,14 @@
       <div class="mm-msg" id="ofMsg"></div>
     </div>
     <div class="offers-table-wrap card-panel"><div id="offersList"></div></div>
+  </main>
+
+  <main class="pane hidden" id="enquiriesPane">
+    <div class="pane-head">
+      <div><h2>Enquiries</h2><p class="mm-sub">Franchise, careers and contact forms from the website. Call the number and mark it Contacted.</p></div>
+      <div class="pane-actions"><select id="enqFilter"><option value="">All types</option><option value="franchise">Franchise</option><option value="career">Careers</option><option value="contact">Contact</option></select></div>
+    </div>
+    <div id="enqList" class="card-panel" style="padding:0;overflow:auto"></div>
   </main>
 
   <main class="pane hidden" id="notifyPane">

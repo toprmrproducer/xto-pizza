@@ -255,6 +255,7 @@ function connectSSE() {
   state.sse = es;
   es.addEventListener('order:new', (e) => { const o = JSON.parse(e.data); beep(); toast('New order ' + o.id + ' from ' + o.customer.name + '!'); refreshOrders(); refreshStats(); });
   es.addEventListener('order:update', () => { refreshOrders(); refreshStats(); });
+  es.addEventListener('enquiry:new', (e) => { const q = JSON.parse(e.data); beep(); toast('New ' + (q.type || '') + ' enquiry from ' + q.name); refreshEnquiries(); });
   es.addEventListener('menu:update', () => { menuItems = []; renderMenuMgr(); });
   es.addEventListener('rider:pos', (e) => { state.riderPos = JSON.parse(e.data); paintRidersOnMap(); paintRidersList(); });
   es.addEventListener('offers:update', () => { if (!$('#offersPane').classList.contains('hidden')) refreshOffers(); });
@@ -276,7 +277,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Backspace') { pinBuf = pinBuf.slice(0, -1); renderDots(); }
   }
 });
-const PANES = { orders: 'board', menu: 'menuMgr', riders: 'ridersPane', offers: 'offersPane', notify: 'notifyPane' };
+const PANES = { orders: 'board', menu: 'menuMgr', riders: 'ridersPane', offers: 'offersPane', notify: 'notifyPane', enquiries: 'enquiriesPane' };
 $$('.tab').forEach((t) => t.addEventListener('click', () => {
   $$('.tab').forEach((x) => x.classList.toggle('active', x === t));
   Object.entries(PANES).forEach(([k, id]) => $('#' + id).classList.toggle('hidden', k !== t.dataset.tab));
@@ -284,6 +285,7 @@ $$('.tab').forEach((t) => t.addEventListener('click', () => {
   if (t.dataset.tab === 'riders') { initRidersPane(); refreshRiders(); }
   if (t.dataset.tab === 'offers') refreshOffers();
   if (t.dataset.tab === 'notify') refreshNotifyStats();
+  if (t.dataset.tab === 'enquiries') refreshEnquiries();
 }));
 $('#mmSearch').addEventListener('input', paintMenuMgr);
 
@@ -489,3 +491,39 @@ document.addEventListener('click', (e) => {
 $('#eiClose')?.addEventListener('click', () => $('#editItemModal').classList.add('hidden'));
 $('#eiSave')?.addEventListener('click', saveItemEdit);
 $('#eiDelete')?.addEventListener('click', deleteItem);
+
+
+/* ---------------- enquiries inbox ---------------- */
+const TYPE_LABEL = { franchise: 'Franchise', career: 'Careers', contact: 'Contact' };
+let enquiries = [];
+function escHtml(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+async function refreshEnquiries() {
+  try {
+    const r = await api('/api/admin/enquiries');
+    enquiries = r.enquiries || [];
+  } catch (e) { return; }
+  const nu = enquiries.filter((e) => e.status === 'NEW').length;
+  const badge = $('#enqBadge');
+  if (badge) { badge.style.display = nu ? '' : 'none'; badge.textContent = nu; }
+  renderEnquiries();
+}
+function renderEnquiries() {
+  const f = ($('#enqFilter') || {}).value || '';
+  const list = enquiries.filter((e) => !f || e.type === f);
+  $('#enqList').innerHTML = list.length ? `<table style="width:100%;border-collapse:collapse;font-size:.92rem">
+    <thead><tr style="text-align:left;border-bottom:1px solid var(--line, #333)"><th style="padding:12px">When</th><th>Type</th><th>Name</th><th>Phone</th><th>City / role</th><th>Message</th><th>Status</th></tr></thead>
+    <tbody>${list.map((e) => `<tr style="border-bottom:1px solid var(--line, #333);vertical-align:top">
+      <td style="padding:12px;white-space:nowrap">${new Date(e.createdAt).toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}<br><small>${escHtml(e.id)}</small></td>
+      <td>${TYPE_LABEL[e.type] || escHtml(e.type)}</td>
+      <td><b>${escHtml(e.name)} ${escHtml(e.lastName)}</b><br><small>${escHtml(e.email)}</small></td>
+      <td><a href="tel:${escHtml(e.phone)}">${escHtml(e.phone)}</a></td>
+      <td>${escHtml(e.city)}${e.extra && e.extra.role ? escHtml(e.extra.role) : ''}${e.extra && e.extra.space ? '<br><small>' + escHtml(e.extra.space) + '</small>' : ''}</td>
+      <td style="max-width:300px">${escHtml(e.message)}</td>
+      <td><select data-enq="${escHtml(e.id)}">${['NEW', 'CONTACTED', 'CLOSED'].map((s) => `<option${s === e.status ? ' selected' : ''}>${s}</option>`).join('')}</select></td>
+    </tr>`).join('')}</tbody></table>` : '<p style="padding:24px">No enquiries yet.</p>';
+  $$('#enqList select[data-enq]').forEach((s) => s.addEventListener('change', async () => {
+    await api('/api/admin/enquiries/' + encodeURIComponent(s.dataset.enq) + '/status', { method: 'POST', body: JSON.stringify({ status: s.value }) }).catch(() => {});
+    refreshEnquiries();
+  }));
+}
+document.addEventListener('change', (e) => { if (e.target && e.target.id === 'enqFilter') renderEnquiries(); });

@@ -25,7 +25,7 @@
     if (url.indexOf('/api/') !== 0) return real(input, init);
     var path = url.split('?')[0], qs = new URLSearchParams(url.split('?')[1] || '');
     var body = {}; try { body = (init && init.body) ? JSON.parse(init.body) : {}; } catch (e) {}
-    if (path === '/api/menu') return Promise.resolve(ok({ categories: D.menu.categories, items: D.menu.items.map(function (i) { return Object.assign({}, i, { available: true }); }), deliveryFee: D.menu.deliveryFee, freeDeliveryAbove: D.menu.freeDeliveryAbove, currency: 'INR' }));
+    if (path === '/api/menu') return Promise.resolve(ok({ addons: D.menu.addons || [], categories: D.menu.categories, items: D.menu.items.map(function (i) { return Object.assign({}, i, { available: true }); }), deliveryFee: D.menu.deliveryFee, freeDeliveryAbove: D.menu.freeDeliveryAbove, currency: 'INR' }));
     if (path === '/api/outlets') return Promise.resolve(ok({ outlets: D.outlets }));
     if (path === '/api/config') return Promise.resolve(ok({ brand: D.config.brand, razorpay: { keyId: 'rzp_test_demo', live: false }, vapid: null, outletsGeo: D.config.outletsGeo }));
     if (path === '/api/offers') return Promise.resolve(ok({ offers: D.offers }));
@@ -51,8 +51,13 @@
       var lines = (body.items || []).map(function (l) {
         var it = D.menu.items.find(function (i) { return i.id === l.id; });
         var q = Math.max(1, Math.min(20, +l.qty || 1));
-        itemTotal += it.price * q;
-        return { id: it.id, name: it.name, price: it.price, qty: q };
+        var unit = it.price, names = [];
+        (l.addons || []).forEach(function (aid) {
+          var ad = (D.menu.addons || []).find(function (a) { return a.id === aid; });
+          if (ad && it.size && ad.prices[it.size]) { unit += ad.prices[it.size]; names.push(ad.name); }
+        });
+        itemTotal += unit * q;
+        return { id: it.id, name: names.length ? it.name + ' + ' + names.join(', ') : it.name, price: unit, qty: q, addons: l.addons || [] };
       });
       if (!lines.length) return Promise.resolve(ok({ error: 'Empty cart' }, 400));
       var coupon = null;
@@ -80,6 +85,12 @@
     if (om) {
       var found = allOrders().find(function (o) { return o.id.toUpperCase() === om[1].toUpperCase(); });
       return Promise.resolve(found ? ok({ order: found }) : ok({ error: 'Order not found' }, 404));
+    }
+    if (path === '/api/enquiries' && init && init.method === 'POST') {
+      var nm = String(body.name || '').trim();
+      if (nm.length < 2) return Promise.resolve(ok({ error: 'Please enter your name' }, 400));
+      if (!/^[6-9]\d{9}$/.test(String(body.phone || '').replace(/\D/g, '').slice(-10))) return Promise.resolve(ok({ error: 'Please enter a valid 10-digit mobile number' }, 400));
+      return Promise.resolve(ok({ ok: true, id: 'DEMO-' + Math.floor(Math.random() * 9000 + 1000) }, 201));
     }
     if (path === '/api/track/rider') return Promise.resolve(ok({ rider: null }));
     return Promise.resolve(ok({ error: 'No route' }, 404));

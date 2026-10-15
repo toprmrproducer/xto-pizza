@@ -41,6 +41,14 @@ def find_ai(item):
 
 matched, fallback = [], []
 for item in menu['items']:
+    if item.get('imgLock'):  # dish has its own generated photo in public/images/ai
+        item['_ai'] = 'images/' + item['img'] + '.jpg'
+        src_own = os.path.join(ROOT, 'public', 'images', item['img'] + '.jpg')
+        dst_own = os.path.join(DOCS, 'images', item['img'] + '.jpg')
+        os.makedirs(os.path.dirname(dst_own), exist_ok=True)
+        if os.path.exists(src_own): shutil.copy2(src_own, dst_own)
+        matched.append(item['name'] + ' (own photo)')
+        continue
     src = find_ai(item)
     dst = os.path.join(AI_DIR, item['id'] + '.png')  # converted to .jpg below
     if src:

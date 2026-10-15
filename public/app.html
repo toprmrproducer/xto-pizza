@@ -120,6 +120,23 @@
 
 </main>
 
+<!-- OPTIONS SHEET: size + add-ons -->
+<div class="sheet" id="optSheet">
+  <div class="sheet-card">
+    <div class="sheet-handle"></div>
+    <div class="sheet-head"><h3>Customise</h3><button class="icon-x" id="optClose" aria-label="Close">&times;</button></div>
+    <div class="sheet-body">
+      <div class="opt-head"><img id="optImg" src="" alt=""><div><h4 id="optName"></h4><p id="optDesc"></p></div></div>
+      <div class="opt-h" id="optSizeH">Size</div><div id="optSizes"></div>
+      <div class="opt-h" id="optAddH">Make it yours</div><div id="optAddons"></div>
+      <div class="opt-foot">
+        <div class="opt-qty"><button type="button" id="optMinus" aria-label="Less">&minus;</button><span id="optQty">1</span><button type="button" id="optPlus" aria-label="More">+</button></div>
+        <button class="btn-primary" id="optAdd" type="button">Add to cart</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CHECKOUT SHEET -->
 <div class="sheet" id="checkoutSheet">
   <div class="sheet-card">

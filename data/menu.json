@@ -101,7 +101,11 @@
       "img": "ai/tomato-and-cheese-6-in",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tomato & Cheese",
+      "group": "tomato-cheese",
+      "size": "six",
+      "sizeLabel": "6 in"
     },
     {
       "id": "onion-and-cheese-6-in",
@@ -112,7 +116,11 @@
       "img": "ai/onion-and-cheese-6-in",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Onion & Cheese",
+      "group": "onion-cheese",
+      "size": "six",
+      "sizeLabel": "6 in"
     },
     {
       "id": "margherita-regular",
@@ -123,7 +131,11 @@
       "img": "ai/margherita-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Margherita",
+      "group": "margherita",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "margherita-medium",
@@ -134,7 +146,11 @@
       "img": "ai/margherita-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Margherita",
+      "group": "margherita",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "margherita-large",
@@ -145,7 +161,11 @@
       "img": "ai/margherita-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Margherita",
+      "group": "margherita",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "corn-and-cheese-regular",
@@ -153,10 +173,15 @@
       "name": "Corn & Cheese (Regular)",
       "desc": "Red onion, sweet corn and mozzarella cheese",
       "price": 139,
-      "img": "ai/corn-and-cheese-regular",
+      "img": "ai/corn-and-cheese-pizza",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Corn & Cheese",
+      "group": "corn-cheese",
+      "size": "regular",
+      "sizeLabel": "Regular",
+      "imgLock": true
     },
     {
       "id": "corn-and-cheese-medium",
@@ -164,10 +189,15 @@
       "name": "Corn & Cheese (Medium)",
       "desc": "Red onion, sweet corn and mozzarella cheese",
       "price": 299,
-      "img": "ai/corn-and-cheese-medium",
+      "img": "ai/corn-and-cheese-pizza",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Corn & Cheese",
+      "group": "corn-cheese",
+      "size": "medium",
+      "sizeLabel": "Medium",
+      "imgLock": true
     },
     {
       "id": "corn-and-cheese-large",
@@ -175,10 +205,15 @@
       "name": "Corn & Cheese (Large)",
       "desc": "Red onion, sweet corn and mozzarella cheese",
       "price": 439,
-      "img": "ai/corn-and-cheese-large",
+      "img": "ai/corn-and-cheese-pizza",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Corn & Cheese",
+      "group": "corn-cheese",
+      "size": "large",
+      "sizeLabel": "Large",
+      "imgLock": true
     },
     {
       "id": "paneer-makhani-regular",
@@ -189,7 +224,11 @@
       "img": "ai/paneer-makhani-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Paneer Makhani",
+      "group": "paneer-makhani",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "paneer-makhani-medium",
@@ -200,7 +239,11 @@
       "img": "ai/paneer-makhani-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Paneer Makhani",
+      "group": "paneer-makhani",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "paneer-makhani-large",
@@ -211,7 +254,11 @@
       "img": "ai/paneer-makhani-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Paneer Makhani",
+      "group": "paneer-makhani",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "dil-desi-regular",
@@ -222,7 +269,11 @@
       "img": "ai/dil-desi-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Dil Desi",
+      "group": "dil-desi",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "dil-desi-medium",
@@ -233,7 +284,11 @@
       "img": "ai/dil-desi-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Dil Desi",
+      "group": "dil-desi",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "dil-desi-large",
@@ -244,7 +299,11 @@
       "img": "ai/dil-desi-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Dil Desi",
+      "group": "dil-desi",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "farmers-delight-regular",
@@ -255,7 +314,11 @@
       "img": "ai/farmers-delight-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Farmer's Delight",
+      "group": "farmer-s-delight",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "farmers-delight-medium",
@@ -266,7 +329,11 @@
       "img": "ai/farmers-delight-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Farmer's Delight",
+      "group": "farmer-s-delight",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "farmers-delight-large",
@@ -277,7 +344,11 @@
       "img": "ai/farmers-delight-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Farmer's Delight",
+      "group": "farmer-s-delight",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "tandoori-paneer-tikka-regular",
@@ -288,7 +359,11 @@
       "img": "ai/tandoori-paneer-tikka-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tandoori Paneer Tikka",
+      "group": "tandoori-paneer-tikka",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "tandoori-paneer-tikka-medium",
@@ -299,7 +374,11 @@
       "img": "ai/tandoori-paneer-tikka-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tandoori Paneer Tikka",
+      "group": "tandoori-paneer-tikka",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "tandoori-paneer-tikka-large",
@@ -310,7 +389,11 @@
       "img": "ai/tandoori-paneer-tikka-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tandoori Paneer Tikka",
+      "group": "tandoori-paneer-tikka",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "tangy-paneer-pizza-regular",
@@ -321,7 +404,11 @@
       "img": "ai/tangy-paneer-pizza-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tangy Paneer Pizza",
+      "group": "tangy-paneer-pizza",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "tangy-paneer-pizza-medium",
@@ -332,7 +419,11 @@
       "img": "ai/tangy-paneer-pizza-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tangy Paneer Pizza",
+      "group": "tangy-paneer-pizza",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "tangy-paneer-pizza-large",
@@ -343,7 +434,11 @@
       "img": "ai/tangy-paneer-pizza-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tangy Paneer Pizza",
+      "group": "tangy-paneer-pizza",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "veggie-mexican-regular",
@@ -354,7 +449,11 @@
       "img": "ai/veggie-mexican-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Veggie Mexican",
+      "group": "veggie-mexican",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "veggie-mexican-medium",
@@ -365,7 +464,11 @@
       "img": "ai/veggie-mexican-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Veggie Mexican",
+      "group": "veggie-mexican",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "veggie-mexican-large",
@@ -376,7 +479,11 @@
       "img": "ai/veggie-mexican-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Veggie Mexican",
+      "group": "veggie-mexican",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "pesto-painting-regular",
@@ -387,7 +494,11 @@
       "img": "ai/pesto-painting-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Pesto Painting",
+      "group": "pesto-painting",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "pesto-painting-medium",
@@ -398,7 +509,11 @@
       "img": "ai/pesto-painting-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Pesto Painting",
+      "group": "pesto-painting",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "pesto-painting-large",
@@ -409,7 +524,11 @@
       "img": "ai/pesto-painting-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Pesto Painting",
+      "group": "pesto-painting",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "chefs-special-paneer-tikka-regular",
@@ -420,7 +539,11 @@
       "img": "ai/chefs-special-paneer-tikka-regular",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Chef's Special Paneer Tikka",
+      "group": "chef-s-special-paneer-tikka",
+      "size": "regular",
+      "sizeLabel": "Regular"
     },
     {
       "id": "chefs-special-paneer-tikka-medium",
@@ -431,7 +554,11 @@
       "img": "ai/chefs-special-paneer-tikka-medium",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Chef's Special Paneer Tikka",
+      "group": "chef-s-special-paneer-tikka",
+      "size": "medium",
+      "sizeLabel": "Medium"
     },
     {
       "id": "chefs-special-paneer-tikka-large",
@@ -442,7 +569,11 @@
       "img": "ai/chefs-special-paneer-tikka-large",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Chef's Special Paneer Tikka",
+      "group": "chef-s-special-paneer-tikka",
+      "size": "large",
+      "sizeLabel": "Large"
     },
     {
       "id": "arabiatta-pasta-half",
@@ -453,7 +584,11 @@
       "img": "ai/arabiatta-pasta-half",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Arabiatta Pasta",
+      "group": "arabiatta-pasta",
+      "size": "half",
+      "sizeLabel": "Half"
     },
     {
       "id": "arabiatta-pasta-full",
@@ -464,7 +599,11 @@
       "img": "ai/arabiatta-pasta-full",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Arabiatta Pasta",
+      "group": "arabiatta-pasta",
+      "size": "full",
+      "sizeLabel": "Full"
     },
     {
       "id": "veg-alfredo-half",
@@ -475,7 +614,11 @@
       "img": "ai/veg-alfredo-half",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Veg Alfredo",
+      "group": "veg-alfredo",
+      "size": "half",
+      "sizeLabel": "Half"
     },
     {
       "id": "veg-alfredo-full",
@@ -486,7 +629,11 @@
       "img": "ai/veg-alfredo-full",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Veg Alfredo",
+      "group": "veg-alfredo",
+      "size": "full",
+      "sizeLabel": "Full"
     },
     {
       "id": "tandoori-pasta-half",
@@ -494,10 +641,15 @@
       "name": "Tandoori Pasta (Half)",
       "desc": "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours",
       "price": 189,
-      "img": "pdfmenu/tandoori-pasta",
+      "img": "ai/tandoori-pasta",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tandoori Pasta",
+      "group": "tandoori-pasta",
+      "size": "half",
+      "sizeLabel": "Half",
+      "imgLock": true
     },
     {
       "id": "tandoori-pasta-full",
@@ -505,10 +657,15 @@
       "name": "Tandoori Pasta (Full)",
       "desc": "Popular indo-western fusion dish combining traditional italian pasta with smoky, spicy indian tandoori flavours",
       "price": 289,
-      "img": "pdfmenu/tandoori-pasta",
+      "img": "ai/tandoori-pasta",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tandoori Pasta",
+      "group": "tandoori-pasta",
+      "size": "full",
+      "sizeLabel": "Full",
+      "imgLock": true
     },
     {
       "id": "chefs-special-pasta",
@@ -519,7 +676,9 @@
       "img": "ai/chefs-special-pasta",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Chef's Special Pasta",
+      "group": "chefs-special-pasta"
     },
     {
       "id": "garlic-bread",
@@ -530,7 +689,9 @@
       "img": "ai/garlic-bread",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Garlic Bread",
+      "group": "garlic-bread"
     },
     {
       "id": "cheese-chilli-tost",
@@ -541,7 +702,9 @@
       "img": "ai/cheese-chilli-tost",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Cheese Chilli Tost",
+      "group": "cheese-chilli-tost"
     },
     {
       "id": "cheesy-garlic-bread",
@@ -552,7 +715,9 @@
       "img": "ai/cheesy-garlic-bread",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Cheesy Garlic Bread",
+      "group": "cheesy-garlic-bread"
     },
     {
       "id": "veg-grilled-sandwich",
@@ -563,7 +728,9 @@
       "img": "ai/veg-grilled-sandwich",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Veg Grilled Sandwich",
+      "group": "veg-grilled-sandwich"
     },
     {
       "id": "cheese-corn-sandwich",
@@ -574,7 +741,9 @@
       "img": "ai/cheese-corn-sandwich",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Cheese Corn Sandwich",
+      "group": "cheese-corn-sandwich"
     },
     {
       "id": "paneer-tikka-sandwich",
@@ -585,7 +754,9 @@
       "img": "ai/paneer-tikka-sandwich",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Paneer Tikka Sandwich",
+      "group": "paneer-tikka-sandwich"
     },
     {
       "id": "veg-burger",
@@ -596,7 +767,9 @@
       "img": "ai/veg-burger",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Veg Burger",
+      "group": "veg-burger"
     },
     {
       "id": "crispy-veg-burger",
@@ -607,7 +780,9 @@
       "img": "ai/crispy-veg-burger",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Crispy Veg Burger",
+      "group": "crispy-veg-burger"
     },
     {
       "id": "cheese-veg-burger",
@@ -618,7 +793,9 @@
       "img": "ai/cheese-veg-burger",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Cheese Veg Burger",
+      "group": "cheese-veg-burger"
     },
     {
       "id": "double-cheese-veg-burger",
@@ -629,7 +806,9 @@
       "img": "ai/double-cheese-veg-burger",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Double Cheese Veg Burger",
+      "group": "double-cheese-veg-burger"
     },
     {
       "id": "tandoori-paneer-burger",
@@ -640,7 +819,10 @@
       "img": "ai/tandoori-paneer-burger",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tandoori Paneer Burger",
+      "group": "tandoori-paneer-burger",
+      "imgLock": true
     },
     {
       "id": "spicy-paneer-veg-burger",
@@ -651,7 +833,9 @@
       "img": "ai/spicy-paneer-veg-burger",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Spicy Paneer Veg Burger",
+      "group": "spicy-paneer-veg-burger"
     },
     {
       "id": "tower-veg-burger",
@@ -662,7 +846,9 @@
       "img": "ai/tower-veg-burger",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Tower Veg Burger",
+      "group": "tower-veg-burger"
     },
     {
       "id": "french-fries",
@@ -673,7 +859,9 @@
       "img": "ai/french-fries",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "French Fries",
+      "group": "french-fries"
     },
     {
       "id": "peri-peri-fries",
@@ -684,7 +872,9 @@
       "img": "ai/peri-peri-fries",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Peri Peri Fries",
+      "group": "peri-peri-fries"
     },
     {
       "id": "cheese-jalapeno-french-fries",
@@ -695,7 +885,9 @@
       "img": "ai/cheese-jalapeno-french-fries",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Cheese Jalapeno French Fries",
+      "group": "cheese-jalapeno-french-fries"
     },
     {
       "id": "salsa-nachos",
@@ -706,7 +898,9 @@
       "img": "ai/salsa-nachos",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Salsa Nachos",
+      "group": "salsa-nachos"
     },
     {
       "id": "creme-cheese-nachos",
@@ -717,7 +911,9 @@
       "img": "ai/creme-cheese-nachos",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Creme Cheese Nachos",
+      "group": "creme-cheese-nachos"
     },
     {
       "id": "cocktail-mayo-dip",
@@ -728,7 +924,9 @@
       "img": "ai/cocktail-mayo-dip",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Cocktail Mayo Dip",
+      "group": "cocktail-mayo-dip"
     },
     {
       "id": "cheese-jalapeno-dip",
@@ -739,7 +937,9 @@
       "img": "ai/cheese-jalapeno-dip",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Cheese Jalapeno Dip",
+      "group": "cheese-jalapeno-dip"
     },
     {
       "id": "peri-peri-dip",
@@ -750,7 +950,9 @@
       "img": "ai/peri-peri-dip",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Peri Peri Dip",
+      "group": "peri-peri-dip"
     },
     {
       "id": "aloo-verona-wrap",
@@ -761,7 +963,9 @@
       "img": "ai/aloo-verona-wrap",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Aloo Verona Wrap",
+      "group": "aloo-verona-wrap"
     },
     {
       "id": "paneer-fajita-wrap",
@@ -772,7 +976,9 @@
       "img": "ai/paneer-fajita-wrap",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Paneer Fajita Wrap",
+      "group": "paneer-fajita-wrap"
     },
     {
       "id": "paneer-tikka-wrap",
@@ -783,7 +989,9 @@
       "img": "ai/paneer-tikka-wrap",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Paneer Tikka Wrap",
+      "group": "paneer-tikka-wrap"
     },
     {
       "id": "mexican-salad",
@@ -794,7 +1002,9 @@
       "img": "ai/mexican-salad",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Mexican Salad",
+      "group": "mexican-salad"
     },
     {
       "id": "combo-crush",
@@ -805,7 +1015,9 @@
       "img": "ai/combo-crush",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Combo Crush",
+      "group": "combo-crush"
     },
     {
       "id": "magic-combo",
@@ -813,10 +1025,13 @@
       "name": "Magic Combo",
       "desc": "2 veg burgers, 1 margherita pizza 7 inch, 1 french fries",
       "price": 289,
-      "img": "pdfmenu/magic-combo",
+      "img": "ai/magic-combo",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Magic Combo",
+      "group": "magic-combo",
+      "imgLock": true
     },
     {
       "id": "king-combo",
@@ -824,10 +1039,13 @@
       "name": "King Combo",
       "desc": "Any one 7 inch pizza (onion cheese, tomato cheese, margherita, sweet corn), 1 salsa nachos, any one 250ml drink",
       "price": 329,
-      "img": "pdfmenu/king-combo",
+      "img": "ai/king-combo",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "King Combo",
+      "group": "king-combo",
+      "imgLock": true
     },
     {
       "id": "combo-magambo",
@@ -835,10 +1053,13 @@
       "name": "Combo Magambo",
       "desc": "2 veg burgers, any one 7 inch premium pizza, 2 pcs garlic bread or 1 french fries, any two 250ml drinks",
       "price": 429,
-      "img": "pdfmenu/combo-magambo",
+      "img": "ai/combo-magambo",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Combo Magambo",
+      "group": "combo-magambo",
+      "imgLock": true
     },
     {
       "id": "party-combo-1",
@@ -846,10 +1067,13 @@
       "name": "Party Combo 1",
       "desc": "1 veg grilled sandwich, 1 premium pizza (regular), 1 french fries, 2 frooti",
       "price": 449,
-      "img": "pdfmenu/party-combo-1",
+      "img": "ai/party-combo-1",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Party Combo 1",
+      "group": "party-combo-1",
+      "imgLock": true
     },
     {
       "id": "party-combo-2",
@@ -857,10 +1081,13 @@
       "name": "Party Combo 2",
       "desc": "2 medium pizzas (any), 2 blue lagoon / summer cooler",
       "price": 899,
-      "img": "pdfmenu/party-combo-2",
+      "img": "ai/party-combo-2",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Party Combo 2",
+      "group": "party-combo-2",
+      "imgLock": true
     },
     {
       "id": "cold-coffee",
@@ -871,7 +1098,9 @@
       "img": "ai/cold-coffee",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Cold Coffee",
+      "group": "cold-coffee"
     },
     {
       "id": "thick-cold-coffee",
@@ -882,7 +1111,9 @@
       "img": "ai/thick-cold-coffee",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Thick Cold Coffee",
+      "group": "thick-cold-coffee"
     },
     {
       "id": "chocolate-y-iced-mocha",
@@ -893,7 +1124,9 @@
       "img": "ai/chocolate-y-iced-mocha",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Chocolate-y Iced Mocha",
+      "group": "chocolate-y-iced-mocha"
     },
     {
       "id": "thick-cold-coffee-with-chocolate-crush",
@@ -904,7 +1137,9 @@
       "img": "ai/thick-cold-coffee-with-chocolate-crush",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Thick Cold Coffee with Chocolate Crush",
+      "group": "thick-cold-coffee-with-chocolate-crush"
     },
     {
       "id": "strawberry-margherta",
@@ -912,10 +1147,13 @@
       "name": "Strawberry Margherta",
       "desc": "Strawberry sparkle, 300ml",
       "price": 79,
-      "img": "pdfmenu/mocktails-shared",
+      "img": "ai/strawberry-margherta",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Strawberry Margherta",
+      "group": "strawberry-margherta",
+      "imgLock": true
     },
     {
       "id": "mango-mojito",
@@ -923,10 +1161,13 @@
       "name": "Mango Mojito",
       "desc": "Mango, mint, lime, 300ml",
       "price": 79,
-      "img": "pdfmenu/mocktails-shared",
+      "img": "ai/mango-mojito",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Mango Mojito",
+      "group": "mango-mojito",
+      "imgLock": true
     },
     {
       "id": "kiwi-crush",
@@ -934,10 +1175,13 @@
       "name": "Kiwi Crush",
       "desc": "Real kiwi, crushed ice, 300ml",
       "price": 79,
-      "img": "pdfmenu/mocktails-shared",
+      "img": "ai/kiwi-crush",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Kiwi Crush",
+      "group": "kiwi-crush",
+      "imgLock": true
     },
     {
       "id": "summer-cooler",
@@ -945,10 +1189,13 @@
       "name": "Summer Cooler",
       "desc": "Seasonal fruits, sparkling, light, 300ml",
       "price": 89,
-      "img": "pdfmenu/mocktails-shared",
+      "img": "ai/summer-cooler",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Summer Cooler",
+      "group": "summer-cooler",
+      "imgLock": true
     },
     {
       "id": "blue-lagoon",
@@ -956,10 +1203,13 @@
       "name": "Blue Lagoon",
       "desc": "Electric blue citrus cooler, 300ml",
       "price": 99,
-      "img": "pdfmenu/mocktails-shared",
+      "img": "ai/blue-lagoon",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Blue Lagoon",
+      "group": "blue-lagoon",
+      "imgLock": true
     },
     {
       "id": "mojito",
@@ -967,10 +1217,13 @@
       "name": "Mojito",
       "desc": "Mint, lime, soda, classic refresher, 300ml",
       "price": 109,
-      "img": "pdfmenu/mocktails-shared",
+      "img": "ai/mojito",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Mojito",
+      "group": "mojito",
+      "imgLock": true
     },
     {
       "id": "strawberry-shake",
@@ -981,7 +1234,9 @@
       "img": "ai/strawberry-shake",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Strawberry Shake",
+      "group": "strawberry-shake"
     },
     {
       "id": "strawberry-kiwi-shake",
@@ -992,7 +1247,9 @@
       "img": "ai/strawberry-kiwi-shake",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Strawberry Kiwi Shake",
+      "group": "strawberry-kiwi-shake"
     },
     {
       "id": "mango-shake",
@@ -1000,10 +1257,13 @@
       "name": "Mango Shake",
       "desc": "Alphonso mango blended thick, 300ml",
       "price": 89,
-      "img": "pdfmenu/shakes-shared",
+      "img": "ai/mango-shake",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Mango Shake",
+      "group": "mango-shake",
+      "imgLock": true
     },
     {
       "id": "banana-shake",
@@ -1011,10 +1271,13 @@
       "name": "Banana Shake",
       "desc": "Creamy banana, 300ml",
       "price": 89,
-      "img": "pdfmenu/shakes-shared",
+      "img": "ai/banana-shake",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Banana Shake",
+      "group": "banana-shake",
+      "imgLock": true
     },
     {
       "id": "oreo-shake",
@@ -1025,7 +1288,9 @@
       "img": "ai/oreo-shake",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Oreo Shake",
+      "group": "oreo-shake"
     },
     {
       "id": "hazelnut-shake",
@@ -1036,7 +1301,9 @@
       "img": "ai/hazelnut-shake",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Hazelnut Shake",
+      "group": "hazelnut-shake"
     },
     {
       "id": "kitkat-shake",
@@ -1047,7 +1314,9 @@
       "img": "ai/kitkat-shake",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Kitkat Shake",
+      "group": "kitkat-shake"
     },
     {
       "id": "xto-special-shake",
@@ -1055,10 +1324,13 @@
       "name": "XTO Special Shake",
       "desc": "Our signature loaded shake. Ask us why it is special",
       "price": 149,
-      "img": "pdfmenu/shakes-shared",
+      "img": "ai/xto-special-shake",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "XTO Special Shake",
+      "group": "xto-special-shake",
+      "imgLock": true
     },
     {
       "id": "ice-tea",
@@ -1069,7 +1341,9 @@
       "img": "ai/ice-tea",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Ice Tea",
+      "group": "ice-tea"
     },
     {
       "id": "peach-ice-tea",
@@ -1080,7 +1354,9 @@
       "img": "ai/peach-ice-tea",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Peach Ice Tea",
+      "group": "peach-ice-tea"
     },
     {
       "id": "coke",
@@ -1088,10 +1364,13 @@
       "name": "Coke",
       "desc": "250ml, charged at MRP",
       "price": 40,
-      "img": "pdfmenu/soft-drinks-shared",
+      "img": "ai/coke",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Coke",
+      "group": "coke",
+      "imgLock": true
     },
     {
       "id": "sprite",
@@ -1099,10 +1378,13 @@
       "name": "Sprite",
       "desc": "250ml, charged at MRP",
       "price": 40,
-      "img": "pdfmenu/soft-drinks-shared",
+      "img": "ai/sprite",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Sprite",
+      "group": "sprite",
+      "imgLock": true
     },
     {
       "id": "thums-up",
@@ -1110,10 +1392,13 @@
       "name": "Thums Up",
       "desc": "250ml, charged at MRP",
       "price": 40,
-      "img": "pdfmenu/soft-drinks-shared",
+      "img": "ai/thums-up",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Thums Up",
+      "group": "thums-up",
+      "imgLock": true
     },
     {
       "id": "diet-coke",
@@ -1121,12 +1406,53 @@
       "name": "Diet Coke",
       "desc": "250ml, charged at MRP",
       "price": 40,
-      "img": "pdfmenu/soft-drinks-shared",
+      "img": "ai/diet-coke",
       "tags": [
         "menu-card"
-      ]
+      ],
+      "groupName": "Diet Coke",
+      "group": "diet-coke",
+      "imgLock": true
     }
   ],
   "deliveryFee": 29,
-  "freeDeliveryAbove": 499
+  "freeDeliveryAbove": 499,
+  "addons": [
+    {
+      "id": "extra-topping",
+      "name": "Extra topping",
+      "prices": {
+        "regular": 30,
+        "medium": 40,
+        "large": 60
+      }
+    },
+    {
+      "id": "extra-cheese",
+      "name": "Extra cheese",
+      "prices": {
+        "regular": 40,
+        "medium": 60,
+        "large": 80
+      }
+    },
+    {
+      "id": "cheese-burst",
+      "name": "Cheese burst",
+      "prices": {
+        "regular": 40,
+        "medium": 70,
+        "large": 120
+      }
+    },
+    {
+      "id": "thin-crust",
+      "name": "Thin crust base",
+      "prices": {
+        "regular": 20,
+        "medium": 30,
+        "large": 40
+      }
+    }
+  ]
 }

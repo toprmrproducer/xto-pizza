@@ -7,15 +7,24 @@ const INR = (n) => '\u20B9' + Number(n).toLocaleString('en-IN');
 const CART_KEY = 'xto_cart_v1';
 const PHONE_KEY = 'xto_phone';
 
-const state = { menu: null, outlets: [], cat: 'all', cart: loadCart(), phone: localStorage.getItem(PHONE_KEY) || '', payCtx: null, coupon: null, offers: [], appMaps: {} };
+const SIZE_ORDER = ['six', 'regular', 'half', 'medium', 'full', 'large'];
+const state = { sel: {}, menu: null, outlets: [], cat: 'all', cart: loadCart(), phone: localStorage.getItem(PHONE_KEY) || '', payCtx: null, coupon: null, offers: [], appMaps: {} };
 
 function loadCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch (e) { return {}; } }
 function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(state.cart)); }
 function cartCount() { return Object.values(state.cart).reduce((s, q) => s + q, 0); }
+function itemById(id) { return state.menu.items.find((i) => i.id === id); }
+function addonById(id) { return (state.menu.addons || []).find((a) => a.id === id); }
+function lineKey(id, addons) { return addons && addons.length ? id + '|' + addons.slice().sort().join(',') : id; }
 function cartLines() {
-  return Object.entries(state.cart).map(([id, qty]) => {
-    const item = state.menu.items.find((i) => i.id === id);
-    return item ? { ...item, qty } : null;
+  return Object.entries(state.cart).map(([key, qty]) => {
+    const [id, adds] = key.split('|');
+    const item = itemById(id);
+    if (!item) return null;
+    const aids = adds ? adds.split(',') : [];
+    let unit = item.price; const names = [];
+    for (const aid of aids) { const ad = addonById(aid); if (!ad) continue; unit += (ad.prices && ad.prices[item.size]) || 0; names.push(ad.name); }
+    return { ...item, key, qty, addons: aids, price: unit, name: names.length ? item.name + ' + ' + names.join(', ') : item.name };
   }).filter(Boolean);
 }
 function checkedMode() { return ($('input[name="mode"]:checked') || {}).value || 'delivery'; }
@@ -48,6 +57,8 @@ async function boot() {
   renderAppPromos();
   renderAppOffers();
   bindUI();
+  bindMenuDelegates();
+  bindOptions();
   document.getElementById('couponApply')?.addEventListener('click', applyCouponFromField);
   document.getElementById('appLocateBtn')?.addEventListener('click', appLocate);
   document.getElementById('enableUpdatesBtn')?.addEventListener('click', onEnableUpdates);
@@ -78,10 +89,11 @@ function installHint() {
 }
 
 /* ---------------- home ---------------- */
-const CAT_EMOJI = { pizza: '🍕', burgers: '🍔', sandwich: '🥪', pasta: '🍝', sides: '🍟', wraps: '🌯', combos: '🎯', beverages: '🍹', 'coffee-shakes': '🥤' };
 function renderQuick() {
-  $('#quickGrid').innerHTML = state.menu.categories.map((c) => `
-    <button class="quick-cat" data-cat="${c.id}"><span class="qemoji">${CAT_EMOJI[c.id] || '🍽️'}</span>${c.name.split(' ')[0]}</button>`).join('');
+  $('#quickGrid').innerHTML = state.menu.categories.map((c) => {
+    const first = state.menu.items.find((i) => i.cat === c.id);
+    return `<button class="quick-cat" data-cat="${c.id}"><span class="qthumb"><img src="images/${first ? first.img : 'pizza-cheese'}.jpg" alt="" loading="lazy"></span>${c.name}</button>`;
+  }).join('');
   $$('#quickGrid .quick-cat').forEach((b) => b.addEventListener('click', () => {
     gotoView('menu');
     state.cat = b.dataset.cat;
@@ -90,16 +102,16 @@ function renderQuick() {
   }));
 }
 function renderBest() {
-  const best = state.menu.items.filter((i) => (i.tags || []).includes('bestseller')).slice(0, 8);
+  const want = ['farmers-delight-regular', 'tandoori-paneer-tikka-regular', 'double-cheese-veg-burger', 'kitkat-shake', 'combo-crush', 'cheesy-garlic-bread', 'margherita-regular', 'veggie-mexican-regular'];
+  const best = want.map((id) => itemById(id)).filter(Boolean);
   $('#bestRow').innerHTML = best.map((i) => `
     <div class="bcard">
-      <img src="images/${i.img}.jpg" alt="" loading="lazy" onerror="this.src='images/pizza-closeup.jpg'" />
-      <div><h4>${i.name}</h4><div class="bp"><b>${INR(i.price)}</b><button data-add="${i.id}">ADD</button></div></div>
+      <img src="images/${i.img}.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='images/pizza-closeup.jpg'" />
+      <div><h4>${i.groupName || i.name}</h4><div class="bp"><b>${INR(i.price)}</b><button data-add="${i.id}">ADD</button></div></div>
     </div>`).join('');
-  $$('#bestRow [data-add]').forEach((b) => b.addEventListener('click', () => addToCart(b.dataset.add)));
 }
 function renderComboStrip() {
-  const combos = state.menu.items.filter((i) => i.cat === 'combos');
+  const combos = state.menu.items.filter((i) => i.cat === 'combo');
   $('#comboStrip').innerHTML = combos.map((c) => `
     <div class="cstrip-card">
       <img src="images/${c.img}.jpg" alt="" loading="lazy" />
@@ -128,25 +140,34 @@ function renderTabs() {
 function syncTabs() {
   $$('#catTabs .m-tab').forEach((x) => x.classList.toggle('active', x.dataset.cat === state.cat));
 }
-function rowHTML(item) {
-  const hue = [...item.id].reduce((s, c) => s + c.charCodeAt(0), 0) % 3;
-  const grads = ['linear-gradient(135deg,#f0731d,#b3271e)', 'linear-gradient(135deg,#2f7d5b,#173f2e)', 'linear-gradient(135deg,#ffc53d,#f0731d)'];
-  const media = item.img
-    ? `<img src="images/${item.img}.jpg" alt="" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="r-fallback" style="display:none;background:${grads[hue]}">${item.name[0]}</div>`
-    : `<div class="r-fallback" style="background:${grads[hue]}">${item.name[0]}</div>`;
-  const tag = (item.tags || []).includes('bestseller') ? '<span class="tag-mini">Bestseller</span>' :
-    (item.tags || []).includes('deal') ? '<span class="tag-mini" style="background:var(--red);color:#fff">Deal</span>' : '';
-  const ctl = !item.available ? '<span class="soldout-tag">Sold out</span>'
-    : state.cart[item.id]
-      ? `<div class="r-stepper"><button data-dec="${item.id}">−</button><span>${state.cart[item.id]}</span><button data-inc="${item.id}">+</button></div>`
-      : `<button class="r-add" data-add="${item.id}">ADD +</button>`;
-  return `<div class="m-row" id="row-${item.id}">
+function groupItems(items) {
+  const m = new Map();
+  for (const i of items) { const k = i.cat + '|' + (i.group || i.id); if (!m.has(k)) m.set(k, []); m.get(k).push(i); }
+  return Array.from(m.values()).map((g) => g.sort((a, b) => SIZE_ORDER.indexOf(a.size || 'regular') - SIZE_ORDER.indexOf(b.size || 'regular') || a.price - b.price));
+}
+function gkOf(item) { return item.cat + '|' + (item.group || item.id); }
+function rowId(gk) { return 'row-' + gk.replace(/[^a-z0-9]+/gi, '_'); }
+function selectedOf(g) { const id = state.sel[gkOf(g[0])]; return g.find((i) => i.id === id && i.available) || g.find((i) => i.available) || g[0]; }
+function addonsFor(item) { return (state.menu.addons || []).filter((a) => item.size && a.prices && a.prices[item.size]); }
+function rowHTML(g) {
+  const sel = selectedOf(g), gk = gkOf(g[0]), name = g[0].groupName || g[0].name;
+  const chips = g.length > 1
+    ? `<div class="m-chips">${g.map((i) => `<button type="button" class="m-chip${i.id === sel.id ? ' on' : ''}" data-chip="${i.id}"${i.available ? '' : ' disabled'}>${i.sizeLabel}<small>${INR(i.price)}</small></button>`).join('')}</div>`
+    : (sel.sizeLabel ? `<div class="m-chips"><span class="m-chip on">${sel.sizeLabel}<small>${INR(sel.price)}</small></span></div>` : '');
+  const customisable = addonsFor(sel).length > 0;
+  const q = state.cart[sel.id] || 0;
+  const ctl = !sel.available ? '<span class="soldout-tag">Sold out</span>'
+    : (!customisable && q)
+      ? `<div class="r-stepper"><button data-dec="${sel.id}" aria-label="Less">&minus;</button><span>${q}</span><button data-inc="${sel.id}" aria-label="More">+</button></div>`
+      : `<button class="r-add" data-add="${sel.id}">ADD +</button>`;
+  return `<div class="m-row" id="${rowId(gk)}" data-gk="${gk}">
     <div>
-      <span class="veg-dot"></span><h4>${item.name}</h4>${tag}
-      <div class="rd">${item.desc}</div>
-      <div class="r-foot"><b>${INR(item.price)}</b>${ctl}</div>
+      <span class="veg-dot"></span><h4>${name}</h4>
+      <div class="rd">${sel.desc || ''}</div>
+      ${chips}
+      <div class="r-foot"><b>${INR(sel.price)}</b>${ctl}</div>
     </div>
-    <div class="r-img">${media}</div>
+    <div class="r-img"><img src="images/${sel.img}.jpg" alt="" loading="lazy" onerror="this.onerror=null;this.src='images/pizza-cheese.jpg'"></div>
   </div>`;
 }
 function renderMenuList() {
@@ -154,37 +175,83 @@ function renderMenuList() {
   const cats = state.cat === 'all' ? state.menu.categories : state.menu.categories.filter((c) => c.id === state.cat);
   let html = '';
   for (const cat of cats) {
-    const items = state.menu.items.filter((i) => i.cat === cat.id && (!q || (i.name + ' ' + i.desc).toLowerCase().includes(q)));
+    const items = state.menu.items.filter((i) => i.cat === cat.id && (!q || ((i.groupName || i.name) + ' ' + i.desc).toLowerCase().includes(q)));
     if (!items.length) continue;
     if (state.cat === 'all') html += `<div class="sec-label" style="padding-left:0">${cat.name}</div>`;
-    html += items.map(rowHTML).join('');
+    html += groupItems(items).map(rowHTML).join('');
   }
   $('#menuList').innerHTML = html || '<div class="empty-state"><b>Nothing found</b>Try "paneer", "fries" or "shake".</div>';
-  bindRows();
 }
-function bindRows(root) {
-  const scope = root || $('#menuList');
-  $$('[data-add]', scope).forEach((b) => b.addEventListener('click', () => addToCart(b.dataset.add)));
-  $$('[data-inc]', scope).forEach((b) => b.addEventListener('click', () => { state.cart[b.dataset.inc] = Math.min(20, (state.cart[b.dataset.inc] || 0) + 1); saveCart(); refreshRow(b.dataset.inc); updateCartUI(); }));
-  $$('[data-dec]', scope).forEach((b) => b.addEventListener('click', () => {
-    state.cart[b.dataset.dec] = (state.cart[b.dataset.dec] || 0) - 1;
-    if (state.cart[b.dataset.dec] <= 0) delete state.cart[b.dataset.dec];
-    saveCart(); refreshRow(b.dataset.dec); updateCartUI();
-  }));
+function refreshRow(idOrKey) {
+  const item = itemById(String(idOrKey).split('|')[0]);
+  if (!item) return;
+  const gk = gkOf(item);
+  const row = document.getElementById(rowId(gk));
+  if (!row) return;
+  const items = state.menu.items.filter((i) => gkOf(i) === gk);
+  row.outerHTML = rowHTML(groupItems(items)[0]);
 }
-function refreshRow(id) {
-  const item = state.menu.items.find((i) => i.id === id);
-  const row = $('#row-' + id);
-  if (row && item) {
-    row.outerHTML = rowHTML(item);
-    bindRows($('#row-' + id));
-  }
+function bindMenuDelegates() {
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest('[data-chip]');
+    if (chip) { const it = itemById(chip.dataset.chip); state.sel[gkOf(it)] = it.id; refreshRow(it.id); return; }
+    const add = e.target.closest('[data-add]');
+    if (add) { addToCart(add.dataset.add); return; }
+    const inc = e.target.closest('#menuList [data-inc]');
+    if (inc) { state.cart[inc.dataset.inc] = Math.min(20, (state.cart[inc.dataset.inc] || 0) + 1); saveCart(); refreshRow(inc.dataset.inc); updateCartUI(); return; }
+    const dec = e.target.closest('#menuList [data-dec]');
+    if (dec) {
+      const id = dec.dataset.dec; state.cart[id] = (state.cart[id] || 0) - 1;
+      if (state.cart[id] <= 0) delete state.cart[id];
+      saveCart(); refreshRow(id); updateCartUI();
+    }
+  });
 }
-function addToCart(id) {
-  state.cart[id] = (state.cart[id] || 0) + 1;
+function addToCart(id, addons, qty) {
+  const item = itemById(id);
+  if (!item) return;
+  if (addons === undefined && addonsFor(item).length) { openOptions(item); return; }
+  const key = lineKey(id, addons || []);
+  state.cart[key] = Math.min(20, (state.cart[key] || 0) + (qty || 1));
   saveCart(); updateCartUI(); refreshRow(id);
-  const item = state.menu.items.find((i) => i.id === id);
-  toast(item.name + ' added');
+  toast((item.groupName || item.name) + ' added');
+}
+
+/* option sheet: size + add-ons */
+const opt = { g: null, id: null, addons: new Set(), qty: 1 };
+function openOptions(item) {
+  opt.g = groupItems(state.menu.items.filter((i) => gkOf(i) === gkOf(item)))[0];
+  opt.id = item.id; opt.addons = new Set(); opt.qty = 1;
+  renderOptions();
+  $('#optSheet').classList.add('show');
+}
+function renderOptions() {
+  const item = opt.g.find((i) => i.id === opt.id);
+  $('#optName').textContent = item.groupName || item.name;
+  $('#optDesc').textContent = item.desc || '';
+  $('#optImg').src = 'images/' + item.img + '.jpg';
+  const multi = opt.g.length > 1;
+  $('#optSizeH').style.display = multi ? '' : 'none';
+  $('#optSizes').innerHTML = multi ? opt.g.map((i) => `<label class="opt-row"><span><input type="radio" name="optSize" value="${i.id}"${i.id === opt.id ? ' checked' : ''}${i.available ? '' : ' disabled'}> ${i.sizeLabel}</span><b>${INR(i.price)}</b></label>`).join('') : '';
+  const ads = addonsFor(item);
+  $('#optAddH').style.display = ads.length ? '' : 'none';
+  $('#optAddons').innerHTML = ads.map((a) => `<label class="opt-row"><span><input type="checkbox" value="${a.id}"${opt.addons.has(a.id) ? ' checked' : ''}> ${a.name}</span><b>+ ${INR(a.prices[item.size])}</b></label>`).join('');
+  $('#optQty').textContent = opt.qty;
+  const unit = item.price + ads.filter((a) => opt.addons.has(a.id)).reduce((s, a) => s + a.prices[item.size], 0);
+  $('#optAdd').textContent = 'Add to cart \u2022 ' + INR(unit * opt.qty);
+  $$('#optSizes input').forEach((r) => r.addEventListener('change', () => { opt.id = r.value; opt.addons = new Set(); renderOptions(); }));
+  $$('#optAddons input').forEach((c) => c.addEventListener('change', () => { c.checked ? opt.addons.add(c.value) : opt.addons.delete(c.value); renderOptions(); }));
+}
+function bindOptions() {
+  $('#optMinus').addEventListener('click', () => { opt.qty = Math.max(1, opt.qty - 1); renderOptions(); });
+  $('#optPlus').addEventListener('click', () => { opt.qty = Math.min(20, opt.qty + 1); renderOptions(); });
+  $('#optClose').addEventListener('click', () => $('#optSheet').classList.remove('show'));
+  $('#optAdd').addEventListener('click', () => {
+    const item = opt.g.find((i) => i.id === opt.id);
+    state.sel[gkOf(item)] = item.id;
+    addToCart(item.id, Array.from(opt.addons), opt.qty);
+    $('#optSheet').classList.remove('show');
+  });
 }
 
 /* ---------------- cart ---------------- */
@@ -204,7 +271,7 @@ function updateCartUI() {
     const media = l.img ? `<img src="images/${l.img}.jpg" alt="" onerror="this.outerHTML='<div class=\\'r-fallback\\' style=\\'background:linear-gradient(135deg,#f0731d,#b3271e)\\'>${l.name[0]}</div>'" />` : `<div class="r-fallback" style="background:linear-gradient(135deg,#f0731d,#b3271e)">${l.name[0]}</div>`;
     return `<div class="cart-line">${media}
       <div><h4>${l.name}</h4><div class="clp">${INR(l.price)} each</div></div>
-      <div class="cl-stepper"><button data-cdec="${l.id}">−</button><span>${l.qty}</span><button data-cinc="${l.id}">+</button></div>
+      <div class="cl-stepper"><button data-cdec="${l.key}">&minus;</button><span>${l.qty}</span><button data-cinc="${l.key}">+</button></div>
     </div>`;
   }).join('') + `
     <div class="bill-card">
@@ -283,7 +350,7 @@ async function placeOrderAfterPayment(ctx, payment) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       mode: ctx.mode, outlet: ctx.outlet, customer: ctx.customer,
-      items: cartLines().map((l) => ({ id: l.id, qty: l.qty })),
+      items: cartLines().map((l) => ({ id: l.id, qty: l.qty, addons: l.addons })),
       couponCode: state.coupon ? state.coupon.code : undefined,
       payment
     })

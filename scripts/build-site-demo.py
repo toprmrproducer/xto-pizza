@@ -35,10 +35,19 @@ for f in os.listdir(os.path.join(DOCS, 'css')):
     if f.startswith('admin'): os.remove(os.path.join(DOCS, 'css', f))
 
 # JS copies: image paths must be relative on the Pages subpath
-for f in ('site.js', 'app.js'):
+for f in ('site.js', 'app.js', 'layout.js'):
     p = os.path.join(DOCS, 'js', f)
     s = open(p).read()
     s = s.replace('/images/', 'images/')
+    if f == 'layout.js':  # clean storefront URLs become the static demo pages
+        for a, b in (("'/#menu'", "'site.html#menu'"), ("'/#offers'", "'site.html#offers'"), ("'/#outlets'", "'site.html#outlets'"),
+                     ("'/#story'", "'site.html#story'"), ('href="/#menu"', 'href="site.html#menu"'), ('href="/#offers"', 'href="site.html#offers"'),
+                     ('href="/#outlets"', 'href="site.html#outlets"'), ("'/franchise'", "'franchise.html'"), ("'/careers'", "'careers.html'"),
+                     ("'/contact'", "'contact.html'"), ('href="/franchise"', 'href="franchise.html"'), ('href="/careers"', 'href="careers.html"'),
+                     ('href="/contact"', 'href="contact.html"'), ('href="/app"', 'href="app.html"'), ("'/?cart=1'", "'site.html?cart=1'"),
+                     ("'/?track=1'", "'site.html?track=1'"), ("'/?q='", "'site.html?q='"), ('href="/" aria', 'href="site.html" aria'),
+                     ("['home', home ? '#top' : '/', 'Home']", "['home', home ? '#top' : 'site.html', 'Home']")):
+            s = s.replace(a, b)
     open(p, 'w').write(s)
 
 # Leaflet default markers live at leaflet/images/ (resolved relative to leaflet.css)
@@ -51,7 +60,7 @@ for f in ('marker-icon.png', 'marker-icon-2x.png', 'marker-shadow.png'):
 
 # ---- demo data ----
 data = {
-    "menu": {"categories": menu['categories'], "items": menu['items'],
+    "menu": {"categories": menu['categories'], "items": menu['items'], "addons": menu.get('addons', []),
              "deliveryFee": menu.get('deliveryFee', 29), "freeDeliveryAbove": menu.get('freeDeliveryAbove', 499)},
     "outlets": OUTLETS,
     "offers": offers,
@@ -88,7 +97,7 @@ SHIM = r'''/* XTO demo shim: answers /api/* locally so the demo runs on any stat
     if (url.indexOf('/api/') !== 0) return real(input, init);
     var path = url.split('?')[0], qs = new URLSearchParams(url.split('?')[1] || '');
     var body = {}; try { body = (init && init.body) ? JSON.parse(init.body) : {}; } catch (e) {}
-    if (path === '/api/menu') return Promise.resolve(ok({ categories: D.menu.categories, items: D.menu.items.map(function (i) { return Object.assign({}, i, { available: true }); }), deliveryFee: D.menu.deliveryFee, freeDeliveryAbove: D.menu.freeDeliveryAbove, currency: 'INR' }));
+    if (path === '/api/menu') return Promise.resolve(ok({ addons: D.menu.addons || [], categories: D.menu.categories, items: D.menu.items.map(function (i) { return Object.assign({}, i, { available: true }); }), deliveryFee: D.menu.deliveryFee, freeDeliveryAbove: D.menu.freeDeliveryAbove, currency: 'INR' }));
     if (path === '/api/outlets') return Promise.resolve(ok({ outlets: D.outlets }));
     if (path === '/api/config') return Promise.resolve(ok({ brand: D.config.brand, razorpay: { keyId: 'rzp_test_demo', live: false }, vapid: null, outletsGeo: D.config.outletsGeo }));
     if (path === '/api/offers') return Promise.resolve(ok({ offers: D.offers }));
@@ -114,8 +123,13 @@ SHIM = r'''/* XTO demo shim: answers /api/* locally so the demo runs on any stat
       var lines = (body.items || []).map(function (l) {
         var it = D.menu.items.find(function (i) { return i.id === l.id; });
         var q = Math.max(1, Math.min(20, +l.qty || 1));
-        itemTotal += it.price * q;
-        return { id: it.id, name: it.name, price: it.price, qty: q };
+        var unit = it.price, names = [];
+        (l.addons || []).forEach(function (aid) {
+          var ad = (D.menu.addons || []).find(function (a) { return a.id === aid; });
+          if (ad && it.size && ad.prices[it.size]) { unit += ad.prices[it.size]; names.push(ad.name); }
+        });
+        itemTotal += unit * q;
+        return { id: it.id, name: names.length ? it.name + ' + ' + names.join(', ') : it.name, price: unit, qty: q, addons: l.addons || [] };
       });
       if (!lines.length) return Promise.resolve(ok({ error: 'Empty cart' }, 400));
       var coupon = null;
@@ -144,6 +158,12 @@ SHIM = r'''/* XTO demo shim: answers /api/* locally so the demo runs on any stat
       var found = allOrders().find(function (o) { return o.id.toUpperCase() === om[1].toUpperCase(); });
       return Promise.resolve(found ? ok({ order: found }) : ok({ error: 'Order not found' }, 404));
     }
+    if (path === '/api/enquiries' && init && init.method === 'POST') {
+      var nm = String(body.name || '').trim();
+      if (nm.length < 2) return Promise.resolve(ok({ error: 'Please enter your name' }, 400));
+      if (!/^[6-9]\d{9}$/.test(String(body.phone || '').replace(/\D/g, '').slice(-10))) return Promise.resolve(ok({ error: 'Please enter a valid 10-digit mobile number' }, 400));
+      return Promise.resolve(ok({ ok: true, id: 'DEMO-' + Math.floor(Math.random() * 9000 + 1000) }, 201));
+    }
     if (path === '/api/track/rider') return Promise.resolve(ok({ rider: null }));
     return Promise.resolve(ok({ error: 'No route' }, 404));
   };
@@ -158,7 +178,7 @@ import time
 V = str(int(time.time()))
 def bust(s):
     for pat, rep in (('js/site.js', 'js/site.js?v=' + V), ('js/app.js', 'js/app.js?v=' + V),
-                     ('css/site.css', 'css/site.css?v=' + V), ('css/app.css', 'css/app.css?v=' + V),
+                     ('css/site.css', 'css/site.css?v=' + V), ('css/home.css', 'css/home.css?v=' + V), ('js/layout.js', 'js/layout.js?v=' + V), ('js/forms.js', 'js/forms.js?v=' + V), ('css/app.css', 'css/app.css?v=' + V),
                      ('leaflet/leaflet.css', 'leaflet/leaflet.css?v=' + V), ('leaflet/leaflet.js', 'leaflet/leaflet.js?v=' + V),
                      ('vendor/qrcode.min.js', 'vendor/qrcode.min.js?v=' + V),
                      ('demo-data.js', 'demo-data.js?v=' + V), ('demo-shim.js', 'demo-shim.js?v=' + V)):
@@ -185,4 +205,7 @@ def demotify(src, dst, extra=None):
 demotify(os.path.join(PUB, 'index.html'), os.path.join(DOCS, 'site.html'))
 demotify(os.path.join(PUB, 'app.html'), os.path.join(DOCS, 'app.html'))
 demotify(os.path.join(PUB, 'qr.html'), os.path.join(DOCS, 'qr.html'))
+for page in ('franchise', 'careers', 'contact'):
+    demotify(os.path.join(PUB, page + '.html'), os.path.join(DOCS, page + '.html'),
+             lambda t: t.replace('<script src="js/layout.js">', INJECT + '<script src="js/layout.js">'))
 print('demo bundle complete')

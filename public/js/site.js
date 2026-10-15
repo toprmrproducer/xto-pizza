@@ -6,15 +6,30 @@ const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
 const INR = (n) => '\u20B9' + Number(n).toLocaleString('en-IN');
 const CART_KEY = 'xto_cart_v1';
 
-const state = { menu: null, outlets: [], cat: 'all', cart: loadCart(), payCtx: null, coupon: null, map: null, riderMap: null, promoTimer: null, promoIdx: 0, offers: [] };
+const state = { menu: null, outlets: [], cat: 'all', cart: loadCart(), payCtx: null, coupon: null, map: null, riderMap: null, offers: [], sel: {} };
+const SIZE_ORDER = ['six', 'regular', 'half', 'medium', 'full', 'large'];
 
 function loadCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch (e) { return {}; } }
-function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(state.cart)); }
+function saveCart() { try { localStorage.setItem(CART_KEY, JSON.stringify(state.cart)); } catch (e) {} }
 function cartCount() { return Object.values(state.cart).reduce((s, q) => s + q, 0); }
+function lineKey(id, addons) { return addons && addons.length ? id + '|' + addons.slice().sort().join(',') : id; }
+function itemById(id) { return state.menu.items.find((i) => i.id === id); }
+function addonById(id) { return (state.menu.addons || []).find((a) => a.id === id); }
 function cartLines() {
-  return Object.entries(state.cart).map(([id, qty]) => {
-    const item = state.menu.items.find((i) => i.id === id);
-    return item ? { ...item, qty } : null;
+  return Object.entries(state.cart).map(([key, qty]) => {
+    const [id, adds] = key.split('|');
+    const item = itemById(id);
+    if (!item) return null;
+    const aids = adds ? adds.split(',') : [];
+    let unit = item.price;
+    const names = [];
+    for (const aid of aids) {
+      const ad = addonById(aid);
+      if (!ad) continue;
+      unit += (ad.prices && ad.prices[item.size]) || 0;
+      names.push(ad.name);
+    }
+    return { ...item, key, qty, addons: aids, price: unit, name: names.length ? item.name + ' + ' + names.join(', ') : item.name };
   }).filter(Boolean);
 }
 function cartTotals() {
@@ -23,7 +38,12 @@ function cartTotals() {
   const discount = state.coupon ? Math.min(state.coupon.discount, itemTotal) : 0;
   return { lines, itemTotal, deliveryFee: 0, discount, total: itemTotal - discount };
 }
-function checkedMode() { return ($('input[name="mode"]:checked') || {}).value || 'delivery'; }
+function checkedMode() { return ($('input[name="mode"]:checked') || {}).value || 'dinein'; }
+function addLine(id, addons, qty) {
+  const key = lineKey(id, addons || []);
+  state.cart[key] = Math.min(20, (state.cart[key] || 0) + (qty || 1));
+  saveCart(); updateCartUI();
+}
 
 function toast(msg) {
   const t = $('#toast');
@@ -40,65 +60,113 @@ async function boot() {
   const [menuRes, outletsRes] = await Promise.all([fetch('/api/menu').then((r) => r.json()), fetch('/api/outlets').then((r) => r.json())]);
   state.menu = menuRes;
   state.outlets = outletsRes.outlets;
+  const qp = new URLSearchParams(location.search);
+  if (qp.get('q')) $('#menuSearch').value = qp.get('q');
   renderTabs();
   renderMenu();
   renderCombos();
-  renderOutlets();
-  renderFooterOutlets();
   renderCatCircles();
   renderBestsellers();
-  renderPromos();
-  renderCouponWall();
+  renderOffers();
   initLocator();
   bindUI();
+  bindDelegates();
+  startMarquee();
+  showOpenStatus();
   document.getElementById('enableUpdatesBtn')?.addEventListener('click', onEnableUpdates);
   document.getElementById('couponApply')?.addEventListener('click', applyCouponFromField);
   document.getElementById('locateMe')?.addEventListener('click', locateMe);
-  document.addEventListener('sse', () => {}); // no-op hook point
   updateCartUI();
-  document.addEventListener('scroll', () => $('#nav').classList.toggle('scrolled', scrollY > 30), { passive: true });
-  const io = new IntersectionObserver((es) => es.forEach((e) => e.isIntersecting && e.target.classList.add('in')), { threshold: 0.12 });
-  $$('.reveal').forEach((el) => io.observe(el));
+  document.addEventListener('scroll', () => $('#nav') && $('#nav').classList.toggle('scrolled', scrollY > 30), { passive: true });
   if (location.hash.startsWith('#order=')) { trackById(decodeURIComponent(location.hash.slice(7))); }
+  if (qp.get('cart')) openCart();
+  if (qp.get('track')) openModal('trackModal');
 }
 
-/* ---------------- menu ---------------- */
+/* seamless marquee: repeat the set until one half covers the viewport, then duplicate it for the -50% loop */
+function startMarquee() {
+  const t = $('#mqTrack');
+  if (!t) return;
+  const set = t.innerHTML;
+  t.innerHTML = set;
+  const w = Math.max(1, t.scrollWidth);
+  const n = Math.max(1, Math.ceil(window.innerWidth / w));
+  const half = set.repeat(n);
+  t.innerHTML = half + half;
+}
+function showOpenStatus() {
+  const el = $('#openNow');
+  if (!el) return;
+  const parse = (h) => {
+    const m = String(h).match(/(\d{1,2}):(\d{2})\s*(am|pm)\s*-\s*(\d{1,2}):(\d{2})\s*(am|pm)/i);
+    if (!m) return null;
+    const to24 = (hh, mm, ap) => ((+hh % 12) + (ap.toLowerCase() === 'pm' ? 12 : 0)) * 60 + +mm;
+    return { open: to24(m[1], m[2], m[3]), close: to24(m[4], m[5], m[6]), closeLabel: m[4] + ':' + m[5] + ' ' + m[6].toLowerCase() };
+  };
+  const parts = new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit', hour12: false }).formatToParts(new Date());
+  const now = +parts.find((p) => p.type === 'hour').value * 60 + +parts.find((p) => p.type === 'minute').value;
+  const openOnes = state.outlets.map((o) => ({ o, h: parse(o.hours) })).filter((x) => x.h && now >= x.h.open && now < x.h.close);
+  if (openOnes.length) {
+    el.classList.add('on');
+    el.querySelector('span').textContent = 'Open now at ' + openOnes.map((x) => x.o.name.replace('XTO Pizza ', '').replace(/ \(.*\)/, '')).join(' and ') + ' until ' + openOnes[0].h.closeLabel;
+  } else {
+    el.querySelector('span').textContent = 'Outlets are closed right now. Opening at 11:00 am.';
+  }
+}
+
+/* ---------------- menu (grouped by size) ---------------- */
+function groupItems(items) {
+  const m = new Map();
+  for (const i of items) {
+    const k = i.cat + '|' + (i.group || i.id);
+    if (!m.has(k)) m.set(k, []);
+    m.get(k).push(i);
+  }
+  return Array.from(m.values()).map((g) => g.sort((a, b) =>
+    SIZE_ORDER.indexOf(a.size || 'regular') - SIZE_ORDER.indexOf(b.size || 'regular') || a.price - b.price));
+}
+function groupKey(g) { return g[0].cat + '|' + (g[0].group || g[0].id); }
+function selectedOf(g) {
+  const id = state.sel[groupKey(g)];
+  return g.find((i) => i.id === id && i.available) || g.find((i) => i.available) || g[0];
+}
+function addonsFor(item) { return (state.menu.addons || []).filter((a) => item.size && a.prices && a.prices[item.size]); }
+function plainQty(id) { return state.cart[id] || 0; }
+
 function renderTabs() {
   const tabs = [{ id: 'all', name: 'All' }, ...state.menu.categories];
-  $('#catTabs').innerHTML = tabs.map((t) => `<button class="cat-tab${t.id === 'all' ? ' active' : ''}" data-cat="${t.id}">${t.name}</button>`).join('');
-  $$('#catTabs .cat-tab').forEach((b) => b.addEventListener('click', () => {
+  $('#catTabs').innerHTML = tabs.map((t) => `<button class="xpill${t.id === state.cat ? ' on' : ''}" data-cat="${t.id}">${t.name}</button>`).join('');
+  $$('#catTabs .xpill').forEach((b) => b.addEventListener('click', () => {
     state.cat = b.dataset.cat;
-    $$('#catTabs .cat-tab').forEach((x) => x.classList.toggle('active', x === b));
+    $$('#catTabs .xpill').forEach((x) => x.classList.toggle('on', x === b));
     renderMenu();
   }));
 }
 
-function cardHTML(item) {
-  const qty = state.cart[item.id] || 0;
-  const img = item.img ? `/images/${item.img}.jpg` : null;
-  const hue = [...item.id].reduce((s, c) => s + c.charCodeAt(0), 0) % 3;
-  const grads = ['linear-gradient(135deg,#f0731d,#b3271e)', 'linear-gradient(135deg,#2f7d5b,#173f2e)', 'linear-gradient(135deg,#ffc53d,#f0731d)'];
-  const tag = (item.tags || []).includes('bestseller') ? '<span class="tag-chip">Bestseller</span>' :
-    (item.tags || []).includes('deal') ? '<span class="tag-chip red">Combo Deal</span>' :
-    (item.tags || []).includes('premium') ? '<span class="tag-chip">Premium</span>' : '';
-  const media = img
-    ? `<img src="${img}" alt="${item.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='grid'"><div class="card-fallback" style="display:none;background:${grads[hue]}">${item.name[0]}</div>`
-    : `<div class="card-fallback" style="background:${grads[hue]}">${item.name[0]}</div>`;
-  const stepper = `<div class="qty-stepper${qty ? ' show' : ''}" data-qty="${item.id}">
-      <button data-dec="${item.id}" aria-label="Less">−</button><span class="qty-val">${qty || 1}</span><button data-inc="${item.id}" aria-label="More">+</button>
-    </div>`;
-  return `<article class="card" data-item="${item.id}">
-    <div class="card-img">
-      <span class="veg-badge" title="Pure veg"></span>${tag}${media}
-      ${item.available ? '' : '<div class="sold-out">Sold out</div>'}
+function cardHTML(g) {
+  const sel = selectedOf(g);
+  const key = groupKey(g);
+  const name = g[0].groupName || g[0].name;
+  const multi = g.length > 1;
+  const chips = multi
+    ? `<div class="xchips" role="radiogroup" aria-label="Size">${g.map((i) => `<button type="button" class="xchip${i.id === sel.id ? ' on' : ''}" data-chip="${i.id}" data-gk="${key}" role="radio" aria-checked="${i.id === sel.id}"${i.available ? '' : ' disabled'}>${i.sizeLabel}<small>${INR(i.price)}</small></button>`).join('')}</div>`
+    : (sel.sizeLabel ? `<div class="xchips"><span class="xchip on" style="cursor:default">${sel.sizeLabel}<small>${INR(sel.price)}</small></span></div>` : '');
+  const customisable = addonsFor(sel).length > 0;
+  const qty = plainQty(sel.id);
+  const action = !sel.available ? '' :
+    (!customisable && qty
+      ? `<div class="xqty"><button data-dec="${sel.id}" aria-label="Less">&minus;</button><span>${qty}</span><button data-inc="${sel.id}" aria-label="More">+</button></div>`
+      : `<button class="xadd" data-add="${sel.id}" data-gk="${key}">${customisable ? 'ADD +' : 'ADD +'}</button>`);
+  return `<article class="xcard" data-gk="${key}">
+    <div class="xcard-img"><span class="xveg" title="Pure veg"></span>
+      <img src="/images/${sel.img}.jpg" alt="${name}" loading="lazy" onerror="this.onerror=null;this.src='/images/pizza-cheese.jpg'">
+      ${sel.available ? '' : '<div class="xsold">Sold out</div>'}
     </div>
-    <div class="card-body">
-      <div class="card-name">${item.name}</div>
-      <div class="card-desc">${item.desc}</div>
-      <div class="card-foot">
-        <div class="price"><small>₹</small>${item.price}</div>
-        ${item.available ? `<button class="add-btn${qty ? ' hidden' : ''}" data-add="${item.id}">ADD +</button>${stepper}` : ''}
-      </div>
+    <div class="xcard-body">
+      <div class="xcard-name">${name}</div>
+      <div class="xcard-desc">${sel.desc || ''}</div>
+      ${chips}
+      <div class="xcard-foot"><div class="xprice"><small>&#8377;</small>${sel.price}</div>${action}</div>
     </div>
   </article>`;
 }
@@ -108,100 +176,109 @@ function renderMenu() {
   const list = $('#menuList');
   const cats = state.cat === 'all' ? state.menu.categories : state.menu.categories.filter((c) => c.id === state.cat);
   let html = '';
-  let shown = 0;
   for (const cat of cats) {
-    const items = state.menu.items.filter((i) => i.cat === cat.id && (!q || (i.name + ' ' + i.desc).toLowerCase().includes(q)));
+    const items = state.menu.items.filter((i) => i.cat === cat.id && (!q || ((i.groupName || i.name) + ' ' + i.desc).toLowerCase().includes(q)));
     if (!items.length) continue;
-    shown += items.length;
-    html += `<div class="cat-block" id="cat-${cat.id}">
-      <h3 style="font-family:Sora;font-size:1.15rem;margin:26px 0 4px">${cat.name}</h3>
-      <div class="cat-note">${cat.note || ''}</div>
-      <div class="menu-grid">${items.map(cardHTML).join('')}</div>
+    html += `<div class="xcat-block" id="cat-${cat.id}">
+      <h3>${cat.name}</h3><div class="note">${cat.note || ''}</div>
+      <div class="xgrid">${groupItems(items).map(cardHTML).join('')}</div>
     </div>`;
   }
-  list.innerHTML = html || '<div class="empty-note">Nothing matches that search. Try "paneer" or "shake".</div>';
-  bindCardButtons(list);
+  list.innerHTML = html || '<div class="xempty">Nothing matches that search. Try "paneer" or "shake".</div>';
 }
-
-function bindCardButtons(root) {
-  $$('[data-add]', root).forEach((b) => b.addEventListener('click', () => {
-    const id = b.dataset.add;
-    state.cart[id] = 1;
-    saveCart(); updateCartUI();
-    const card = b.closest('.card');
-    b.classList.add('hidden');
-    $('.qty-stepper', card).classList.add('show');
-    toast($('.card-name', card).textContent + ' added to cart');
-  }));
-  $$('[data-inc]', root).forEach((b) => b.addEventListener('click', () => {
-    const id = b.dataset.inc;
-    state.cart[id] = Math.min(20, (state.cart[id] || 0) + 1);
-    saveCart(); syncSteppers(id); updateCartUI();
-  }));
-  $$('[data-dec]', root).forEach((b) => b.addEventListener('click', () => {
-    const id = b.dataset.dec;
-    state.cart[id] = (state.cart[id] || 0) - 1;
-    if (state.cart[id] <= 0) delete state.cart[id];
-    saveCart(); syncSteppers(id); updateCartUI();
-  }));
-}
-function syncSteppers(id) {
-  const card = $(`[data-item="${id}"]`);
+function refreshCard(gk) {
+  const card = $(`.xcard[data-gk="${gk}"]`);
   if (!card) return;
-  const q = state.cart[id] || 0;
-  $('.qty-val', card).textContent = q || 1;
-  $('.qty-stepper', card).classList.toggle('show', q > 0);
-  $('.add-btn', card).classList.toggle('hidden', q > 0);
+  const items = state.menu.items.filter((i) => (i.cat + '|' + (i.group || i.id)) === gk);
+  const tmp = document.createElement('div');
+  tmp.innerHTML = cardHTML(groupItems(items)[0]);
+  card.replaceWith(tmp.firstElementChild);
 }
 
-/* ---------------- combos & outlets ---------------- */
+function bindDelegates() {
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest('[data-chip]');
+    if (chip) {
+      state.sel[chip.dataset.gk] = chip.dataset.chip;
+      refreshCard(chip.dataset.gk);
+      return;
+    }
+    const add = e.target.closest('[data-add]');
+    if (add) {
+      const item = itemById(add.dataset.add);
+      if (!item) return;
+      if (addonsFor(item).length) {
+        const items = state.menu.items.filter((i) => i.cat === item.cat && (i.group || i.id) === (item.group || item.id));
+        openOptions(groupItems(items)[0], item.id);
+      } else {
+        addLine(item.id, [], 1);
+        toast((item.groupName || item.name) + ' added to cart');
+        const gk = item.cat + '|' + (item.group || item.id);
+        refreshCard(gk);
+      }
+      return;
+    }
+    const inc = e.target.closest('[data-inc]');
+    if (inc) { addLine(inc.dataset.inc, [], 1); refreshCard(itemById(inc.dataset.inc).cat + '|' + (itemById(inc.dataset.inc).group || inc.dataset.inc)); return; }
+    const dec = e.target.closest('[data-dec]');
+    if (dec) {
+      const id = dec.dataset.dec;
+      state.cart[id] = (state.cart[id] || 0) - 1;
+      if (state.cart[id] <= 0) delete state.cart[id];
+      saveCart(); updateCartUI();
+      const it = itemById(id); if (it) refreshCard(it.cat + '|' + (it.group || id));
+    }
+  });
+}
+
+/* ---------------- option sheet ---------------- */
+const opt = { g: null, id: null, addons: new Set(), qty: 1 };
+function openOptions(g, id) {
+  opt.g = g; opt.id = id; opt.addons = new Set(); opt.qty = 1;
+  renderOptions();
+  openModal('optModal');
+}
+function renderOptions() {
+  const item = opt.g.find((i) => i.id === opt.id);
+  $('#optName').textContent = item.groupName || item.name;
+  $('#optDesc').textContent = item.desc || '';
+  $('#optImg').src = '/images/' + item.img + '.jpg';
+  const multi = opt.g.length > 1;
+  $('#optSizeH').style.display = multi ? '' : 'none';
+  $('#optSizes').innerHTML = multi ? opt.g.map((i) => `<label class="xopt-row"><span class="l"><input type="radio" name="optSize" value="${i.id}"${i.id === opt.id ? ' checked' : ''}${i.available ? '' : ' disabled'}>${i.sizeLabel}</span><span>${INR(i.price)}</span></label>`).join('') : '';
+  const ads = addonsFor(item);
+  $('#optAddH').style.display = ads.length ? '' : 'none';
+  $('#optAddons').innerHTML = ads.map((a) => `<label class="xopt-row"><span class="l"><input type="checkbox" value="${a.id}"${opt.addons.has(a.id) ? ' checked' : ''}>${a.name}</span><span>+ ${INR(a.prices[item.size])}</span></label>`).join('');
+  $('#optQty').textContent = opt.qty;
+  const unit = item.price + ads.filter((a) => opt.addons.has(a.id)).reduce((s, a) => s + a.prices[item.size], 0);
+  $('#optAdd').textContent = 'Add to cart \u2022 ' + INR(unit * opt.qty);
+  $$('#optSizes input').forEach((r) => r.addEventListener('change', () => { opt.id = r.value; opt.addons = new Set(); renderOptions(); }));
+  $$('#optAddons input').forEach((c) => c.addEventListener('change', () => { c.checked ? opt.addons.add(c.value) : opt.addons.delete(c.value); renderOptions(); }));
+}
+function bindOptions() {
+  $('#optMinus').addEventListener('click', () => { opt.qty = Math.max(1, opt.qty - 1); renderOptions(); });
+  $('#optPlus').addEventListener('click', () => { opt.qty = Math.min(20, opt.qty + 1); renderOptions(); });
+  $('#optAdd').addEventListener('click', () => {
+    const item = opt.g.find((i) => i.id === opt.id);
+    addLine(item.id, Array.from(opt.addons), opt.qty);
+    state.sel[item.cat + '|' + (item.group || item.id)] = item.id;
+    refreshCard(item.cat + '|' + (item.group || item.id));
+    closeModal('optModal');
+    toast((item.groupName || item.name) + ' (' + (item.sizeLabel || 'one size') + ') added to cart');
+  });
+}
+
+/* ---------------- combos ---------------- */
 function renderCombos() {
-  const combos = state.menu.items.filter((i) => i.cat === 'combos');
+  const combos = state.menu.items.filter((i) => i.cat === 'combo');
   $('#comboGrid').innerHTML = combos.map((c) => `
-    <div class="combo-card">
-      <img src="/images/${c.img}.jpg" alt="${c.name}" loading="lazy" onerror="this.remove()" />
-      <div class="combo-shade"></div>
-      <span class="deal-flag">COMBO</span>
-      <div class="combo-info">
-        <div><h3>${c.name}</h3><p>${c.desc}</p></div>
-        <div class="combo-price"><b>${INR(c.price)}</b><button class="add-btn" style="background:var(--gold);border-color:var(--gold);color:var(--ink)" data-add-combo="${c.id}">ADD +</button></div>
+    <article class="xcombo">
+      <img src="/images/${c.img}.jpg" alt="${c.name}" loading="lazy" onerror="this.onerror=null;this.src='/images/pizza-cheese.jpg'" />
+      <div>
+        <h3>${c.name}</h3><p>${c.desc}</p>
+        <div class="foot"><span class="xprice"><small>&#8377;</small>${c.price}</span>${c.available ? `<button class="xbtn alt sm" data-add="${c.id}">Add</button>` : '<span>Sold out</span>'}</div>
       </div>
-    </div>`).join('');
-  $$('[data-add-combo]').forEach((b) => b.addEventListener('click', () => {
-    state.cart[b.dataset.addCombo] = (state.cart[b.dataset.addCombo] || 0) + 1;
-    saveCart(); updateCartUI(); toast('Combo added to cart'); syncSteppers(b.dataset.addCombo);
-  }));
-}
-function renderOutlets() {
-  $('#outletGrid').innerHTML = state.outlets.map((o) => `
-    <div class="outlet-card reveal in">
-      <div class="outlet-top">
-        <h3>${o.name}</h3>
-        <span class="rating-pill">★ 4.0 Google</span>
-      </div>
-      <div class="outlet-rows">
-        <div class="outlet-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>${o.address}</span></div>
-        <div class="outlet-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.58 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>${o.phone}</span></div>
-        <div class="outlet-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>${o.hours}</span></div>
-      </div>
-      <div class="outlet-actions">
-        <a class="btn-out" href="${o.maps}" target="_blank" rel="noopener">📍 Google Maps</a>
-        <a class="btn-out" href="tel:${o.phone.replace(/\s/g, '')}">Call Outlet</a>
-        <button class="btn-out" data-pickup="${o.id}">Order Pickup Here</button>
-      </div>
-    </div>`).join('');
-  $$('[data-pickup]').forEach((b) => b.addEventListener('click', () => {
-    const r = $(`#ckOutlet option[value="${b.dataset.pickup}"]`);
-    if (r) r.selected = true;
-    $('input[name="mode"][value="pickup"]').checked = true;
-    updateBill();
-    openCart();
-    toast('Pickup at ' + b.dataset.pickup + ' selected. Add items and checkout.');
-  }));
-}
-function renderFooterOutlets() {
-  $('#footerOutlets').insertAdjacentHTML('beforeend', state.outlets.map((o) =>
-    `<a href="${o.maps}" target="_blank" rel="noopener">${o.name.replace('XTO Pizza ', '')}</a>`).join(''));
+    </article>`).join('');
 }
 
 /* ---------------- cart ---------------- */
@@ -209,32 +286,28 @@ function updateCartUI() {
   const n = cartCount();
   $('#cartCount').textContent = n;
   const box = $('#cartItems');
-  const { lines, itemTotal, deliveryFee, total } = cartTotals();
+  const { lines, itemTotal, total } = cartTotals();
   if (!lines.length) {
     box.innerHTML = '<div class="cart-empty"><b>Your cart is empty</b>The oven is hot. Add something delicious.</div>';
     $('#cartFoot').innerHTML = '';
     return;
   }
-  box.innerHTML = lines.map((l) => {
-    const media = l.img ? `<img src="/images/${l.img}.jpg" alt="" onerror="this.outerHTML='<div class=cl-fallback style=background:linear-gradient(135deg,#f0731d,#b3271e)></div>'" />` : '<div class="cl-fallback" style="background:linear-gradient(135deg,#f0731d,#b3271e)"></div>';
-    return `<div class="cart-line">
-      ${media}
+  box.innerHTML = lines.map((l) => `<div class="cart-line">
+      <img src="/images/${l.img}.jpg" alt="" onerror="this.onerror=null;this.src='/images/pizza-cheese.jpg'" />
       <div><h4>${l.name}</h4><div class="cl-price">${INR(l.price)} each</div></div>
       <div class="cl-stepper">
-        <button data-cdec="${l.id}">−</button><span class="cl-qty">${l.qty}</span><button data-cinc="${l.id}">+</button>
+        <button data-cdec="${l.key}" aria-label="Less">&minus;</button><span class="cl-qty">${l.qty}</span><button data-cinc="${l.key}" aria-label="More">+</button>
       </div>
-    </div>`;
-  }).join('');
-  $$('[data-cinc]', box).forEach((b) => b.addEventListener('click', () => { state.cart[b.dataset.cinc]++; saveCart(); updateCartUI(); syncSteppers(b.dataset.cinc); }));
+    </div>`).join('');
+  const refresh = (key) => { const it = itemById(key.split('|')[0]); if (it) refreshCard(it.cat + '|' + (it.group || it.id)); };
+  $$('[data-cinc]', box).forEach((b) => b.addEventListener('click', () => { state.cart[b.dataset.cinc] = Math.min(20, state.cart[b.dataset.cinc] + 1); saveCart(); updateCartUI(); refresh(b.dataset.cinc); }));
   $$('[data-cdec]', box).forEach((b) => b.addEventListener('click', () => {
-    state.cart[b.dataset.cdec]--; if (state.cart[b.dataset.cdec] <= 0) delete state.cart[b.dataset.cdec];
-    saveCart(); updateCartUI(); syncSteppers(b.dataset.cdec);
+    const k = b.dataset.cdec; state.cart[k]--; if (state.cart[k] <= 0) delete state.cart[k];
+    saveCart(); updateCartUI(); refresh(k);
   }));
-  const remaining = state.menu.freeDeliveryAbove - itemTotal;
   $('#cartFoot').innerHTML = `
     <div class="cart-row"><span>Item total</span><span>${INR(itemTotal)}</span></div>
     <div class="cart-row total"><span>To pay</span><span>${INR(total)}</span></div>
-    ${modeDeliverySelected() && remaining > 0 ? `<div class="free-del-note">Add ${INR(remaining)} more for free delivery</div>` : ''}
     <button class="btn btn-primary btn-block" id="checkoutBtn">Checkout ${INR(total)}</button>`;
   $('#checkoutBtn').addEventListener('click', openCheckout);
 }
@@ -303,7 +376,7 @@ async function placeOrderAfterPayment(ctx, payment) {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       mode: ctx.mode, outlet: ctx.outlet, customer: ctx.customer,
-      items: cartLines().map((l) => ({ id: l.id, qty: l.qty })),
+      items: cartLines().map((l) => ({ id: l.id, qty: l.qty, addons: l.addons })),
       couponCode: state.coupon ? state.coupon.code : undefined,
       payment
     })
@@ -400,11 +473,11 @@ async function confirmPayment() {
 
 /* ---------------- tracking ---------------- */
 const STEPS = [
-  ['PLACED', 'Order received', '🔥'],
-  ['ACCEPTED', 'Accepted by kitchen', '👨‍🍳'],
-  ['PREPARING', 'Cooking now', '🍕'],
-  ['READY', 'Ready', '🛍️'],
-  ['SERVED', 'Served. Enjoy!', '✅']
+  ['PLACED', 'Order received', '1'],
+  ['ACCEPTED', 'Accepted by kitchen', '2'],
+  ['PREPARING', 'Cooking now', '3'],
+  ['READY', 'Ready', '4'],
+  ['SERVED', 'Served. Enjoy!', '5']
 ];
 function renderTimeline(el, order) {
   if (!el) return;
@@ -457,12 +530,13 @@ async function trackGo() {
 /* ---------------- ui bind ---------------- */
 function bindUI() {
   $('#cartBtn').addEventListener('click', openCart);
+  bindOptions();
   $('#cartClose').addEventListener('click', closeCart);
   $('#scrim').addEventListener('click', closeCart);
   $('#payBtn').addEventListener('click', startPayment);
   $('#rzpPayBtn').addEventListener('click', confirmPayment);
   $('#trackGo').addEventListener('click', trackGo);
-  $('#trackLink').addEventListener('click', (e) => { e.preventDefault(); openModal('trackModal'); });
+  const tl = $('#trackLink'); if (tl) tl.addEventListener('click', (e) => { e.preventDefault(); openModal('trackModal'); });
   $('#menuSearch').addEventListener('input', () => renderMenu());
   $$('input[name="mode"]').forEach((r) => r.addEventListener('change', () => {
     $('#tableField').style.display = checkedMode() === 'dinein' ? '' : 'none';
@@ -487,69 +561,31 @@ function bindUI() {
 
 boot();
 
-/* ---------------- homepage: promos, categories, bestsellers, coupons ---------------- */
-async function renderPromos() {
+/* ---------------- homepage: offers, categories, bestsellers ---------------- */
+async function renderOffers() {
   const res = await fetch('/api/offers').then((r) => r.json()).catch(() => ({ offers: [] }));
   state.offers = res.offers || [];
-  const slides = state.offers.map((o, i) => ({
-    kicker: i === 0 ? 'Limited time' : 'Offer live now',
-    title: o.type === 'percent' ? o.value + '% OFF' : INR(o.value) + ' OFF',
-    sub: o.label || ('Use code ' + o.code),
-    code: o.code,
-    cls: ['p-orange', 'p-red', 'p-gold'][i % 3]
-  }));
-  if (!slides.length) return;
-  const el = $('#promoCarousel');
-  el.innerHTML = slides.map((sl, i) => `
-    <div class="promo-slide ${sl.cls}${i === 0 ? ' active' : ''}">
-      <div class="promo-copy">
-        <div class="promo-kicker">${sl.kicker}</div>
-        <div class="promo-title">${sl.title}</div>
-        <div class="promo-sub">${sl.sub}</div>
-        <button class="promo-code" data-code="${sl.code}">Use code ${sl.code} <span class="promo-arrow">&rarr;</span></button>
-      </div>
-      <div class="promo-art"><img src="/images/pizza-closeup.jpg" alt="" loading="lazy" /></div>
-    </div>`).join('');
-  $('#promoDots').innerHTML = slides.map((_, i) => `<button data-dot="${i}" class="${i === 0 ? 'on' : ''}"></button>`).join('');
-  const show = (i) => {
-    state.promoIdx = i % slides.length;
-    $$('.promo-slide', el).forEach((sl, k) => sl.classList.toggle('active', k === state.promoIdx));
-    $$('#promoDots button').forEach((d, k) => d.classList.toggle('on', k === state.promoIdx));
-  };
-  clearInterval(state.promoTimer);
-  state.promoTimer = setInterval(() => show(state.promoIdx + 1), 4200);
-  $$('#promoDots button').forEach((d) => d.addEventListener('click', () => { show(+d.dataset.dot); clearInterval(state.promoTimer); state.promoTimer = setInterval(() => show(state.promoIdx + 1), 4200); }));
-  $$('[data-code]', el).forEach((b) => b.addEventListener('click', () => { copyCode(b.dataset.code); }));
+  $('#offerRail').innerHTML = state.offers.map((o) => `
+    <div class="xoffer">
+      <div class="xoffer-ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5 5 19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></div>
+      <div><b>${o.type === 'percent' ? o.value + '% off' : INR(o.value) + ' off'}</b>
+      <span>${o.label || 'On your order'}${o.minOrder ? ' &bull; min order ' + INR(o.minOrder) : ''}</span>
+      <button data-code="${o.code}" type="button">${o.code} &middot; copy</button></div>
+    </div>`).join('') || '<div class="xempty">New offers dropping soon.</div>';
+  $$('#offerRail [data-code]').forEach((b) => b.addEventListener('click', () => copyCode(b.dataset.code)));
 }
 function copyCode(code) {
   navigator.clipboard?.writeText(code).catch(() => {});
   $('#ckCoupon').value = code;
-  state.pendingCode = code;
   toast('Code ' + code + ' copied. Apply it at checkout.');
   document.getElementById('menu').scrollIntoView({ behavior: 'smooth' });
-}
-async function renderCouponWall() {
-  if (!state.offers.length) {
-    const res = await fetch('/api/offers').then((r) => r.json()).catch(() => ({ offers: [] }));
-    state.offers = res.offers || [];
-  }
-  $('#couponWall').innerHTML = state.offers.map((o, i) => `
-    <div class="coupon-card c${i % 3}">
-      <div class="coupon-cut top"></div>
-      <div class="coupon-value">${o.type === 'percent' ? o.value + '%' : INR(o.value)}</div>
-      <div class="coupon-label">${o.label || 'On your next order'}</div>
-      <div class="coupon-min">${o.minOrder ? 'Min order ' + INR(o.minOrder) : 'No minimum'}</div>
-      <button class="coupon-code-btn" data-code="${o.code}">${o.code} <span>copy</span></button>
-      <div class="coupon-cut bottom"></div>
-    </div>`).join('') || '<div class="empty-note">New offers dropping soon. Stay hungry.</div>';
-  $$('#couponWall [data-code]').forEach((b) => b.addEventListener('click', () => copyCode(b.dataset.code)));
 }
 function renderCatCircles() {
   $('#catCircles').innerHTML = state.menu.categories.map((c) => {
     const first = state.menu.items.find((i) => i.cat === c.id);
-    return `<a class="cat-circle" href="#menu" data-jump-cat="${c.id}">
-      <span class="cat-ring"><img src="/images/${first ? first.img : 'pizza-cheese'}.jpg" alt="${c.name}" loading="lazy" /></span>
-      <span class="cat-name">${c.name}</span>
+    return `<a class="xcat" href="#menu" data-jump-cat="${c.id}">
+      <span class="ring"><img src="/images/${first ? first.img : 'pizza-cheese'}.jpg" alt="" loading="lazy" /></span>
+      <b>${c.name}</b>
     </a>`;
   }).join('');
   $$('#catCircles [data-jump-cat]').forEach((a) => a.addEventListener('click', () => {
@@ -558,19 +594,18 @@ function renderCatCircles() {
   }));
 }
 function renderBestsellers() {
-  const picks = ['farmers-delight', 'tandoori-paneer', 'double-cheese-burger', 'kitkat-shake', 'combo-delight', 'cheesy-garlic-bread']
-    .map((id) => state.menu.items.find((i) => i.id === id)).filter(Boolean);
-  const top = (picks.length ? picks : state.menu.items.slice(0, 6));
-  $('#bestRow').innerHTML = top.map((i) => `
-    <div class="best-card">
-      <img src="/images/${i.img}.jpg" alt="${i.name}" loading="lazy" />
-      <div class="best-body">
-        <b>${i.name}</b>
-        <span>${INR(i.price)}</span>
-        <button class="btn btn-primary btn-sm" data-add="${i.id}">Add</button>
-      </div>
-    </div>`).join('');
-  bindCardButtons($('#bestRow'));
+  const want = ['farmers-delight-regular', 'tandoori-paneer-tikka-regular', 'double-cheese-veg-burger', 'kitkat-shake', 'combo-crush', 'cheesy-garlic-bread'];
+  const picks = want.map((id) => itemById(id)).filter(Boolean);
+  const top = picks.length ? picks : state.menu.items.slice(0, 6);
+  $('#bestRow').innerHTML = top.map((i) => {
+    const grp = state.menu.items.filter((x) => x.cat === i.cat && (x.group || x.id) === (i.group || i.id));
+    const from = Math.min(...grp.map((x) => x.price));
+    return `<div class="xbest-card">
+      <img src="/images/${i.img}.jpg" alt="${i.groupName || i.name}" loading="lazy" onerror="this.onerror=null;this.src='/images/pizza-cheese.jpg'" />
+      <div><b>${i.groupName || i.name}</b><span>${grp.length > 1 ? 'from ' : ''}${INR(from)}</span>
+      <button class="xbtn sm" data-add="${i.id}" type="button">Add</button></div>
+    </div>`;
+  }).join('');
 }
 
 /* ---------------- coupon apply in checkout ---------------- */

@@ -42,7 +42,7 @@ config.razorpay = Object.assign({
 }, config.razorpay || {});
 config.razorpay.live = (process.env.RAZORPAY_LIVE === '1') && !!process.env.RAZORPAY_KEY_SECRET;
 let db = readJSON(path.join(DATA, 'db.json'), { orderSeq: 1000, orders: [], payments: {}, riders: [], unavailable: [] });
-db.riders = db.riders || []; db.offers = db.offers || []; db.pushSubs = db.pushSubs || []; db.riderPos = db.riderPos || {}; db.sim = db.sim || {}; db.riderSeq = db.riderSeq || 0;
+db.riders = db.riders || []; db.offers = db.offers || []; db.pushSubs = db.pushSubs || []; db.riderPos = db.riderPos || {}; db.sim = db.sim || {}; db.riderSeq = db.riderSeq || 0; db.enquiries = db.enquiries || []; db.enquirySeq = db.enquirySeq || 0;
 
 function saveDb() { writeJSON(path.join(DATA, 'db.json'), db); }
 
@@ -104,13 +104,23 @@ function priceOrder(lines) {
     if (!mi) return { error: 'Unknown item: ' + line.id };
     if (!isAvailable(mi.id)) return { error: 'Item unavailable: ' + mi.name };
     const qty = Math.max(1, Math.min(20, parseInt(line.qty, 10) || 1));
-    itemTotal += mi.price * qty;
-    items.push({ id: mi.id, name: mi.name, price: mi.price, qty });
+    // size add-ons (extra cheese, cheese burst...) priced per size from the menu card
+    const ids = Array.isArray(line.addons) ? Array.from(new Set(line.addons.map(String))) : [];
+    let unit = mi.price;
+    const names = [];
+    for (const aid of ids) {
+      const ad = (menu.addons || []).find((a) => a.id === aid);
+      const add = ad && mi.size && ad.prices ? Number(ad.prices[mi.size]) : 0;
+      if (!ad || !add) return { error: 'Add-on not available for ' + mi.name + ': ' + aid };
+      unit += add;
+      names.push(ad.name);
+    }
+    itemTotal += unit * qty;
+    items.push({ id: mi.id, name: names.length ? mi.name + ' + ' + names.join(', ') : mi.name, price: unit, qty, addons: ids });
   }
   if (!items.length) return { error: 'Empty cart' };
   return { items, itemTotal, deliveryFee: 0, total: itemTotal };
 }
-
 function publicOrder(o) {
   return {
     id: o.id, createdAt: o.createdAt, status: o.status, mode: o.mode, outlet: o.outlet,
@@ -398,6 +408,9 @@ const server = http.createServer(async (req, res) => {
     if (p === '/admin') return serveFile(res, path.join(PUBLIC, 'admin.html'));
     if (p === '/qr') return serveFile(res, path.join(PUBLIC, 'qr.html'));
     if (p === '/rider') return serveFile(res, path.join(PUBLIC, 'rider.html'));
+    if (p === '/franchise') return serveFile(res, path.join(PUBLIC, 'franchise.html'));
+    if (p === '/careers') return serveFile(res, path.join(PUBLIC, 'careers.html'));
+    if (p === '/contact') return serveFile(res, path.join(PUBLIC, 'contact.html'));
     if (p === '/track') return serveFile(res, path.join(PUBLIC, 'index.html'));
     if (p === '/api/events') return sseHandler(req, res);
     if (p === '/healthz') return json(res, 200, { ok: true, uptime: process.uptime() });
@@ -420,7 +433,7 @@ const server = http.createServer(async (req, res) => {
   // ---- public API ----------------------------------------------------------
   if (p === '/api/menu' && method === 'GET') {
     const items = menu.items.map((i) => Object.assign({}, i, { available: isAvailable(i.id) }));
-    return json(res, 200, { categories: menu.categories, items, deliveryFee: menu.deliveryFee, freeDeliveryAbove: menu.freeDeliveryAbove, currency: 'INR' });
+    return json(res, 200, { categories: menu.categories, items, addons: menu.addons || [], deliveryFee: menu.deliveryFee, freeDeliveryAbove: menu.freeDeliveryAbove, currency: 'INR' });
   }
   if (p === '/api/outlets' && method === 'GET') return json(res, 200, { outlets });
   if (p === '/api/config' && method === 'GET') return json(res, 200, { brand: config.brand, razorpay: { keyId: config.razorpay.keyId, live: config.razorpay.live }, vapid: vapid.pub, outletsGeo: RIDER_HOME });
@@ -467,6 +480,30 @@ const server = http.createServer(async (req, res) => {
     const pay = captureMockPayment(body.gatewayOrderId);
     if (!pay) return json(res, 402, { error: 'Payment failed' });
     return json(res, 200, { paid: true, paymentId: pay.id });
+  }
+
+  if (p === '/api/enquiries' && method === 'POST') {
+    const b = await readBody(req);
+    if (b.website) return json(res, 200, { ok: true }); // honeypot: bots fill hidden fields
+    const type = ['franchise', 'contact', 'career'].includes(b.type) ? b.type : 'contact';
+    const clip = (v, n) => String(v == null ? '' : v).trim().slice(0, n);
+    const name = clip(b.name, 80);
+    const phone = String(b.phone || '').replace(/\D/g, '').slice(-10);
+    const email = clip(b.email, 120);
+    if (name.length < 2) return json(res, 400, { error: 'Please enter your name' });
+    if (!/^[6-9]\d{9}$/.test(phone)) return json(res, 400, { error: 'Please enter a valid 10-digit mobile number' });
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json(res, 400, { error: 'Please enter a valid email address' });
+    if (type === 'franchise' && !clip(b.city, 80)) return json(res, 400, { error: 'Please tell us your city' });
+    db.enquirySeq += 1;
+    const row = {
+      id: 'ENQ-' + db.enquirySeq, type, status: 'NEW', createdAt: new Date().toISOString(),
+      name, lastName: clip(b.lastName, 80), phone, email, city: clip(b.city, 80),
+      message: clip(b.message, 2000), extra: { investment: clip(b.investment, 40), space: clip(b.space, 40), role: clip(b.role, 60) }
+    };
+    db.enquiries.unshift(row);
+    saveDb();
+    broadcast('enquiry:new', row);
+    return json(res, 201, { ok: true, id: row.id });
   }
 
   if (p === '/api/orders' && method === 'POST') {
@@ -592,6 +629,18 @@ const server = http.createServer(async (req, res) => {
       saveDb();
       broadcast('menu:update', { id, available: body.available !== false });
       return json(res, 200, { ok: true });
+    }
+    if (p === '/api/admin/enquiries' && method === 'GET') {
+      return json(res, 200, { enquiries: db.enquiries });
+    }
+    if ((m = p.match(/^\/api\/admin\/enquiries\/([^/]+)\/status$/)) && method === 'POST') {
+      const row = db.enquiries.find((e) => e.id === m[1]);
+      if (!row) return json(res, 404, { error: 'Enquiry not found' });
+      const body = await readBody(req);
+      if (!['NEW', 'CONTACTED', 'CLOSED'].includes(body.status)) return json(res, 400, { error: 'Bad status' });
+      row.status = body.status;
+      saveDb();
+      return json(res, 200, { ok: true, enquiry: row });
     }
     if (p === '/api/admin/menu' && method === 'GET') {
       return json(res, 200, { items: menu.items.map((i) => Object.assign({}, i, { available: isAvailable(i.id) })) });

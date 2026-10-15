@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Franchise Enquiry | XTO Pizza</title>
+<meta name="description" content="Own an XTO Pizza outlet. Share your details and the XTO team will call you with the franchise model." />
+<link rel="icon" href="/images/icon-192.png" />
+<meta name="theme-color" content="#b3271e" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="/css/site.css" />
+<link rel="stylesheet" href="/css/home.css" />
+</head>
+<body class="x" data-page="franchise">
+<div id="xh-mount"></div>
+<main>
+
+<section class="xpage-hero"><div class="xw">
+  <div class="xeyebrow">Franchise enquiry</div>
+  <h1>Be your own boss. Own an XTO Pizza.</h1>
+  <p>XTO is a 100% pure veg pizzeria from Pune with a focused menu of pizzas, burgers, pasta, wraps and shakes. If you want to run an outlet in your city, tell us about yourself and we will call you.</p>
+</div></section>
+<section class="xs"><div class="xw xform-grid">
+  <div>
+    <div class="xeyebrow">Why XTO</div>
+    <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);margin-bottom:18px">A menu people already love</h2>
+    <div class="xvalues" style="grid-template-columns:1fr 1fr;margin-bottom:30px">
+      <div class="xvalue"><h3>Pure veg brand</h3><p>A fully vegetarian kitchen that families and groups choose without a second thought.</p></div>
+      <div class="xvalue"><h3>Focused menu</h3><p>94 items across pizza, burgers, pasta, wraps, shakes and combos, priced for everyday ordering.</p></div>
+      <div class="xvalue"><h3>Ordering built in</h3><p>Website, mobile app, QR table ordering and an admin dashboard for every outlet.</p></div>
+      <div class="xvalue"><h3>Two live outlets</h3><p>Shivane Khadakwasla and Nanded City, Pune.</p></div>
+    </div>
+    <div class="xeyebrow">How it works</div>
+    <ol class="xlist" style="padding:0">
+      <li><span class="n">1</span><div><b>Share your details</b><span>Fill in the form with your city and whether you already have a space.</span></div></li>
+      <li><span class="n">2</span><div><b>We call you</b><span>The XTO team explains the franchise model, investment and support.</span></div></li>
+      <li><span class="n">3</span><div><b>Location review</b><span>We look at your shortlisted location together.</span></div></li>
+      <li><span class="n">4</span><div><b>Setup and launch</b><span>Menu, ordering system and outlet go-live support.</span></div></li>
+    </ol>
+  </div>
+  <div class="xform-card">
+    <h2>Share your details</h2>
+    <form data-enquiry="franchise" data-success="fOk" novalidate>
+      <div class="xrow"><div class="xfield"><label for="f-name">First name *</label><input id="f-name" name="name" type="text" placeholder="Your first name" required autocomplete="given-name" /></div><div class="xfield"><label for="f-lastName">Last name</label><input id="f-lastName" name="lastName" type="text" placeholder="Your last name"  autocomplete="family-name" /></div></div>
+      <div class="xrow"><div class="xfield"><label for="f-city">City *</label><input id="f-city" name="city" type="text" placeholder="e.g. Pune" required  /></div><div class="xfield"><label for="f-phone">Contact number *</label><input id="f-phone" name="phone" type="tel" placeholder="10-digit mobile" required inputmode="numeric" maxlength="10" autocomplete="tel" /></div></div>
+      <div class="xfield"><label for="f-email">Email id</label><input id="f-email" name="email" type="email" placeholder="you@example.com"  autocomplete="email" /></div>
+      <div class="xfield"><label for="f-space">Do you have a space for the outlet?</label>
+        <select id="f-space" name="space"><option value="">Select one</option><option>Yes, I own or lease a space</option><option>I am looking for a location</option><option>Not sure yet</option></select></div>
+      <div class="xfield"><label for="f-message">Message</label><textarea id="f-message" name="message" placeholder="Tell us a little about your plans"></textarea></div>
+      <input class="xhp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+      <div class="xerr" role="alert"></div>
+      <button class="xbtn" type="submit">Send enquiry</button>
+    </form>
+    <div class="xok" id="fOk" hidden><b>Thank you. We have your details.</b>Your enquiry reference is <strong data-ref></strong>. The XTO team will call you soon.</div>
+  </div>
+</div></section>
+</main>
+<div id="xf-mount"></div>
+<script src="/js/layout.js"></script>
+<script src="/js/forms.js"></script>
+</body>
+</html>
