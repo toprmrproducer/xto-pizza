@@ -60,7 +60,7 @@
           '<p style="margin-top:10px">Dine-in and takeaway. UPI, cards and netbanking via Razorpay. GST and packaging charges extra.</p>' +
         '</div>' +
       '</div>' +
-      '<div class="xf-base"><span>&copy; 2026 XTO Pizza. Ardur Foods Pvt. Ltd. All rights reserved.</span><span>Pure veg. Baked fresh. Pune.</span></div>' +
+      '<div class="xf-base"><span>&copy; 2026 XTO Pizza. Ardur Foods Pvt. Ltd. All rights reserved.</span><span><a href="privacy.html" style="display:inline">Privacy</a> &middot; <a href="terms.html" style="display:inline">Terms</a> &middot; <a href="refund.html" style="display:inline">Refunds</a></span></div>' +
     '</div></footer>';
 
   var hm = document.getElementById('xh-mount'); if (hm) hm.outerHTML = header;

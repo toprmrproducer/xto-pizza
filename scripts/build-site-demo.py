@@ -43,7 +43,7 @@ for f in ('site.js', 'app.js', 'layout.js'):
         for a, b in (("'/#menu'", "'site.html#menu'"), ("'/#offers'", "'site.html#offers'"), ("'/#outlets'", "'site.html#outlets'"),
                      ("'/#story'", "'site.html#story'"), ('href="/#menu"', 'href="site.html#menu"'), ('href="/#offers"', 'href="site.html#offers"'),
                      ('href="/#outlets"', 'href="site.html#outlets"'), ("'/franchise'", "'franchise.html'"), ("'/careers'", "'careers.html'"),
-                     ("'/contact'", "'contact.html'"), ('href="/franchise"', 'href="franchise.html"'), ('href="/careers"', 'href="careers.html"'),
+                     ("'/contact'", "'contact.html'"), ('href="/privacy"', 'href="privacy.html"'), ('href="/terms"', 'href="terms.html"'), ('href="/refund"', 'href="refund.html"'),  ('href="/franchise"', 'href="franchise.html"'), ('href="/careers"', 'href="careers.html"'),
                      ('href="/contact"', 'href="contact.html"'), ('href="/app"', 'href="app.html"'), ("'/?cart=1'", "'site.html?cart=1'"),
                      ("'/?track=1'", "'site.html?track=1'"), ("'/?q='", "'site.html?q='"), ('href="/" aria', 'href="site.html" aria'),
                      ("['home', home ? '#top' : '/', 'Home']", "['home', home ? '#top' : 'site.html', 'Home']")):
@@ -205,7 +205,7 @@ def demotify(src, dst, extra=None):
 demotify(os.path.join(PUB, 'index.html'), os.path.join(DOCS, 'site.html'))
 demotify(os.path.join(PUB, 'app.html'), os.path.join(DOCS, 'app.html'))
 demotify(os.path.join(PUB, 'qr.html'), os.path.join(DOCS, 'qr.html'))
-for page in ('franchise', 'careers', 'contact'):
+for page in ('franchise', 'careers', 'contact', 'privacy', 'terms', 'refund'):
     demotify(os.path.join(PUB, page + '.html'), os.path.join(DOCS, page + '.html'),
              lambda t: t.replace('<script src="js/layout.js">', INJECT + '<script src="js/layout.js">'))
 print('demo bundle complete')

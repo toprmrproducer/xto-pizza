@@ -411,6 +411,9 @@ const server = http.createServer(async (req, res) => {
     if (p === '/franchise') return serveFile(res, path.join(PUBLIC, 'franchise.html'));
     if (p === '/careers') return serveFile(res, path.join(PUBLIC, 'careers.html'));
     if (p === '/contact') return serveFile(res, path.join(PUBLIC, 'contact.html'));
+    if (p === '/privacy') return serveFile(res, path.join(PUBLIC, 'privacy.html'));
+    if (p === '/terms') return serveFile(res, path.join(PUBLIC, 'terms.html'));
+    if (p === '/refund') return serveFile(res, path.join(PUBLIC, 'refund.html'));
     if (p === '/track') return serveFile(res, path.join(PUBLIC, 'index.html'));
     if (p === '/api/events') return sseHandler(req, res);
     if (p === '/healthz') return json(res, 200, { ok: true, uptime: process.uptime() });
