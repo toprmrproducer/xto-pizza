@@ -17,6 +17,10 @@ for f in os.listdir(img_src):
     if not os.path.isfile(src): continue
     shutil.copy2(src, os.path.join(img_dst, f))
 
+ai_dst = os.path.join(img_dst, 'ai'); os.makedirs(ai_dst, exist_ok=True)
+for f in os.listdir(os.path.join(img_src, 'ai')):
+    if f.startswith('feature-'): shutil.copy2(os.path.join(img_src, 'ai', f), os.path.join(ai_dst, f))
+
 items, cats = menu['items'], menu['categories']
 cards = []
 for c in cats:
@@ -99,6 +103,11 @@ header img{width:54px;height:54px}
 footer{text-align:center;font-size:12px;color:var(--muted);padding:26px 20px 34px;line-height:1.9;border-top:1px solid var(--line)}
 footer b{color:var(--ink)}
 footer a{color:var(--orange);text-decoration:none;font-weight:700}
+.fresh{max-width:1100px;margin:22px auto 0;padding:0 20px}
+.fresh h3{font:800 15px Georgia,serif;letter-spacing:.04em;text-transform:uppercase;color:var(--orange);margin:0 0 10px}
+.fresh .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.fresh .strip img{width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:14px;display:block}
+@media(max-width:700px){.fresh{padding:0 14px}.fresh .strip{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
@@ -113,6 +122,12 @@ footer a{color:var(--orange);text-decoration:none;font-weight:700}
   <div><b>Shivane (Khadakwasla)</b>NDA Rd, near Add Mart, Shivane, Pune 411023<br><a href="tel:+917030000776">Call 70300 00776</a></div>
   <div><b>Nanded City</b>Destination Centre, F-65, Sinhagad Rd, Pune 411068<br><a href="tel:+917030000886">Call 70300 00886</a></div>
 </div>
+<section class="fresh"><h3>Fresh from the oven</h3><div class="strip">
+<img src="images/ai/feature-feast-1.jpg" alt="Veg burgers, fries and Margherita pizza" loading="lazy">
+<img src="images/ai/feature-margherita-pull-1.jpg" alt="Margherita pizza cheese pull" loading="lazy">
+<img src="images/ai/feature-veg-pull-2.jpg" alt="Veggie pizza with olives, jalapeno and corn" loading="lazy">
+<img src="images/ai/feature-feast-2.jpg" alt="Burgers, masala fries and pizza" loading="lazy">
+</div></section>
 <nav class="cats">CATS</nav>
 <main>
 CARDS

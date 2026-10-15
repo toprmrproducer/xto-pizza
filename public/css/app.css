@@ -269,3 +269,8 @@ h1, h3 { font-family: 'Sora', sans-serif; letter-spacing: -0.02em; }
 .rider-map { height: 200px; border-radius: 14px; overflow: hidden; border: 1px solid var(--line); margin-top: 10px; }
 .rider-cap { text-align: center; font: 700 12.5px 'Sora'; color: var(--red); margin-top: 6px; }
 .ghost-block { width: 100%; margin-top: 8px; background: none; border: 1.5px solid var(--line); border-radius: 12px; padding: 11px; font: 700 13px 'Sora'; color: var(--ink); cursor: pointer; }
+
+/* fresh-from-the-oven photo rail on app home */
+.fresh-rail { display: flex; gap: 12px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -18px; padding: 2px 18px 10px; scrollbar-width: none; }
+.fresh-rail::-webkit-scrollbar { display: none; }
+.fresh-rail img { flex: 0 0 74%; max-width: 320px; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 20px; scroll-snap-align: start; }
