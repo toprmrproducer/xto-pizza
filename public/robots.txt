@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /rider
+Disallow: /api/
+Disallow: /app
+Disallow: /qr
+
+Sitemap: https://xtopizza.in/sitemap.xml

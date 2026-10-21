@@ -60,7 +60,7 @@
           '<p style="margin-top:10px">Dine-in and takeaway. UPI, cards and netbanking via Razorpay. GST and packaging charges extra.</p>' +
         '</div>' +
       '</div>' +
-      '<div class="xf-base"><span>&copy; 2026 XTO Pizza. Ardur Foods Pvt. Ltd. All rights reserved.</span><span><a href="/privacy" style="display:inline">Privacy</a> &middot; <a href="/terms" style="display:inline">Terms</a> &middot; <a href="/refund" style="display:inline">Refunds</a></span></div>' +
+      '<div class="xf-base"><span>&copy; 2026 XTO Pizza. Ardur Foods Pvt. Ltd. All rights reserved.</span><span class="xf-legal"><a href="/privacy" style="display:inline">Privacy Policy</a> &middot; <a href="/terms" style="display:inline">Terms and Conditions</a> &middot; <a href="/refund" style="display:inline">Refund Policy</a> &middot; <a href="/delete-data" style="display:inline">Delete my data</a> &middot; <a href="/blog" style="display:inline">Blog</a></span></div>' +
     '</div></footer>';
 
   var hm = document.getElementById('xh-mount'); if (hm) hm.outerHTML = header;

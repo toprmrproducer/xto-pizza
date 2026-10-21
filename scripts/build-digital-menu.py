@@ -167,7 +167,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 50px}
 .f{background:var(--ink);color:rgba(255,255,255,.8);border-radius:26px;padding:28px;display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:24px;font-size:.9rem;line-height:1.7}
 .f h4{color:#fff;font:700 1rem var(--disp);margin-bottom:6px}
 .f a{color:#ffc53d;font-weight:600}
-.legal{text-align:center;color:var(--muted);font-size:.78rem;margin-top:16px}
+.legal{text-align:center;color:var(--muted);font-size:.85rem;line-height:1.9;margin-top:16px}.legal a{color:var(--ink);font-weight:600;text-decoration:underline}
 @media(max-width:1020px){.grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:860px){.wrap{grid-template-columns:1fr;padding-top:16px}.side{display:none}.pills{display:flex}.hero{grid-template-columns:1fr;padding:22px}.mosaic{height:200px}.f{grid-template-columns:1fr}.brand span{display:none}html{scroll-padding-top:128px}}
 @media(max-width:520px){.grid{grid-template-columns:1fr}.order{padding:10px 14px}.search input{padding-left:40px}}
@@ -205,7 +205,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 50px}
     <div><h4>Shivane (Khadakwasla)</h4>NDA Rd, near Add Mart, Shivane, Pune 411023<br>11 am - 10:30 pm<br><a href="tel:+917030000776">+91 70300 00776</a></div>
     <div><h4>Nanded City</h4>Destination Centre, F-65, Sinhagad Rd, Pune 411068<br>11 am - 11 pm<br><a href="tel:+917030000886">+91 70300 00886</a></div>
   </div>
-  <div class="legal">Ardur Foods Pvt. Ltd. &middot; ordernow@xtopizza.com &middot; Prices in INR</div>
+  <div class="legal"><a href="https://xtopizza.in/privacy">Privacy Policy</a> &middot; <a href="https://xtopizza.in/terms">Terms and Conditions</a> &middot; <a href="https://xtopizza.in/refund">Refund Policy</a> &middot; <a href="https://xtopizza.in/delete-data">Delete my data</a><br>Ardur Foods Pvt. Ltd. &middot; Prices in INR</div>
 </footer>
 <script>
 (function(){
@@ -243,3 +243,74 @@ open(os.path.join(ROOT, 'docs', 'index.html'), 'w').write(out)
 # the old "AI shots" menu link keeps working: same page
 open(os.path.join(ROOT, 'docs', 'menu-ai.html'), 'w').write(out)
 print(f'built docs/index.html: {count} dishes, {len(order)} cards, {len(cats)} categories, {len(out)} chars')
+
+# ---- LIVE variant (19 Oct 2026): public/menu.html renders from /api/menu at load, so admin edits
+# (prices, sold-out toggles, new items) show instantly on menu./shivane./nanded. subdomains.
+MAIN = 'https://xtopizza.in'
+live = (PAGE.replace('__PILLS__', '').replace('__NAV__', '').replace('__SECTIONS__', '').replace('__ADDONS__', '')
+        .replace('__COUNT__', '<span id="cnt">our</span>').replace('__LIVE__', MAIN))
+live = live.replace('src="images/', 'src="/images/').replace('href="images/', 'href="/images/')
+live = live.replace('<a class="order" href="'+MAIN+'/"', '<a class="order" href="'+MAIN+'/#menu"')
+live = live.replace('<title>XTO Pizza | Digital Menu</title>', '<title>XTO Pizza Digital Menu | Pure Veg Pizza, Pune</title>\n<link rel="canonical" href="https://menu.xtopizza.in/" />')
+live = live.replace('<div class="hero">', '<div class="outlet-bar none" id="ob"></div>\n    <div class="hero">', 1)
+live = live.replace('</style>', '.outlet-bar{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px;margin-bottom:14px;box-shadow:var(--sh);display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center}.outlet-bar b{font:800 1.05rem var(--disp)}.outlet-bar a.btn{background:var(--red);color:#fff;padding:8px 16px;border-radius:999px;font-weight:700;font-size:.85rem}.outlet-bar a.alt{background:#fff;color:var(--red);border:1.5px solid var(--red)}.so{opacity:.55}.so .pr b::after{content:" (sold out)";font-size:.7rem;color:var(--red);font-weight:700}</style>', 1)
+live = live.replace('(function(){\n  // size pills update the card price', 'function initMenu(){\n  // size pills update the card price', 1)
+assert live.rstrip().endswith('</html>')
+tail = '})();\n</script>\n</body>\n</html>'
+assert tail in live
+RENDER = r'''}
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+  var ORDER=['six','regular','half','medium','full','large'];
+  var CART_KEY='xto_cart_v1', PRICE={};
+  function cart(){try{return JSON.parse(localStorage.getItem(CART_KEY))||{}}catch(e){return {}}}
+  function save(c){try{localStorage.setItem(CART_KEY,JSON.stringify(c))}catch(e){}}
+  function bar(){var c=cart(),n=0,t=0;Object.keys(c).forEach(function(k){var id=k.split('|')[0];n+=c[k];t+=(PRICE[id]||0)*c[k]});
+    var el=document.getElementById('cb'); if(!el) return; if(!n){el.style.display='none';return}
+    el.style.display='flex'; el.querySelector('span').textContent=n+(n>1?' items':' item')+(t?' | \u20b9'+t:'');
+    var o=oid?'&outlet='+oid:''; el.querySelector('a').setAttribute('href','/order?cart=1'+o);}
+  function card(g){
+    var f=g[0], name=f.groupName||f.name, sold=g.every(function(x){return x.available===false});
+    var sizes='';
+    if(g.length>1) sizes='<div class="sz-l">Size</div><div class="szs">'+g.map(function(x,n){return '<button type="button" class="sz'+(n===0?' on':'')+'" data-id="'+esc(x.id)+'" data-p="'+x.price+'">'+esc(x.sizeLabel||'')+'<b>&#8377;'+x.price+'</b></button>'}).join('')+'</div>';
+    else if(f.sizeLabel) sizes='<div class="sz-l">Size</div><div class="szs"><span class="sz on">'+esc(f.sizeLabel)+'<b>&#8377;'+f.price+'</b></span></div>';
+    return '<article class="card'+(sold?' so':'')+'" data-name="'+esc((name+' '+(f.desc||'')).toLowerCase())+'"><div class="ph"><img src="/images/'+esc(f.img)+'.jpg" alt="'+esc(name)+'" loading="lazy" onerror="this.onerror=null;this.src=\'/images/ai/feature-veg-pull.jpg\'"><span class="vg" title="Pure veg"></span></div><div class="cb"><div class="t"><h3>'+esc(name)+'</h3><span class="pr">'+(g.length>1?'from ':'')+'<b class="pv">&#8377;'+g[0].price+'</b></span></div><p>'+esc(f.desc||'')+'</p>'+sizes+'<button type="button" class="addbtn" data-id="'+esc(g[0].id)+'"'+(sold?' disabled':'')+'>'+(sold?'Sold out':'+ Add')+'</button></div></article>';
+  }
+  var OUT={shivane:{n:'XTO Pizza Shivane (Khadakwasla)',a:'NDA Rd, near Add Mart, Shivane, Pune 411023',h:'11 am - 10:30 pm',t:'+917030000776',tl:'+91 70300 00776',m:'https://maps.google.com/?q=XTO+PIZZA+Shivane+Pune'},
+           nanded:{n:'XTO Pizza Nanded City',a:'Survey No.1,2, Destination Centre, Shop F-65, Sinhagad Rd, Nanded City, Pune 411068',h:'11 am - 11 pm',t:'+917030000886',tl:'+91 70300 00886',m:'https://maps.google.com/?q=XTO+Pizza+Nanded+City+Pune'}};
+  var host=location.hostname.split('.')[0], qs=new URLSearchParams(location.search), oid=OUT[host]?host:(OUT[qs.get('outlet')]?qs.get('outlet'):'');
+  fetch('/api/menu').then(function(r){return r.json()}).then(function(m){
+    var groups={}, order=[];
+    m.items.forEach(function(i){var k=i.cat+'|'+(i.group||i.id); if(!groups[k]){groups[k]=[];order.push(k)} groups[k].push(i)});
+    order.forEach(function(k){groups[k].sort(function(a,b){return (ORDER.indexOf(a.size||'regular')-ORDER.indexOf(b.size||'regular'))||(a.price-b.price)})});
+    var byCat={}; order.forEach(function(k){var c=k.split('|')[0]; (byCat[c]=byCat[c]||[]).push(card(groups[k]))});
+    var cats=m.categories.filter(function(c){return byCat[c.id]});
+    document.getElementById('results').innerHTML=cats.map(function(c){return '<section id="cat-'+c.id+'"><div class="sh"><h2>'+esc(c.name)+'</h2><p>'+esc(c.note||'')+'</p></div><div class="grid">'+byCat[c.id].join('')+'</div></section>'}).join('');
+    document.querySelector('.side').innerHTML='<h4>Menu</h4>'+cats.map(function(c){return '<a href="#cat-'+c.id+'" data-c="'+c.id+'"><span>'+esc(c.name)+'</span><em>'+byCat[c.id].length+'</em></a>'}).join('')+(m.addons&&m.addons.length?'<a href="#cat-addons"><span>Add-ons</span><em>'+m.addons.length+'</em></a>':'');
+    document.querySelector('.pills').innerHTML=cats.map(function(c){return '<a href="#cat-'+c.id+'">'+esc(c.name)+'</a>'}).join('');
+    document.getElementById('cnt').textContent=order.length;
+    if(m.addons&&m.addons.length){var rows=m.addons.map(function(a){return '<tr><th>'+esc(a.name)+'</th><td>&#8377;'+a.prices.regular+'</td><td>&#8377;'+a.prices.medium+'</td><td>&#8377;'+a.prices.large+'</td></tr>'}).join('');
+      document.getElementById('results').insertAdjacentHTML('afterend','<section id="cat-addons"><div class="sh"><h2>Dil Maange More</h2><p>Add-ons for Regular, Medium and Large pizzas</p></div><div class="addons"><table><thead><tr><th></th><th>Regular</th><th>Medium</th><th>Large</th></tr></thead><tbody>'+rows+'</tbody></table></div></section>')}
+    if(oid){var o=OUT[oid], ob=document.getElementById('ob'); ob.classList.remove('none');
+      ob.innerHTML='<div><b>'+esc(o.n)+'</b><br><span style="color:var(--muted);font-size:.88rem">'+esc(o.a)+' &middot; '+esc(o.h)+'</span></div><span style="flex:1"></span><a class="btn" href="tel:'+o.t+'">Call '+esc(o.tl)+'</a><a class="btn alt" href="'+o.m+'" target="_blank" rel="noopener">Directions</a>';
+      document.title=o.n+' Digital Menu | XTO Pizza'}
+    m.items.forEach(function(i){PRICE[i.id]=i.price});
+    initMenu(); bar();
+    document.getElementById('results').addEventListener('click',function(e){
+      var b=e.target.closest('.addbtn'); if(!b||b.disabled) return;
+      var on=b.closest('.card').querySelector('button.sz.on'); var id=(on&&on.dataset.id)||b.dataset.id;
+      var c=cart(); c[id]=Math.min(20,(c[id]||0)+1); save(c);
+      b.textContent='Added \u2713'; b.classList.add('ok'); setTimeout(function(){b.textContent='+ Add'; b.classList.remove('ok')},900); bar();
+    });
+    if(location.hash){var el=document.querySelector(location.hash); if(el) el.scrollIntoView()}
+  }).catch(function(){document.getElementById('results').innerHTML='<div class="empty">Menu is loading slowly. Please refresh or ask at the counter.</div>'});
+})();
+</script>
+</body>
+</html>'''
+live = live.replace(tail, RENDER)
+live = live.replace('</body>', '<div class="cartbar" id="cb" style="display:none"><span></span><a href="/order?cart=1">Checkout</a></div></body>', 1)
+live = live.replace('</style>', '.addbtn{margin-top:10px;width:100%;padding:11px;border-radius:999px;border:1.5px solid var(--red);background:#fff;color:var(--red);font:700 .9rem Inter;cursor:pointer}.addbtn.ok{background:var(--red);color:#fff}.addbtn:disabled{opacity:.5;cursor:not-allowed}.cartbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;background:#1b120c;color:#fff;border-radius:999px;padding:10px 10px 10px 22px;gap:18px;align-items:center;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);font:600 .95rem Inter}.cartbar a{background:var(--orange);color:#fff;padding:10px 22px;border-radius:999px;font-weight:800}</style>', 1)
+live = live.replace('<a class="order" href="' + MAIN + '/#menu"', '<a class="order" href="/order"')
+open(os.path.join(ROOT, 'public', 'menu.html'), 'w').write(live)
+print('built public/menu.html (live menu)')

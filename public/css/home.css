@@ -31,7 +31,7 @@ body.x h1, body.x h2, body.x h3, body.x h4 { font-family: var(--x-display); lett
 .xbtn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 
 /* ---------- header ---------- */
-.xh { position: sticky; top: 0; z-index: 60; box-shadow: 0 2px 18px -8px rgba(27, 18, 12, .45); }
+.xh { position: sticky; top: 0; z-index: 2000; box-shadow: 0 2px 18px -8px rgba(27, 18, 12, .45); }
 .xh-top { background: var(--x-red); color: #fff; }
 .xh-in { display: flex; align-items: center; gap: 18px; padding: 10px 0; }
 .xh-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: #fff; flex: none; }
@@ -290,3 +290,8 @@ body.x h1, body.x h2, body.x h3, body.x h4 { font-family: var(--x-display); lett
   .xprice { font-size: 1.05rem; }
   .xadd { padding: 7px 12px; }
 }
+
+.xf-legal a{color:#fff !important;font-weight:600;text-decoration:underline;font-size:.95rem;margin:0 4px}.xf-legal{line-height:2}
+
+/* Leaflet panes use z-index up to 1000; isolate the map so it can never paint over the sticky header */
+.leaflet-container{isolation:isolate;z-index:0}

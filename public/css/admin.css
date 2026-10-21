@@ -178,3 +178,8 @@ h1, h2, h3 { font-family: 'Sora', sans-serif; letter-spacing: -.01em; }
 .mini-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .mini-head h3{font:700 16px 'Sora';color:#ffd98a}
 .mmc-actions{display:flex;gap:10px;align-items:center}
+.leaflet-container{isolation:isolate;z-index:0}
+
+/* toast: fully hidden unless showing (was only slid 90px, so an empty pill stayed visible) */
+.toast { opacity: 0; visibility: hidden; pointer-events: none; transition: transform .3s cubic-bezier(.2,.9,.3,1.3), opacity .25s ease, visibility 0s linear .3s; }
+.toast.show { opacity: 1; visibility: visible; pointer-events: auto; transition: transform .3s cubic-bezier(.2,.9,.3,1.3), opacity .2s ease, visibility 0s; }

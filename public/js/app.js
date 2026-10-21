@@ -8,7 +8,7 @@ const CART_KEY = 'xto_cart_v1';
 const PHONE_KEY = 'xto_phone';
 
 const SIZE_ORDER = ['six', 'regular', 'half', 'medium', 'full', 'large'];
-const state = { sel: {}, menu: null, outlets: [], cat: 'all', cart: loadCart(), phone: localStorage.getItem(PHONE_KEY) || '', payCtx: null, coupon: null, offers: [], appMaps: {} };
+const state = { loc: null, sel: {}, menu: null, outlets: [], cat: 'all', cart: loadCart(), phone: localStorage.getItem(PHONE_KEY) || '', payCtx: null, coupon: null, offers: [], appMaps: {} };
 
 function loadCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch (e) { return {}; } }
 function saveCart() { localStorage.setItem(CART_KEY, JSON.stringify(state.cart)); }
@@ -39,13 +39,14 @@ function toast(msg) {
   const t = $('#toast');
   t.textContent = msg;
   t.classList.add('show');
+  t.onclick = () => t.classList.remove('show');
   clearTimeout(t._h);
   t._h = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
 /* ---------------- boot ---------------- */
 async function boot() {
-  const [menuRes, outletsRes] = await Promise.all([fetch('/api/menu').then((r) => r.json()), fetch('/api/outlets').then((r) => r.json())]);
+  const [menuRes, outletsRes] = await Promise.all([fetch('/api/menu').then((r) => r.json()), fetch('/api/outlets').then((r) => r.json()), XPay.load()]);
   state.menu = menuRes;
   state.outlets = outletsRes.outlets;
   renderQuick();
@@ -66,6 +67,12 @@ async function boot() {
   if (state.phone) { $('#phoneInput').value = state.phone; loadOrders(); }
   registerSW();
   installHint();
+  // returning from a UPI app / bank page: /app#order=XT-123
+  if (location.hash.startsWith('#order=')) {
+    const oid = decodeURIComponent(location.hash.slice(7));
+    fetch('/api/orders/' + encodeURIComponent(oid)).then((r) => r.json()).then((r) => { if (r && r.order) showAppSuccess(r.order); }).catch(() => {});
+    history.replaceState(null, '', location.pathname);
+  }
 }
 
 function registerSW() {
@@ -291,158 +298,150 @@ function updateCartUI() {
 /* ---------------- checkout + payment ---------------- */
 function openCheckout() {
   $('#ckOutlet').innerHTML = state.outlets.map((o) => `<option value="${o.id}">${o.name}</option>`).join('');
-  $('#tableField').style.display = checkedMode() === 'dinein' ? '' : 'none';
   if (state.phone) { $('#ckPhone').value = state.phone; }
-  updateBill();
+  syncModeFields();
+  updateLocStatus();
   $('#ckError').textContent = '';
   $('#checkoutSheet').classList.add('show');
 }
+function syncModeFields() {
+  const mode = checkedMode();
+  $('#tableField').style.display = mode === 'dinein' ? '' : 'none';
+  $('#deliveryFields').style.display = mode === 'delivery' ? '' : 'none';
+  const del = $('#modeDeliveryOpt');
+  if (del) del.style.display = (XPay.settings && XPay.settings.deliveryEnabled) ? '' : 'none';
+  updateBill();
+}
 function updateBill() {
-  const { lines, itemTotal, deliveryFee, total } = cartTotals();
+  const { lines, itemTotal } = cartTotals();
   if (!lines.length) return;
+  const discount = state.coupon ? Math.min(state.coupon.discount, itemTotal) : 0;
+  const mode = checkedMode();
+  const fee = mode === 'delivery' ? XPay.deliveryFee(itemTotal) : 0;
+  const S = XPay.settings || {};
+  let hint = '';
+  if (mode === 'delivery') {
+    if (fee === null) hint = 'Delivery is not available right now.';
+    else if (S.minOrderDelivery && itemTotal < S.minOrderDelivery) hint = 'Minimum order for delivery is ' + INR(S.minOrderDelivery) + '. Add ' + INR(S.minOrderDelivery - itemTotal) + ' more.';
+    else if (S.freeDeliveryAbove > 0 && fee > 0) hint = 'Free delivery above ' + INR(S.freeDeliveryAbove) + '.';
+  }
+  if (!hint && S.minOrderValue && itemTotal < S.minOrderValue) hint = 'Minimum order is ' + INR(S.minOrderValue) + '.';
+  $('#ckHint').textContent = hint;
   $('#billBox').innerHTML = `
     <div class="bill-row"><span>Items (${lines.reduce((s, l) => s + l.qty, 0)})</span><span>${INR(itemTotal)}</span></div>
-    <div class="bill-row"><span>Delivery</span><span>${deliveryFee === 0 ? 'FREE' : INR(deliveryFee)}</span></div>
-    <div class="bill-row big"><span>To pay</span><span>${INR(total)}</span></div>`;
+    ${discount ? `<div class="bill-row"><span>Coupon</span><span>-${INR(discount)}</span></div>` : ''}
+    ${mode === 'delivery' && fee !== null ? `<div class="bill-row"><span>Delivery fee</span><span>${fee === 0 ? 'FREE' : INR(fee)}</span></div>` : ''}
+    <div class="bill-row big"><span>To pay</span><span>${INR(itemTotal - discount + (fee || 0))}</span></div>`;
+}
+function updateLocStatus() {
+  const el = $('#ckLocStatus'); if (!el) return;
+  const loc = state.loc, S = XPay.settings || {};
+  if (!loc) { el.textContent = 'We use your location once to check the delivery distance.'; return; }
+  const g = (XPay.geo || {})[$('#ckOutlet').value];
+  if (!g) { el.textContent = 'Location pinned.'; return; }
+  const d = XPay.km(g, [loc.lat, loc.lng]);
+  const out = S.deliveryRadiusKm && d > S.deliveryRadiusKm;
+  el.style.color = out ? '#b3271e' : '#1c7c31';
+  el.textContent = out ? 'You are ' + d.toFixed(1) + ' km from this outlet. We deliver within ' + S.deliveryRadiusKm + ' km. Try the other outlet or choose takeaway.'
+    : 'Location pinned, ' + d.toFixed(1) + ' km from this outlet. We deliver within ' + S.deliveryRadiusKm + ' km.';
+}
+async function locateForDelivery() {
+  const btn = $('#ckLocate'); btn.disabled = true; btn.textContent = 'Finding you...';
+  try {
+    state.loc = await XPay.locate();
+    const n = XPay.nearest(state.loc.lat, state.loc.lng);
+    if (n) $('#ckOutlet').value = n.id;
+  } catch (e) { toast(e.message); }
+  btn.disabled = false; btn.textContent = '📍 Use my current location';
+  updateLocStatus();
 }
 
+function checkoutPayload() {
+  const mode = checkedMode();
+  const p = {
+    source: 'app', mode, outlet: $('#ckOutlet').value,
+    customer: { name: $('#ckName').value.trim(), phone: $('#ckPhone').value.replace(/\D/g, ''), tableNumber: ($('#ckTable') ? $('#ckTable').value : '').trim() },
+    items: cartLines().map((l) => ({ id: l.id, qty: l.qty, addons: l.addons })),
+    couponCode: state.coupon ? state.coupon.code : undefined
+  };
+  if (mode === 'delivery') p.address = { line: $('#ckAddr').value.trim(), landmark: $('#ckLandmark').value.trim(), lat: state.loc && state.loc.lat, lng: state.loc && state.loc.lng };
+  return p;
+}
+function showAppSuccess(order) {
+  state.cart = {}; saveCart(); state.coupon = null; const cf = $('#ckCoupon'); if (cf) cf.value = ''; const cm = $('#couponMsg'); if (cm) cm.textContent = '';
+  state.phone = order.customer.phone; try { localStorage.setItem(PHONE_KEY, state.phone); } catch (e) {}
+  updateCartUI();
+  lastAppOrder = order;
+  $('#successOrderId').textContent = order.id;
+  renderTimeline($('#trackBox'), order);
+  $('#checkoutSheet').classList.remove('show');
+  $('#successSheet').classList.add('show');
+  $('#successDone').textContent = 'Track My Order';
+  loadOrders();
+}
 async function startPayment() {
   const errEl = $('#ckError');
   errEl.textContent = '';
-  const name = $('#ckName').value.trim();
-  const phone = $('#ckPhone').value.replace(/\D/g, '');
-  const tableNumber = ($('#ckTable') ? $('#ckTable').value : '').trim();
-  const mode = checkedMode();
-  if (name.length < 2) { errEl.textContent = 'Please enter your name.'; return; }
-  if (!/^[6-9]\d{9}$/.test(phone)) { errEl.textContent = 'Valid 10-digit mobile required.'; return; }
-  if (mode === 'dinein' && !tableNumber) { errEl.textContent = 'Please enter your table number.'; return; }
-  localStorage.setItem(PHONE_KEY, phone);
-  state.phone = phone;
-  const { total } = cartTotals();
-
-  $('#payBtn').disabled = true;
-  $('#payBtn').textContent = 'Opening checkout...';
-  try {
-    const intent = await fetch('/api/pay/intent', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: total * 100 })
-    }).then((r) => r.json());
-    state.payCtx = { intent, customer: { name, phone, tableNumber }, mode, outlet: $('#ckOutlet').value, total };
-    $('#payBtn').disabled = false;
-    $('#payBtn').textContent = 'Pay Securely';
-    if (intent.live) { openRazorpayLiveCheckout(); return; }
-    $('#rzpAmount').textContent = INR(total);
-    $('#rzpDesc').textContent = (mode === 'dinein' ? 'Dine-in' : 'Takeaway') + ' \u2022 ' + $('#ckOutlet option:checked').textContent;
-    $('#rzpPayLabel').textContent = 'Pay ' + INR(total);
-    $('#rzpPayBtn').disabled = false;
-    $('#rzpSuccess').classList.add('hidden');
-    $('#checkoutSheet').classList.remove('show');
-    $('#rzpModal').classList.add('show');
-  } catch (e) {
-    errEl.textContent = 'Could not start payment. Try again.';
+  const p = checkoutPayload();
+  if (p.customer.name.length < 2) { errEl.textContent = 'Please enter your name.'; return; }
+  if (!/^[6-9]\d{9}$/.test(p.customer.phone)) { errEl.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
+  if (p.mode === 'dinein' && !p.customer.tableNumber) { errEl.textContent = 'Please enter your table number.'; return; }
+  if (p.mode === 'delivery') {
+    if (p.address.line.length < 8) { errEl.textContent = 'Please enter your full delivery address.'; return; }
+    if (!state.loc) { errEl.textContent = 'Tap "Use my current location" so we can check the delivery distance.'; return; }
   }
-  $('#payBtn').disabled = false;
-  $('#payBtn').textContent = 'Pay Securely';
+  const btn = $('#payBtn');
+  btn.disabled = true; btn.textContent = 'Opening secure checkout...';
+  try {
+    const r = await XPay.start(p);
+    if (!r.ok) { errEl.textContent = (r.json && r.json.error) || 'Could not start payment. Try again.'; return; }
+    const start = r.json;
+    state.payCtx = { start, mode: p.mode, outlet: p.outlet, total: start.amount };
+    if (start.provider === 'mock') {
+      $('#rzpAmount').textContent = INR(start.amount);
+      $('#rzpDesc').textContent = ({ dinein: 'Dine-in', takeaway: 'Takeaway', delivery: 'Delivery' })[p.mode] + ' \u2022 ' + $('#ckOutlet option:checked').textContent;
+      $('#rzpPayLabel').textContent = 'Pay ' + INR(start.amount);
+      $('#rzpPayBtn').disabled = false;
+      $('#rzpSuccess').classList.add('hidden');
+      $('#checkoutSheet').classList.remove('show');
+      $('#rzpModal').classList.add('show');
+      return;
+    }
+    $('#checkoutSheet').classList.remove('show');
+    const out = await XPay.pay(start);
+    if (out.order) { showAppSuccess(out.order); return; }
+    $('#checkoutSheet').classList.add('show');
+    errEl.textContent = out.error || 'Payment did not complete. No money moved.';
+  } catch (e) {
+    console.error('checkout failed', e);
+    errEl.textContent = 'Could not start payment. Try again.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Pay Securely';
+  }
 }
-
-async function placeOrderAfterPayment(ctx, payment) {
-  const res = await fetch('/api/orders', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode: ctx.mode, outlet: ctx.outlet, customer: ctx.customer,
-      items: cartLines().map((l) => ({ id: l.id, qty: l.qty, addons: l.addons })),
-      couponCode: state.coupon ? state.coupon.code : undefined,
-      payment
-    })
-  }).then((r) => r.json());
-  if (!res.ok) throw new Error(res.error || 'order failed');
-  return res;
-}
-
-function openRazorpayLiveCheckout() {
-  $('#checkoutSheet').classList.remove('show');
-  const ctx = state.payCtx;
-  const fail = (msg) => {
-    toast(msg);
-    openCheckout();
-  };
-  const launch = () => {
-    const rzp = new Razorpay({
-      key: ctx.intent.keyId,
-      order_id: ctx.intent.gatewayOrderId,
-      amount: ctx.intent.amount,
-      currency: 'INR',
-      name: 'XTO Pizza',
-      description: (ctx.mode === 'dinein' ? 'Dine-in' : 'Takeaway') + ' \u2022 ' + ctx.outlet,
-      prefill: { name: ctx.customer.name, contact: ctx.customer.phone },
-      theme: { color: '#e8590c' },
-      handler: async (resp) => {
-        try {
-          const cap = await fetch('/api/pay/capture', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(resp)
-          }).then((r) => r.json());
-          if (!cap.paid) throw new Error('verification failed');
-          const res = await placeOrderAfterPayment(ctx, { status: 'paid', paymentId: cap.paymentId });
-          $('#rzpPayId').textContent = 'Payment ID: ' + cap.paymentId;
-          $('#rzpSuccess').classList.remove('hidden');
-          setTimeout(() => {
-            state.cart = {}; saveCart(); updateCartUI();
-            $('#successOrderId').textContent = res.order.id;
-            renderTimeline($('#trackBox'), res.order);
-            $('#successSheet').classList.add('show');
-            $('#successDone').textContent = 'Track My Order';
-            loadOrders();
-          }, 600);
-        } catch (e) { fail('Payment could not be verified. Try again.'); }
-      },
-      modal: { ondismiss: () => fail('Payment cancelled. No money moved.') }
-    });
-    rzp.on('payment.failed', () => fail('Payment failed. No money moved.'));
-    rzp.open();
-  };
-  if (window.Razorpay) return launch();
-  const s = document.createElement('script');
-  s.src = 'https://checkout.razorpay.com/v1/checkout.js';
-  s.onload = launch;
-  s.onerror = () => fail('Could not reach the payment gateway. Check the connection.');
-  document.head.appendChild(s);
-}
-
+// local demo only (ALLOW_MOCK_PAY=1 on the server): fake gateway screen
 async function confirmPayment() {
   const btn = $('#rzpPayBtn');
-  btn.disabled = true;
-  btn.textContent = 'Processing...';
-  await new Promise((r) => setTimeout(r, 1100));
-  const ctx = state.payCtx;
+  btn.disabled = true; btn.textContent = 'Processing...';
+  await new Promise((r) => setTimeout(r, 900));
   try {
-    const cap = await fetch('/api/pay/capture', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gatewayOrderId: ctx.intent.gatewayOrderId })
-    }).then((r) => r.json());
-    if (!cap.paid) throw new Error('capture failed');
-    const res = await placeOrderAfterPayment(ctx, { status: 'paid', paymentId: cap.paymentId });
-    $('#rzpPayId').textContent = 'Payment ID: ' + cap.paymentId;
+    await fetch('/api/checkout/mock-pay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: state.payCtx.start.orderId }) });
+    const out = await XPay.confirm(state.payCtx.start.orderId);
+    if (!out.order) throw new Error(out.error);
+    $('#rzpPayId').textContent = 'Payment ID: ' + out.order.payment.paymentId;
     $('#rzpSuccess').classList.remove('hidden');
-    setTimeout(() => {
-      $('#rzpModal').classList.remove('show');
-      state.cart = {}; saveCart(); state.coupon = null; const cf = $('#ckCoupon'); if (cf) cf.value = ''; const cm = $('#couponMsg'); if (cm) cm.textContent = '';
-      updateCartUI();
-      lastAppOrder = res.order;
-      $('#successOrderId').textContent = res.order.id;
-      renderTimeline($('#trackBox'), res.order);
-      $('#successSheet').classList.add('show');
-      $('#successDone').textContent = 'Track My Order';
-      loadOrders();
-    }, 1200);
+    setTimeout(() => { $('#rzpModal').classList.remove('show'); showAppSuccess(out.order); }, 1000);
   } catch (e) {
-    btn.disabled = false;
-    btn.textContent = 'Retry Payment';
+    btn.disabled = false; btn.textContent = 'Retry Payment';
     toast('Payment failed. No money moved.');
   }
 }
 
 /* ---------------- orders ---------------- */
+const STEPS_DELIVERY = [
+  ['PLACED', 'Order received'], ['ACCEPTED', 'Accepted'], ['PREPARING', 'Cooking'],
+  ['READY', 'Packed'], ['OUT_FOR_DELIVERY', 'Out for delivery'], ['DELIVERED', 'Delivered']
+];
 const STEPS = [
   ['PLACED', 'Order received'], ['ACCEPTED', 'Accepted'], ['PREPARING', 'Cooking'],
   ['READY', 'Ready'], ['SERVED', 'Served']
@@ -455,11 +454,11 @@ function statusLabel(s) {
 }
 function renderTimeline(el, order) {
   if (!el) return;
-  const cur = STEPS.findIndex((s) => s[0] === order.status);
-  const steps = STEPS;
+  const steps = order.mode === 'delivery' ? STEPS_DELIVERY : STEPS;
+  const cur = steps.findIndex((s) => s[0] === order.status);
   const cancelled = order.status === 'CANCELLED';
   el.innerHTML = `<div class="tl">${steps.map((s) => {
-    const idx = STEPS.indexOf(s);
+    const idx = steps.indexOf(s);
     const done = !cancelled && idx <= cur;
     const current = !cancelled && idx === cur;
     return `<div class="tl-step ${done ? 'done' : ''} ${current ? 'current' : ''}">
@@ -481,7 +480,7 @@ async function loadOrders() {
     <div class="order-card">
       <div class="oc-top"><b>${o.id}</b><span class="status-chip st-${o.status}">${statusLabel(o.status)}</span></div>
       <div class="oc-items">${o.items.map((i) => i.qty + ' x ' + i.name).join(', ')}</div>
-      <div class="oc-foot"><span>${o.mode === 'dinein' ? ('Dine-in' + (o.customer.tableNumber ? ' - T' + o.customer.tableNumber : '')) : 'Takeaway'} \u2022 ${o.outlet === 'shivane' ? 'Shivane' : 'Nanded City'}</span><span>${INR(o.total)}</span></div>
+      <div class="oc-foot"><span>${o.mode === 'dinein' ? ('Dine-in' + (o.customer.tableNumber ? ' - T' + o.customer.tableNumber : '')) : (o.mode === 'delivery' ? 'Delivery' : 'Takeaway')} \u2022 ${o.outlet === 'shivane' ? 'Shivane' : 'Nanded City'}</span><span>${INR(o.total)}</span></div>
       ${o.status === 'OUT_FOR_DELIVERY' ? `<div class="rider-mount" data-rider="${o.id}"></div>` : ''}
     </div>`).join('');
   $$('#ordersList [data-rider]').forEach((m) => renderAppRiderMap(m, m.dataset.rider));
@@ -521,8 +520,10 @@ function bindUI() {
     $('#installSheet').classList.remove('show');
     localStorage.setItem('xto_install_dismissed', '1');
   });
+  $('#ckLocate').addEventListener('click', locateForDelivery);
+  $('#ckOutlet').addEventListener('change', updateLocStatus);
   $$('input[name="mode"]').forEach((r) => r.addEventListener('change', () => {
-    $('#tableField').style.display = checkedMode() === 'dinein' ? '' : 'none';
+    syncModeFields();
     updateBill(); updateCartUI();
   }));
   $$('.rzp-tab').forEach((t) => t.addEventListener('click', () => {

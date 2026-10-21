@@ -89,6 +89,8 @@
     </div>
     <div class="sec-label">Our outlets</div>
     <div id="outletCards"></div>
+    <div class="sec-label">Legal</div>
+    <p style="padding:0 16px 24px;line-height:2;font-size:15px;font-weight:600"><a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms and Conditions</a> &middot; <a href="/refund">Refund Policy</a> &middot; <a href="/delete-data">Delete my data</a></p>
   </section>
 
   <!-- MENU -->
@@ -146,11 +148,18 @@
       <div class="field-row">
         <label class="pill-radio"><input type="radio" name="mode" value="dinein" checked /><span>🍽 Dine-in</span></label>
         <label class="pill-radio"><input type="radio" name="mode" value="takeaway" /><span>🥡 Takeaway</span></label>
+        <label class="pill-radio" id="modeDeliveryOpt"><input type="radio" name="mode" value="delivery" /><span>🛵 Delivery</span></label>
       </div>
       <label class="field"><span>Name</span><input id="ckName" placeholder="Your name" autocomplete="name" /></label>
       <label class="field"><span>Phone</span><input id="ckPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel" /></label>
       <label class="field" id="tableField"><span>Table number</span><input id="ckTable" type="text" inputmode="numeric" placeholder="e.g. 12" /></label>
       <label class="field"><span>Outlet</span><select id="ckOutlet"></select></label>
+      <div id="deliveryFields" style="display:none">
+        <label class="field"><span>Delivery address</span><textarea id="ckAddr" rows="2" placeholder="Flat / house no, building, street, area" maxlength="240"></textarea></label>
+        <label class="field"><span>Landmark (optional)</span><input id="ckLandmark" placeholder="Near..." maxlength="120" /></label>
+        <button class="btn-primary sm" id="ckLocate" type="button">📍 Use my current location</button>
+        <div class="coupon-msg" id="ckLocStatus" style="margin:8px 0 10px">We use your location once to check the delivery distance.</div>
+      </div>
       <label class="field"><span>Coupon code</span>
         <div class="coupon-row">
           <input id="ckCoupon" placeholder="e.g. WELCOME100" autocomplete="off" style="text-transform:uppercase" />
@@ -159,11 +168,12 @@
         <div class="coupon-msg" id="couponMsg"></div>
       </label>
       <div class="bill-box" id="billBox"></div>
+      <div class="coupon-msg" id="ckHint"></div>
       <div class="err" id="ckError"></div>
     </div>
     <div class="sheet-foot">
       <button class="btn-primary block" id="payBtn">Pay Securely</button>
-      <div class="pay-note">Powered by Razorpay. UPI, cards, netbanking.</div>
+      <div class="pay-note">Secure payment by Cashfree. UPI, cards, netbanking.</div>
     </div>
   </div>
 </div>
@@ -260,6 +270,7 @@
 
 <link rel="stylesheet" href="/leaflet/leaflet.css" />
 <script src="/leaflet/leaflet.js"></script>
+<script src="/js/pay.js"></script>
 <script src="/js/app.js"></script>
 </body>
 </html>

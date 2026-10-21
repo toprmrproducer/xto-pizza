@@ -1,4 +1,4 @@
-/* XTO Pizza site engine: menu, cart, mock Razorpay checkout, order tracking */
+/* XTO Pizza site engine: menu, cart, delivery checkout, Cashfree payment, order tracking */
 'use strict';
 
 const $ = (s, el) => (el || document).querySelector(s);
@@ -6,7 +6,7 @@ const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
 const INR = (n) => '\u20B9' + Number(n).toLocaleString('en-IN');
 const CART_KEY = 'xto_cart_v1';
 
-const state = { menu: null, outlets: [], cat: 'all', cart: loadCart(), payCtx: null, coupon: null, map: null, riderMap: null, offers: [], sel: {} };
+const state = { loc: null, menu: null, outlets: [], cat: 'all', cart: loadCart(), payCtx: null, coupon: null, map: null, riderMap: null, offers: [], sel: {} };
 const SIZE_ORDER = ['six', 'regular', 'half', 'medium', 'full', 'large'];
 
 function loadCart() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || {}; } catch (e) { return {}; } }
@@ -49,6 +49,7 @@ function toast(msg) {
   const t = $('#toast');
   t.textContent = msg;
   t.classList.add('show');
+  t.onclick = () => t.classList.remove('show');
   clearTimeout(t._h);
   t._h = setTimeout(() => t.classList.remove('show'), 2400);
 }
@@ -57,7 +58,7 @@ function closeModal(id) { $('#' + id).classList.remove('show'); }
 
 /* ---------------- boot ---------------- */
 async function boot() {
-  const [menuRes, outletsRes] = await Promise.all([fetch('/api/menu').then((r) => r.json()), fetch('/api/outlets').then((r) => r.json())]);
+  const [menuRes, outletsRes] = await Promise.all([fetch('/api/menu').then((r) => r.json()), fetch('/api/outlets').then((r) => r.json()), XPay.load()]);
   state.menu = menuRes;
   state.outlets = outletsRes.outlets;
   const qp = new URLSearchParams(location.search);
@@ -318,160 +319,157 @@ function closeCart() { $('#cartDrawer').classList.remove('show'); $('#scrim').cl
 
 /* ---------------- checkout + mock razorpay ---------------- */
 function updateBill() {
-  const { lines, itemTotal, deliveryFee, total } = cartTotals();
+  const { lines, itemTotal, discount } = cartTotals();
   if (!lines.length) return;
+  const mode = checkedMode();
+  const fee = mode === 'delivery' ? XPay.deliveryFee(itemTotal) : 0;
+  const S = XPay.settings || {};
+  let hint = '';
+  if (mode === 'delivery') {
+    if (fee === null) hint = 'Delivery is not available right now.';
+    else if (S.minOrderDelivery && itemTotal < S.minOrderDelivery) hint = 'Minimum order for delivery is ' + INR(S.minOrderDelivery) + '. Add ' + INR(S.minOrderDelivery - itemTotal) + ' more.';
+    else if (S.freeDeliveryAbove > 0 && fee > 0) hint = 'Free delivery above ' + INR(S.freeDeliveryAbove) + '.';
+  }
+  if (!hint && S.minOrderValue && itemTotal < S.minOrderValue) hint = 'Minimum order is ' + INR(S.minOrderValue) + '.';
+  $('#ckHint').textContent = hint;
+  const total = itemTotal - discount + (fee || 0);
   $('#billBox').innerHTML = `
     <div class="cart-row"><span>Items (${lines.reduce((s, l) => s + l.qty, 0)})</span><span>${INR(itemTotal)}</span></div>
+    ${discount ? `<div class="cart-row"><span>Coupon</span><span>-${INR(discount)}</span></div>` : ''}
+    ${mode === 'delivery' && fee !== null ? `<div class="cart-row"><span>Delivery fee</span><span>${fee === 0 ? 'Free' : INR(fee)}</span></div>` : ''}
     <div class="cart-row total"><span>To pay</span><span>${INR(total)}</span></div>`;
+}
+function syncModeFields() {
+  const mode = checkedMode();
+  $('#tableField').style.display = mode === 'dinein' ? '' : 'none';
+  $('#deliveryFields').style.display = mode === 'delivery' ? '' : 'none';
+  const del = $('#modeDeliveryOpt');
+  if (del) del.style.display = (XPay.settings && XPay.settings.deliveryEnabled) ? '' : 'none';
+  updateBill();
+}
+function updateLocStatus() {
+  const el = $('#ckLocStatus'); if (!el) return;
+  const loc = state.loc, S = XPay.settings || {};
+  if (!loc) { el.textContent = 'We use your location once to check the delivery distance.'; return; }
+  const g = (XPay.geo || {})[$('#ckOutlet').value];
+  if (!g) { el.textContent = 'Location pinned.'; return; }
+  const d = XPay.km(g, [loc.lat, loc.lng]);
+  const out = S.deliveryRadiusKm && d > S.deliveryRadiusKm;
+  el.style.color = out ? '#b3271e' : '#1c7c31';
+  el.textContent = out ? 'You are ' + d.toFixed(1) + ' km from this outlet. We deliver within ' + S.deliveryRadiusKm + ' km. Try the other outlet or choose takeaway.'
+    : 'Location pinned, ' + d.toFixed(1) + ' km from this outlet. We deliver within ' + S.deliveryRadiusKm + ' km.';
+}
+async function locateForDelivery() {
+  const btn = $('#ckLocate'); btn.disabled = true; btn.textContent = 'Finding you...';
+  try {
+    state.loc = await XPay.locate();
+    const n = XPay.nearest(state.loc.lat, state.loc.lng);
+    if (n) $('#ckOutlet').value = n.id;
+  } catch (e) { toast(e.message); }
+  btn.disabled = false; btn.textContent = '📍 Use my current location';
+  updateLocStatus();
 }
 function openCheckout() {
   if (!cartCount()) return;
   closeCart();
-  $('#tableField').style.display = checkedMode() === 'dinein' ? '' : 'none';
+  const hostOutlet = ['shivane', 'nanded'].includes(location.hostname.split('.')[0]) ? location.hostname.split('.')[0] : '';
+  const pref = new URLSearchParams(location.search).get('outlet') || hostOutlet;
   $('#ckOutlet').innerHTML = state.outlets.map((o) => `<option value="${o.id}">${o.name}</option>`).join('');
-  updateBill();
+  if (pref && state.outlets.some((o) => o.id === pref)) $('#ckOutlet').value = pref;
+  syncModeFields();
+  updateLocStatus();
   $('#ckError').textContent = '';
   openModal('checkoutModal');
 }
 
+function checkoutPayload() {
+  const mode = checkedMode();
+  const p = {
+    source: 'website', mode, outlet: $('#ckOutlet').value,
+    customer: { name: $('#ckName').value.trim(), phone: $('#ckPhone').value.replace(/\D/g, ''), tableNumber: ($('#ckTable') ? $('#ckTable').value : '').trim() },
+    items: cartLines().map((l) => ({ id: l.id, qty: l.qty, addons: l.addons })),
+    couponCode: state.coupon ? state.coupon.code : undefined
+  };
+  if (mode === 'delivery') p.address = { line: $('#ckAddr').value.trim(), landmark: $('#ckLandmark').value.trim(), lat: state.loc && state.loc.lat, lng: state.loc && state.loc.lng };
+  return p;
+}
+function showOrderSuccess(order) {
+  state.cart = {}; saveCart(); state.coupon = null; $('#ckCoupon').value = ''; $('#couponMsg').textContent = '';
+  updateCartUI();
+  $('#successOrderId').textContent = order.id;
+  lastSuccessOrder = order;
+  renderTimeline($('#trackBox'), order);
+  renderRiderMap('trackBox', order.id);
+  openModal('successModal');
+  pollUntilClosed(order.id);
+}
 async function startPayment() {
   const errEl = $('#ckError');
   errEl.textContent = '';
-  const name = $('#ckName').value.trim();
-  const phone = $('#ckPhone').value.replace(/\D/g, '');
-  const tableNumber = ($('#ckTable') ? $('#ckTable').value : '').trim();
-  const mode = checkedMode();
-  if (name.length < 2) { errEl.textContent = 'Please enter your name.'; return; }
-  if (!/^[6-9]\d{9}$/.test(phone)) { errEl.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
-  if (mode === 'dinein' && !tableNumber) { errEl.textContent = 'Please enter your table number.'; return; }
-  const { total } = cartTotals();
-
-  $('#payBtn').disabled = true;
-  $('#payBtn').textContent = 'Opening secure checkout...';
-  try {
-    const intent = await fetch('/api/pay/intent', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ amount: total * 100 })
-    }).then((r) => r.json());
-    state.payCtx = { intent, customer: { name, phone, tableNumber }, mode, outlet: $('#ckOutlet').value, total };
-    $('#payBtn').disabled = false;
-    $('#payBtn').textContent = 'Pay Securely';
-    if (intent.live) { openRazorpayLiveCheckout(); return; }
-    $('#rzpAmount').textContent = INR(total);
-    $('#rzpDesc').textContent = (mode === 'dinein' ? 'Dine-in' : 'Takeaway') + ' \u2022 ' + $('#ckOutlet option:checked').textContent;
-    $('#rzpPayLabel').textContent = 'Pay ' + INR(total);
-    $('#rzpPayBtn').disabled = false;
-    $('#rzpSuccess').classList.add('hidden');
-    $('#rzpModal').classList.add('show');
-    closeModal('checkoutModal');
-  } catch (e) {
-    errEl.textContent = 'Could not start payment. Try again.';
+  const p = checkoutPayload();
+  if (p.customer.name.length < 2) { errEl.textContent = 'Please enter your name.'; return; }
+  if (!/^[6-9]\d{9}$/.test(p.customer.phone)) { errEl.textContent = 'Please enter a valid 10-digit mobile number.'; return; }
+  if (p.mode === 'dinein' && !p.customer.tableNumber) { errEl.textContent = 'Please enter your table number.'; return; }
+  if (p.mode === 'delivery') {
+    if (p.address.line.length < 8) { errEl.textContent = 'Please enter your full delivery address.'; return; }
+    if (!state.loc) { errEl.textContent = 'Tap "Use my current location" so we can check the delivery distance.'; return; }
   }
-  $('#payBtn').disabled = false;
-  $('#payBtn').textContent = 'Pay Securely';
-}
-
-async function placeOrderAfterPayment(ctx, payment) {
-  const res = await fetch('/api/orders', {
-    method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      mode: ctx.mode, outlet: ctx.outlet, customer: ctx.customer,
-      items: cartLines().map((l) => ({ id: l.id, qty: l.qty, addons: l.addons })),
-      couponCode: state.coupon ? state.coupon.code : undefined,
-      payment
-    })
-  }).then((r) => r.json());
-  if (!res.ok) throw new Error(res.error || 'order failed');
-  return res;
-}
-
-function openRazorpayLiveCheckout() {
-  closeModal('checkoutModal');
-  const ctx = state.payCtx;
-  const fail = (msg) => {
-    $('#payBtn').disabled = false;
-    $('#payBtn').innerHTML = '<span id="rzpPayLabel">Retry Payment</span>';
+  const btn = $('#payBtn');
+  btn.disabled = true; btn.textContent = 'Opening secure checkout...';
+  try {
+    const r = await XPay.start(p);
+    if (!r.ok) { errEl.textContent = (r.json && r.json.error) || 'Could not start payment. Try again.'; return; }
+    const start = r.json;
+    state.payCtx = { start, mode: p.mode, outlet: p.outlet, total: start.amount };
+    if (start.provider === 'mock') {
+      $('#rzpAmount').textContent = INR(start.amount);
+      $('#rzpDesc').textContent = ({ dinein: 'Dine-in', takeaway: 'Takeaway', delivery: 'Delivery' })[p.mode] + ' \u2022 ' + $('#ckOutlet option:checked').textContent;
+      $('#rzpPayLabel').textContent = 'Pay ' + INR(start.amount);
+      $('#rzpPayBtn').disabled = false;
+      $('#rzpSuccess').classList.add('hidden');
+      $('#rzpModal').classList.add('show');
+      closeModal('checkoutModal');
+      return;
+    }
+    closeModal('checkoutModal');
+    const out = await XPay.pay(start);
+    if (out.order) { showOrderSuccess(out.order); return; }
     openModal('checkoutModal');
-    toast(msg);
-  };
-  const launch = () => {
-    const rzp = new Razorpay({
-      key: ctx.intent.keyId,
-      order_id: ctx.intent.gatewayOrderId,
-      amount: ctx.intent.amount,
-      currency: 'INR',
-      name: 'XTO Pizza',
-      description: (ctx.mode === 'dinein' ? 'Dine-in' : 'Takeaway') + ' \u2022 ' + ctx.outlet,
-      prefill: { name: ctx.customer.name, contact: ctx.customer.phone },
-      theme: { color: '#e8590c' },
-      handler: async (resp) => {
-        try {
-          const cap = await fetch('/api/pay/capture', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(resp)
-          }).then((r) => r.json());
-          if (!cap.paid) throw new Error('verification failed');
-          const res = await placeOrderAfterPayment(ctx, { status: 'paid', paymentId: cap.paymentId });
-          $('#rzpPayId').textContent = 'Payment ID: ' + cap.paymentId;
-          $('#rzpSuccess').classList.remove('hidden');
-          setTimeout(async () => {
-            state.cart = {}; saveCart(); updateCartUI();
-            $('#successOrderId').textContent = res.order.id;
-            renderTimeline($('#trackBox'), res.order);
-            renderRiderMap('trackBox', res.order.id);
-            openModal('successModal');
-            pollUntilClosed(res.order.id);
-          }, 600);
-        } catch (e) { fail('Payment could not be verified. Try again.'); }
-      },
-      modal: { ondismiss: () => fail('Payment cancelled. No money moved.') }
-    });
-    rzp.on('payment.failed', () => fail('Payment failed. No money moved. Try again.'));
-    rzp.open();
-  };
-  if (window.Razorpay) return launch();
-  const s = document.createElement('script');
-  s.src = 'https://checkout.razorpay.com/v1/checkout.js';
-  s.onload = launch;
-  s.onerror = () => fail('Could not reach the payment gateway. Check the connection.');
-  document.head.appendChild(s);
+    errEl.textContent = out.error || 'Payment did not complete. No money moved.';
+  } catch (e) {
+    console.error('checkout failed', e);
+    errEl.textContent = 'Could not start payment. Try again.';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Pay Securely';
+  }
 }
-
+// local demo only (ALLOW_MOCK_PAY=1 on the server): fake gateway screen
 async function confirmPayment() {
   const btn = $('#rzpPayBtn');
-  btn.disabled = true;
-  btn.innerHTML = 'Processing...';
-  await new Promise((r) => setTimeout(r, 1100));
-  const ctx = state.payCtx;
+  btn.disabled = true; btn.innerHTML = 'Processing...';
+  await new Promise((r) => setTimeout(r, 900));
   try {
-    const cap = await fetch('/api/pay/capture', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gatewayOrderId: ctx.intent.gatewayOrderId })
-    }).then((r) => r.json());
-    if (!cap.paid) throw new Error('capture failed');
-    const res = await placeOrderAfterPayment(ctx, { status: 'paid', paymentId: cap.paymentId });
-    $('#rzpPayId').textContent = 'Payment ID: ' + cap.paymentId;
+    await fetch('/api/checkout/mock-pay', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ orderId: state.payCtx.start.orderId }) });
+    const out = await XPay.confirm(state.payCtx.start.orderId);
+    if (!out.order) throw new Error(out.error);
+    $('#rzpPayId').textContent = 'Payment ID: ' + out.order.payment.paymentId;
     $('#rzpSuccess').classList.remove('hidden');
-    setTimeout(async () => {
-      $('#rzpModal').classList.remove('show');
-      state.cart = {}; saveCart(); state.coupon = null; $('#ckCoupon').value = ''; $('#couponMsg').textContent = '';
-      updateCartUI();
-      $('#successOrderId').textContent = res.order.id;
-      lastSuccessOrder = res.order;
-      renderTimeline($('#trackBox'), res.order);
-      renderRiderMap('trackBox', res.order.id);
-      openModal('successModal');
-      // keep the success view fresh while it is open
-      pollUntilClosed(res.order.id);
-    }, 1300);
+    setTimeout(() => { $('#rzpModal').classList.remove('show'); showOrderSuccess(out.order); }, 1000);
   } catch (e) {
-    btn.disabled = false;
-    btn.innerHTML = '<span id="rzpPayLabel">Retry Payment</span>';
+    btn.disabled = false; btn.innerHTML = '<span id="rzpPayLabel">Retry Payment</span>';
     toast('Payment failed. No money moved. Try again.');
   }
 }
 
 /* ---------------- tracking ---------------- */
+const STEPS_DELIVERY = [
+  ['PLACED', 'Order received', '1'],
+  ['ACCEPTED', 'Accepted by kitchen', '2'],
+  ['PREPARING', 'Cooking now', '3'],
+  ['READY', 'Packed and ready', '4'],
+  ['OUT_FOR_DELIVERY', 'Out for delivery', '5'],
+  ['DELIVERED', 'Delivered. Enjoy!', '6']
+];
 const STEPS = [
   ['PLACED', 'Order received', '1'],
   ['ACCEPTED', 'Accepted by kitchen', '2'],
@@ -481,13 +479,13 @@ const STEPS = [
 ];
 function renderTimeline(el, order) {
   if (!el) return;
-  const cur = STEPS.findIndex((s) => s[0] === order.status);
-  const steps = STEPS;
+  const steps = order.mode === 'delivery' ? STEPS_DELIVERY : STEPS;
+  const cur = steps.findIndex((s) => s[0] === order.status);
   const cancelled = order.status === 'CANCELLED';
   el.innerHTML = `
     <div class="tl">
       ${steps.map((s, i) => {
-        const idx = STEPS.indexOf(s);
+        const idx = steps.indexOf(s);
         const done = !cancelled && idx <= cur;
         const current = !cancelled && idx === cur;
         return `<div class="tl-step ${done ? 'done' : ''} ${current ? 'current' : ''}">
@@ -538,10 +536,9 @@ function bindUI() {
   $('#trackGo').addEventListener('click', trackGo);
   const tl = $('#trackLink'); if (tl) tl.addEventListener('click', (e) => { e.preventDefault(); openModal('trackModal'); });
   $('#menuSearch').addEventListener('input', () => renderMenu());
-  $$('input[name="mode"]').forEach((r) => r.addEventListener('change', () => {
-    $('#tableField').style.display = checkedMode() === 'dinein' ? '' : 'none';
-    updateBill(); updateCartUI();
-  }));
+  $$('input[name="mode"]').forEach((r) => r.addEventListener('change', () => { syncModeFields(); updateCartUI(); }));
+  $('#ckLocate').addEventListener('click', locateForDelivery);
+  $('#ckOutlet').addEventListener('change', updateLocStatus);
   $$('.rzp-tab').forEach((t) => t.addEventListener('click', () => {
     $$('.rzp-tab').forEach((x) => x.classList.toggle('active', x === t));
     $$('.rzp-pane').forEach((p) => p.classList.toggle('hidden', p.dataset.pane !== t.dataset.tab));

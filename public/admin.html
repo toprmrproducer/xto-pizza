@@ -24,7 +24,6 @@
       <button class="pin-clear">C</button><button>0</button><button class="pin-back">⌫</button>
     </div>
     <div class="gate-err" id="gateErr"></div>
-    <div class="gate-hint">Demo PIN: 4321 (change in data/config.json)</div>
   </div>
 </div>
 
@@ -47,6 +46,7 @@
         <button class="tab" data-tab="riders">Riders</button>
         <button class="tab" data-tab="offers">Offers</button>
         <button class="tab" data-tab="notify">Notify</button>
+        <button class="tab" data-tab="settings">Settings</button>
         <button class="tab" data-tab="enquiries">Enquiries <span id="enqBadge" class="meta-chip" style="display:none"></span></button>
       </nav>
     </div>
@@ -120,6 +120,31 @@
       <div class="pane-actions"><select id="enqFilter"><option value="">All types</option><option value="franchise">Franchise</option><option value="career">Careers</option><option value="contact">Contact</option></select></div>
     </div>
     <div id="enqList" class="card-panel" style="padding:0;overflow:auto"></div>
+  </main>
+
+  <main class="pane hidden" id="settingsPane">
+    <div class="pane-head"><h2>Store settings</h2></div>
+    <p class="mm-sub">Delivery rules apply instantly on the website, the app and the digital menu order link. Customers outside the radius cannot place a delivery order.</p>
+    <div class="mm-add card-panel">
+      <h3>Delivery</h3>
+      <label class="mm-desc" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="stDelOn" style="width:auto" /> Delivery is on</label>
+      <div class="mm-add-grid">
+        <label>Delivery fee (Rs)<input id="stFee" type="number" min="0" max="500" /></label>
+        <label>Free delivery above (Rs, 0 = never)<input id="stFree" type="number" min="0" /></label>
+        <label>Delivery radius (km)<input id="stRadius" type="number" min="0.5" max="50" step="0.5" /></label>
+        <label>Minimum order for delivery (Rs)<input id="stMinDel" type="number" min="0" /></label>
+      </div>
+      <h3 style="margin-top:18px">All orders</h3>
+      <div class="mm-add-grid">
+        <label>Minimum order, any type (Rs, 0 = none)<input id="stMin" type="number" min="0" /></label>
+      </div>
+      <button class="btn-accent" id="stSave">Save settings</button>
+      <div class="mm-msg" id="stMsg"></div>
+    </div>
+    <div class="mm-add card-panel">
+      <h3>Payments</h3>
+      <div id="stPay" class="mm-sub"></div>
+    </div>
   </main>
 
   <main class="pane hidden" id="notifyPane">

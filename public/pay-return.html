@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex" />
+<title>Confirming your payment | XTO Pizza</title>
+<style>
+*{box-sizing:border-box;margin:0}body{min-height:100vh;display:grid;place-items:center;background:#fff8ef;font-family:Inter,system-ui,sans-serif;color:#1b120c;padding:24px;text-align:center}
+.card{max-width:380px}.spin{width:44px;height:44px;border:4px solid #f0d9c4;border-top-color:#b3271e;border-radius:50%;margin:0 auto 18px;animation:s 1s linear infinite}@keyframes s{to{transform:rotate(360deg)}}
+h1{font-size:1.3rem;margin-bottom:8px}p{color:#6f5c4d;line-height:1.6}a{color:#b3271e;font-weight:700}
+</style>
+</head>
+<body>
+<div class="card" id="c"><div class="spin" id="sp"></div><h1 id="h">Confirming your payment...</h1><p id="p">Please don't close this page.</p></div>
+<script>
+(function(){
+  var q = new URLSearchParams(location.search), oid = q.get('order_id'), src = q.get('src');
+  var home = src === 'app' ? '/app' : '/';
+  var tries = 0;
+  function fail(msg){ document.getElementById('sp').style.display='none'; document.getElementById('h').textContent=msg; document.getElementById('p').innerHTML='If money was deducted, it is safe and your order will appear shortly. <a href="'+home+'">Back to XTO Pizza</a>'; }
+  function go(){
+    fetch('/api/checkout/confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:oid})})
+      .then(function(r){return r.json().then(function(j){return {s:r.status,j:j}})})
+      .then(function(x){
+        if (x.j && x.j.ok && x.j.order) { location.replace(home + '#order=' + encodeURIComponent(x.j.order.id)); return; }
+        if (x.j && x.j.pending && ++tries < 12) { setTimeout(go, 2000); return; }
+        fail(x.j && x.j.pending ? 'Payment not completed' : (x.j && x.j.error) || 'Could not confirm payment');
+      }).catch(function(){ if (++tries < 12) setTimeout(go, 2000); else fail('Connection problem'); });
+  }
+  if (!oid) return fail('Missing order');
+  go();
+})();
+</script>
+</body>
+</html>

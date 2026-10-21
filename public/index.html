@@ -14,6 +14,12 @@
 <link rel="stylesheet" href="/css/site.css" />
 <link rel="stylesheet" href="/css/home.css" />
 <link rel="apple-touch-icon" href="/images/icon-192.png" />
+<link rel="canonical" href="https://xtopizza.in/" />
+<meta property="og:title" content="XTO Pizza | Pure Veg Pizza in Pune" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="https://xtopizza.in/" />
+<meta property="og:image" content="https://xtopizza.in/images/icon-512.png" />
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "Restaurant", "@id": "https://xtopizza.in/#shivane", "name": "XTO Pizza Shivane (Khadakwasla)", "url": "https://xtopizza.in/", "telephone": "+917030000776", "servesCuisine": ["Pizza", "Vegetarian", "Italian", "Burgers", "Pasta"], "priceRange": "Rs 200-400", "image": "https://xtopizza.in/images/icon-512.png", "menu": "https://xtopizza.in/#menu", "acceptsReservations": "False", "address": {"@type": "PostalAddress", "streetAddress": "NDA Rd, near Add Mart, Yashwant Nagar, Deshmukh Nagar, Shivane", "addressLocality": "Pune", "addressRegion": "Maharashtra", "postalCode": "411023", "addressCountry": "IN"}, "parentOrganization": {"@type": "Organization", "name": "XTO Pizza", "url": "https://xtopizza.in/"}}, {"@type": "Restaurant", "@id": "https://xtopizza.in/#nanded", "name": "XTO Pizza Nanded City", "url": "https://xtopizza.in/", "telephone": "+917030000886", "servesCuisine": ["Pizza", "Vegetarian", "Italian", "Burgers", "Pasta"], "priceRange": "Rs 200-400", "image": "https://xtopizza.in/images/icon-512.png", "menu": "https://xtopizza.in/#menu", "acceptsReservations": "False", "address": {"@type": "PostalAddress", "streetAddress": "Survey No.1,2, Destination Centre, Shop No. F-65, Sinhagad Road, Nanded City", "addressLocality": "Pune", "addressRegion": "Maharashtra", "postalCode": "411068", "addressCountry": "IN"}, "parentOrganization": {"@type": "Organization", "name": "XTO Pizza", "url": "https://xtopizza.in/"}, "openingHours": "Mo-Su 11:00-23:00"}]}</script>
 </head>
 <body class="x" data-page="home">
 <div id="xh-mount"></div>
@@ -159,7 +165,7 @@
 </section>
 
 </main>
-<div id="xf-mount"></div>
+<div id="xf-mount"><nav class="xlegal" aria-label="Legal" style="padding:18px 20px;text-align:center;font:600 15px/1.8 Inter,system-ui,sans-serif"><a href="/privacy">Privacy Policy</a> &middot; <a href="/terms">Terms and Conditions</a> &middot; <a href="/refund">Refund Policy</a> &middot; <a href="/delete-data">Delete my data</a> &middot; <a href="/contact">Contact</a></nav></div>
 
 <!-- CART DRAWER -->
 <div class="scrim" id="scrim"></div>
@@ -183,11 +189,18 @@
       <div class="field-row">
         <label class="radio" id="modeDelivery"><input type="radio" name="mode" value="dinein" checked /><span>🍽 Dine-in</span></label>
         <label class="radio" id="modePickup"><input type="radio" name="mode" value="takeaway" /><span>🥡 Takeaway</span></label>
+        <label class="radio" id="modeDeliveryOpt"><input type="radio" name="mode" value="delivery" /><span>🛵 Delivery</span></label>
       </div>
       <label class="field"><span>Name</span><input id="ckName" type="text" placeholder="Your name" autocomplete="name" /></label>
       <label class="field"><span>Phone</span><input id="ckPhone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel" /></label>
       <label class="field" id="tableField"><span>Table number</span><input id="ckTable" type="text" inputmode="numeric" placeholder="e.g. 12" /></label>
       <label class="field"><span>Outlet</span><select id="ckOutlet"></select></label>
+      <div id="deliveryFields" style="display:none">
+        <label class="field"><span>Delivery address</span><textarea id="ckAddr" rows="2" placeholder="Flat / house no, building, street, area" maxlength="240"></textarea></label>
+        <label class="field"><span>Landmark (optional)</span><input id="ckLandmark" type="text" placeholder="Near..." maxlength="120" /></label>
+        <button class="btn btn-ghost btn-sm" id="ckLocate" type="button">📍 Use my current location</button>
+        <div class="coupon-msg" id="ckLocStatus" style="margin:6px 0 10px">We use your location once to check the delivery distance.</div>
+      </div>
       <label class="field coupon-field"><span>Coupon code</span>
         <div class="coupon-row">
           <input id="ckCoupon" type="text" placeholder="e.g. WELCOME100" autocomplete="off" style="text-transform:uppercase" />
@@ -196,9 +209,10 @@
         <div class="coupon-msg" id="couponMsg"></div>
       </label>
       <div class="bill" id="billBox"></div>
+      <div class="coupon-msg" id="ckHint" style="margin-bottom:6px"></div>
       <div class="err" id="ckError"></div>
       <button class="btn btn-primary btn-block" id="payBtn">Pay Securely</button>
-      <div class="pay-note">Powered by Razorpay. UPI, cards and netbanking accepted.</div>
+      <div class="pay-note">Secure payment by Cashfree. UPI, cards and netbanking accepted.</div>
     </div>
   </div>
 </div>
@@ -299,6 +313,7 @@
 <link rel="stylesheet" href="/leaflet/leaflet.css" />
 <script src="/leaflet/leaflet.js"></script>
 <script src="/js/layout.js"></script>
+<script src="/js/pay.js"></script>
 <script src="/js/site.js"></script>
 </body>
 </html>

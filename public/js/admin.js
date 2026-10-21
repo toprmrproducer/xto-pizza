@@ -124,19 +124,22 @@ function renderStats() {
 const COLS = [
   { id: 'new', label: 'New', statuses: ['PLACED'] },
   { id: 'prep', label: 'In Kitchen', statuses: ['ACCEPTED', 'PREPARING'] },
-  { id: 'ready', label: 'Ready', statuses: ['READY'] }
+  { id: 'ready', label: 'Ready', statuses: ['READY', 'OUT_FOR_DELIVERY'] }
 ];
 function nextAction(o) {
   switch (o.status) {
     case 'PLACED': return { next: 'ACCEPTED', label: 'Accept Order', cls: '' };
     case 'ACCEPTED': return { next: 'PREPARING', label: 'Start Cooking', cls: '' };
     case 'PREPARING': return { next: 'READY', label: 'Mark Ready', cls: '' };
-    case 'READY': return { next: 'SERVED', label: o.mode === 'dinein' ? 'Mark Served' : 'Handed Over', cls: 'done' };
+    case 'READY':
+      if (o.mode === 'delivery') return { next: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', cls: '' };
+      return { next: 'SERVED', label: o.mode === 'dinein' ? 'Mark Served' : 'Handed Over', cls: 'done' };
+    case 'OUT_FOR_DELIVERY': return { next: 'DELIVERED', label: 'Mark Delivered', cls: 'done' };
     default: return null;
   }
 }
 function statusMini(s) {
-  const map = { PLACED: 'NEW', ACCEPTED: 'ACCEPTED', PREPARING: 'COOKING', READY: 'READY', SERVED: 'DONE', DELIVERED: 'DONE', CANCELLED: 'CANCELLED' };
+  const map = { PLACED: 'NEW', ACCEPTED: 'ACCEPTED', PREPARING: 'COOKING', READY: 'READY', OUT_FOR_DELIVERY: 'ON THE WAY', SERVED: 'DONE', DELIVERED: 'DONE', CANCELLED: 'CANCELLED' };
   return map[s] || s;
 }
 function cardHTML(o) {
@@ -146,13 +149,15 @@ function cardHTML(o) {
   return `<div class="ocard ${o.status === 'PLACED' ? 'fresh' : ''}" data-order="${o.id}">
     <div class="oc-top"><b>${o.id}</b><span class="oc-time">${timeAgo(o.createdAt)}</span></div>
     <div class="oc-cust">${o.customer.name} &bull; ${o.customer.phone}<a href="tel:${o.customer.phone}">call</a><br />
-      <span style="color:var(--muted)">${o.mode === 'dinein' ? (o.customer.tableNumber ? 'Table ' + o.customer.tableNumber : 'Dine-in') : 'Takeaway at counter'}</span></div>
+      <span style="color:var(--muted)">${o.mode === 'dinein' ? (o.customer.tableNumber ? 'Table ' + o.customer.tableNumber : 'Dine-in') : o.mode === 'delivery' ? 'Delivery' : 'Takeaway at counter'}</span>
+      ${o.mode === 'delivery' && o.address ? `<div style="margin-top:4px;font-size:.85rem">${o.address.line}${o.address.landmark ? ' (' + o.address.landmark + ')' : ''}<br><a href="https://www.google.com/maps/dir/?api=1&destination=${o.address.lat},${o.address.lng}" target="_blank" rel="noopener">Open in Maps</a> &bull; ${o.address.distanceKm} km</div>` : ''}</div>
     <div class="oc-items">
       ${o.items.map((i) => `<div class="oi"><span>${i.qty} x ${i.name}</span><span>${INR(i.price * i.qty)}</span></div>`).join('')}
     </div>
     <div class="oc-meta">
-      <span class="meta-chip mode">${o.mode === 'dinein' ? ('🍽 Dine-in' + (o.customer.tableNumber ? ' - T' + o.customer.tableNumber : '')) : '🥡 Takeaway'}</span>
+      <span class="meta-chip mode">${o.mode === 'dinein' ? ('🍽 Dine-in' + (o.customer.tableNumber ? ' - T' + o.customer.tableNumber : '')) : o.mode === 'delivery' ? '🛵 Delivery' : '🥡 Takeaway'}</span>
       <span class="meta-chip">${outlet}</span>
+      ${o.source ? `<span class="meta-chip" title="${o.source.label}">${o.source.channel === 'website' ? '🌐 Website' : (o.source.platform === 'ios' ? '📱 iOS app' : o.source.platform === 'android' ? '📱 Android app' : '📱 App')}</span>` : ''}
       <span class="meta-chip paid">PAID ${INR(o.total)}</span>
     </div>
     ${riderBox}
@@ -277,7 +282,7 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Backspace') { pinBuf = pinBuf.slice(0, -1); renderDots(); }
   }
 });
-const PANES = { orders: 'board', menu: 'menuMgr', riders: 'ridersPane', offers: 'offersPane', notify: 'notifyPane', enquiries: 'enquiriesPane' };
+const PANES = { orders: 'board', menu: 'menuMgr', riders: 'ridersPane', offers: 'offersPane', notify: 'notifyPane', enquiries: 'enquiriesPane', settings: 'settingsPane' };
 $$('.tab').forEach((t) => t.addEventListener('click', () => {
   $$('.tab').forEach((x) => x.classList.toggle('active', x === t));
   Object.entries(PANES).forEach(([k, id]) => $('#' + id).classList.toggle('hidden', k !== t.dataset.tab));
@@ -286,6 +291,7 @@ $$('.tab').forEach((t) => t.addEventListener('click', () => {
   if (t.dataset.tab === 'offers') refreshOffers();
   if (t.dataset.tab === 'notify') refreshNotifyStats();
   if (t.dataset.tab === 'enquiries') refreshEnquiries();
+  if (t.dataset.tab === 'settings') loadSettings();
 }));
 $('#mmSearch').addEventListener('input', paintMenuMgr);
 
@@ -527,3 +533,25 @@ function renderEnquiries() {
   }));
 }
 document.addEventListener('change', (e) => { if (e.target && e.target.id === 'enqFilter') renderEnquiries(); });
+
+/* ---------------- settings pane ---------------- */
+async function loadSettings() {
+  const d = await api('/api/admin/settings');
+  const s = d.settings;
+  $('#stDelOn').checked = !!s.deliveryEnabled;
+  $('#stFee').value = s.deliveryFee; $('#stFree').value = s.freeDeliveryAbove; $('#stRadius').value = s.deliveryRadiusKm;
+  $('#stMinDel').value = s.minOrderDelivery; $('#stMin').value = s.minOrderValue;
+  const p = d.payments || {};
+  $('#stPay').innerHTML = p.configured ? 'Cashfree is connected (' + p.env + ' mode). Customers pay by UPI, cards and netbanking.'
+    : (p.provider === 'mock' ? 'Demo payments only (local). Not live.' : '<b style="color:#b3271e">Payments are not connected.</b> Online checkout is closed until the Cashfree keys are added on the server.');
+}
+$('#stSave').addEventListener('click', async () => {
+  const msg = $('#stMsg'); msg.textContent = 'Saving...';
+  try {
+    const r = await api('/api/admin/settings', { method: 'POST', body: JSON.stringify({
+      deliveryEnabled: $('#stDelOn').checked, deliveryFee: $('#stFee').value, freeDeliveryAbove: $('#stFree').value,
+      deliveryRadiusKm: $('#stRadius').value, minOrderDelivery: $('#stMinDel').value, minOrderValue: $('#stMin').value
+    }) });
+    msg.style.color = '#1c7c31'; msg.textContent = r.ok ? 'Saved. Live on the website and app now.' : 'Could not save.';
+  } catch (e) { msg.style.color = '#b3271e'; msg.textContent = 'Could not save.'; }
+});

@@ -13,7 +13,8 @@ cp -rf /tmp/xto-src/public/images/pdfmenu/. /opt/xto-pizza/persist-images/pdfmen
 cd /opt/xto-pizza
 docker build -q -t xto-app .
 docker rm -f xto-app >/dev/null
-docker run -d --name xto-app --restart unless-stopped --network voxalio_default \
+ENVF=""; [ -f /opt/xto-pizza/cashfree.env ] && ENVF="--env-file /opt/xto-pizza/cashfree.env"
+docker run -d --name xto-app --restart unless-stopped --network voxalio_default $ENVF \
   -v /opt/xto-pizza/data:/app/data -v /opt/xto-pizza/persist-images:/app/public/images xto-app
 sleep 2
 curl -sk -o /dev/null -w "health: %{http_code}\n" https://xto.43.166.175.196.sslip.io/healthz
