@@ -51,7 +51,7 @@
           '<a href="/franchise">Franchise enquiry</a><a href="/careers">Jobs &amp; careers</a><a href="/contact">Contact us</a><a href="/app">Get the app</a>' +
         '</div>' +
         '<div><h4>Outlets</h4>' +
-          '<p><b style="color:#fff">Shivane (Khadakwasla)</b><br>NDA Rd, near Add Mart, Shivane, Pune 411023<br><a href="tel:+917030000776">+91 70300 00776</a> &middot; 11 am - 10:30 pm</p>' +
+          '<p data-outlet="shivane"><b style="color:#fff">Shivane (Khadakwasla)</b><br>NDA Rd, near Add Mart, Shivane, Pune 411023<br><a href="tel:+917030000776">+91 70300 00776</a> &middot; 11 am - 10:30 pm</p>' +
           '<p><b style="color:#fff">Nanded City</b><br>Destination Centre, F-65, Sinhagad Rd, Pune 411068<br><a href="tel:+917030000886">+91 70300 00886</a> &middot; 11 am - 11 pm</p>' +
         '</div>' +
         '<div><h4>Connect</h4>' +
@@ -63,6 +63,16 @@
       '<div class="xf-base"><span>&copy; 2026 XTO Pizza. Ardur Foods Pvt. Ltd. All rights reserved.</span><span class="xf-legal"><a href="/privacy" style="display:inline">Privacy Policy</a> &middot; <a href="/terms" style="display:inline">Terms and Conditions</a> &middot; <a href="/refund" style="display:inline">Refund Policy</a> &middot; <a href="/delete-data" style="display:inline">Delete my data</a> &middot; <a href="/blog" style="display:inline">Blog</a></span></div>' +
     '</div></footer>';
 
+
+  // hide outlets that are switched off in the admin (Settings > Outlets)
+  fetch('/api/settings').then(function (r) { return r.json(); }).then(function (s) {
+    var open = (s.settings && s.settings.outletsOpen) || {};
+    document.querySelectorAll('[data-outlet]').forEach(function (el) { if (open[el.getAttribute('data-outlet')] === false) el.style.display = 'none'; });
+    var n = Object.keys(open).filter(function (k) { return open[k] !== false; }).length;
+    document.querySelectorAll('[data-outlet-count]').forEach(function (el) { el.textContent = n || 1; });
+    document.querySelectorAll('[data-if-one-outlet]').forEach(function (el) { el.style.display = n === 1 ? '' : 'none'; });
+    document.querySelectorAll('[data-if-many-outlets]').forEach(function (el) { el.style.display = n > 1 ? '' : 'none'; });
+  }).catch(function () {});
   var hm = document.getElementById('xh-mount'); if (hm) hm.outerHTML = header;
   var fm = document.getElementById('xf-mount'); if (fm) fm.outerHTML = footer;
 

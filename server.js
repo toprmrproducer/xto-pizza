@@ -49,13 +49,19 @@ function saveDb() { writeJSON(path.join(DATA, 'db.json'), db); }
 // ---------------------------------------------------------------------------
 // Admin-editable store settings (delivery fee, radius, minimum order)
 // ---------------------------------------------------------------------------
-const DEFAULT_SETTINGS = { deliveryEnabled: true, deliveryFee: 40, freeDeliveryAbove: 0, deliveryRadiusKm: 5, minOrderValue: 0, minOrderDelivery: 199 };
+const DEFAULT_SETTINGS = { outletsOpen: { shivane: false, nanded: true }, deliveryEnabled: true, deliveryFee: 40, freeDeliveryAbove: 0, deliveryRadiusKm: 5, minOrderValue: 0, minOrderDelivery: 199 };
 db.settings = Object.assign({}, DEFAULT_SETTINGS, db.settings || {});
+db.settings.outletsOpen = Object.assign({}, DEFAULT_SETTINGS.outletsOpen, db.settings.outletsOpen || {});
+function outletOpen(id) { return db.settings.outletsOpen[id] !== false; }
 db.pending = db.pending || {};
 function num(x, lo, hi, dflt) { const n = Number(x); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : dflt; }
 function sanitizeSettings(b) {
   const s = db.settings;
+  const oo = Object.assign({}, s.outletsOpen);
+  if (b.outletsOpen && typeof b.outletsOpen === 'object') for (const id of Object.keys(oo)) if (b.outletsOpen[id] !== undefined) oo[id] = !!b.outletsOpen[id];
+  if (!Object.values(oo).some(Boolean)) Object.assign(oo, s.outletsOpen); // never close every outlet
   return {
+    outletsOpen: oo,
     deliveryEnabled: b.deliveryEnabled === undefined ? s.deliveryEnabled : !!b.deliveryEnabled,
     deliveryFee: Math.round(num(b.deliveryFee, 0, 500, s.deliveryFee)),
     freeDeliveryAbove: Math.round(num(b.freeDeliveryAbove, 0, 10000, s.freeDeliveryAbove)),
@@ -478,6 +484,7 @@ function buildDraft(body, req) {
   if (!mode) return { error: 'Choose dine-in, takeaway or delivery' };
   const outlet = outlets.find((o) => o.id === body.outlet);
   if (!outlet) return { error: 'Choose an outlet' };
+  if (!outletOpen(outlet.id)) return { error: outlet.name + ' is not taking online orders right now. Please choose another outlet.' };
   const c = body.customer || {};
   const name = String(c.name || '').trim();
   const phone = String(c.phone || '').replace(/\D/g, '').slice(-10);
@@ -568,6 +575,11 @@ const server = http.createServer(async (req, res) => {
   const hostName = String(req.headers.host || '').split(':')[0].toLowerCase();
   const onXto = hostName.endsWith('.xtopizza.in');
   const sub = onXto ? hostName.slice(0, -'.xtopizza.in'.length) : '';
+  if (method === 'GET' && ['shivane', 'nanded'].includes(sub) && !outletOpen(sub)) {
+    const to = ['nanded', 'shivane'].find((id) => outletOpen(id)) || 'menu';
+    res.writeHead(302, { Location: 'https://' + to + '.xtopizza.in' + req.url });
+    return res.end();
+  }
   if (method === 'GET' && (p === '/' || p === '/index.html')) {
     if (['menu', 'shivane', 'nanded'].includes(sub)) return serveFile(res, path.join(PUBLIC, 'menu.html'));
     if (sub === 'admin') return serveFile(res, path.join(PUBLIC, 'admin.html'));
@@ -620,8 +632,8 @@ const server = http.createServer(async (req, res) => {
     const items = menu.items.map((i) => Object.assign({}, i, { available: isAvailable(i.id) }));
     return json(res, 200, { categories: menu.categories, items, addons: menu.addons || [], deliveryFee: menu.deliveryFee, freeDeliveryAbove: menu.freeDeliveryAbove, currency: 'INR' });
   }
-  if (p === '/api/outlets' && method === 'GET') return json(res, 200, { outlets });
-  if (p === '/api/config' && method === 'GET') return json(res, 200, { brand: config.brand, razorpay: { keyId: config.razorpay.keyId, live: config.razorpay.live }, vapid: vapid.pub, outletsGeo: RIDER_HOME });
+  if (p === '/api/outlets' && method === 'GET') return json(res, 200, { outlets: outlets.filter((o) => outletOpen(o.id)) });
+  if (p === '/api/config' && method === 'GET') return json(res, 200, { brand: config.brand, razorpay: { keyId: config.razorpay.keyId, live: config.razorpay.live }, vapid: vapid.pub, outletsGeo: Object.fromEntries(Object.entries(RIDER_HOME).filter(([id]) => outletOpen(id))) });
 
   if (p === '/api/push/subscribe' && method === 'POST') {
     const body = await readBody(req);
@@ -774,7 +786,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, { orders: list, riders: db.riders });
     }
     if (p === '/api/admin/stats' && method === 'GET') {
-      const todays = db.orders.filter((o) => isToday(o.createdAt) && o.status !== 'CANCELLED');
+      const todays = db.orders.filter((o) => isToday(o.createdAt) && o.status !== 'CANCELLED' && !o.test);
       const revenue = todays.filter((o) => o.payment.status === 'paid').reduce((s, o) => s + o.total, 0);
       const open = db.orders.filter((o) => !['SERVED', 'DELIVERED', 'CANCELLED'].includes(o.status));
       const counters = {};
@@ -887,6 +899,28 @@ const server = http.createServer(async (req, res) => {
       saveDb();
       broadcast('settings:update', db.settings);
       return json(res, 200, { ok: true, settings: db.settings });
+    }
+    if (p === '/api/admin/test-order' && method === 'POST') {
+      // staff test order: appears on the board like a real one, no charge, never sent to Petpooja, excluded from revenue
+      const body = await readBody(req);
+      const outletId = outlets.find((o) => o.id === body.outlet && outletOpen(o.id)) ? body.outlet : (outlets.find((o) => outletOpen(o.id)) || outlets[0]).id;
+      const mode = ['dinein', 'takeaway', 'delivery'].includes(body.mode) ? body.mode : 'takeaway';
+      const cheap = menu.items.filter((i) => isAvailable(i.id)).sort((a, b) => a.price - b.price)[0];
+      const priced = priceOrder([{ id: cheap.id, qty: 1 }]);
+      db.orderSeq += 1;
+      const order = {
+        id: 'XT-' + db.orderSeq, createdAt: new Date().toISOString(), status: 'PLACED', test: true,
+        mode, outlet: outletId, customer: { name: 'TEST ORDER (staff)', phone: '9999999999', tableNumber: mode === 'dinein' ? '1' : '' },
+        items: priced.items, itemTotal: priced.itemTotal, deliveryFee: 0, coupon: null, total: priced.itemTotal,
+        address: mode === 'delivery' ? { line: 'TEST address, do not deliver', landmark: '', lat: (RIDER_HOME[outletId] || [0, 0])[0], lng: (RIDER_HOME[outletId] || [0, 0])[1], distanceKm: 0 } : null,
+        payment: { method: 'test', status: 'paid', paymentId: 'TEST-' + Date.now(), gatewayOrderId: 'TEST' + Date.now() },
+        source: { channel: 'website', platform: 'web', label: 'TEST order created from the admin panel' }, rider: null,
+        etaMin: 15, history: [{ status: 'PLACED', at: new Date().toISOString() }]
+      };
+      db.orders.unshift(order);
+      saveDb();
+      broadcast('order:new', adminOrder(order));
+      return json(res, 200, { ok: true, order: adminOrder(order) });
     }
     if (p === '/api/admin/offers' && method === 'GET') return json(res, 200, { offers: db.offers || [] });
     if (p === '/api/admin/offers' && method === 'POST') {

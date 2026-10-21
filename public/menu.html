@@ -109,7 +109,7 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 50px}
         <div class="k">Pure veg &bull; Dine-in &bull; Takeaway</div>
         <h1>Our menu, fresh from the oven.</h1>
         <p><span id="cnt">our</span> dishes across pizzas, pasta, burgers, wraps, combos and shakes. Pick a size, tell the counter, and we bake it to order.</p>
-        <div class="chips"><span class="v"><i></i>100% pure veg</span><span>Shivane Khadakwasla</span><span>Nanded City</span></div>
+        <div class="chips"><span class="v"><i></i>100% pure veg</span><span data-outlet="shivane">Shivane Khadakwasla</span><span data-outlet="nanded">Nanded City</span></div>
       </div>
       <div class="mosaic"><img src="/images/ai/feature-veg-pull.jpg" alt="XTO veggie pizza cheese pull"><img src="/images/ai/feature-feast-1.jpg" alt="Veg burgers, fries and pizza"><img src="/images/ai/feature-margherita-pull-1.jpg" alt="Margherita pizza slice"></div>
     </div>
@@ -121,8 +121,8 @@ footer{max-width:1240px;margin:0 auto;padding:0 20px 50px}
 <footer>
   <div class="f">
     <div><h4>XTO PIZZA</h4>Pune's pure veg pizzeria.<br>Dine-in and takeaway. GST and packaging charges extra.<br><a href="https://xtopizza.in/" target="_blank" rel="noopener">Order online</a> &middot; <a href="https://xtopizza.in/app" target="_blank" rel="noopener">Get the app</a> &middot; <a href="https://xtopizza.in/franchise" target="_blank" rel="noopener">Franchise</a></div>
-    <div><h4>Shivane (Khadakwasla)</h4>NDA Rd, near Add Mart, Shivane, Pune 411023<br>11 am - 10:30 pm<br><a href="tel:+917030000776">+91 70300 00776</a></div>
-    <div><h4>Nanded City</h4>Destination Centre, F-65, Sinhagad Rd, Pune 411068<br>11 am - 11 pm<br><a href="tel:+917030000886">+91 70300 00886</a></div>
+    <div data-outlet="shivane"><h4>Shivane (Khadakwasla)</h4>NDA Rd, near Add Mart, Shivane, Pune 411023<br>11 am - 10:30 pm<br><a href="tel:+917030000776">+91 70300 00776</a></div>
+    <div data-outlet="nanded"><h4>Nanded City</h4>Destination Centre, F-65, Sinhagad Rd, Pune 411068<br>11 am - 11 pm<br><a href="tel:+917030000886">+91 70300 00886</a></div>
   </div>
   <div class="legal"><a href="https://xtopizza.in/privacy">Privacy Policy</a> &middot; <a href="https://xtopizza.in/terms">Terms and Conditions</a> &middot; <a href="https://xtopizza.in/refund">Refund Policy</a> &middot; <a href="https://xtopizza.in/delete-data">Delete my data</a><br>Ardur Foods Pvt. Ltd. &middot; Prices in INR</div>
 </footer>
@@ -188,6 +188,7 @@ function initMenu(){
       ob.innerHTML='<div><b>'+esc(o.n)+'</b><br><span style="color:var(--muted);font-size:.88rem">'+esc(o.a)+' &middot; '+esc(o.h)+'</span></div><span style="flex:1"></span><a class="btn" href="tel:'+o.t+'">Call '+esc(o.tl)+'</a><a class="btn alt" href="'+o.m+'" target="_blank" rel="noopener">Directions</a>';
       document.title=o.n+' Digital Menu | XTO Pizza'}
     m.items.forEach(function(i){PRICE[i.id]=i.price});
+    fetch('/api/settings').then(function(r){return r.json()}).then(function(s){var open=(s.settings&&s.settings.outletsOpen)||{};document.querySelectorAll('[data-outlet]').forEach(function(el){if(open[el.getAttribute('data-outlet')]===false)el.style.display='none'})}).catch(function(){});
     initMenu(); bar();
     document.getElementById('results').addEventListener('click',function(e){
       var b=e.target.closest('.addbtn'); if(!b||b.disabled) return;

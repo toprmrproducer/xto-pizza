@@ -158,7 +158,7 @@ function cardHTML(o) {
       <span class="meta-chip mode">${o.mode === 'dinein' ? ('🍽 Dine-in' + (o.customer.tableNumber ? ' - T' + o.customer.tableNumber : '')) : o.mode === 'delivery' ? '🛵 Delivery' : '🥡 Takeaway'}</span>
       <span class="meta-chip">${outlet}</span>
       ${o.source ? `<span class="meta-chip" title="${o.source.label}">${o.source.channel === 'website' ? '🌐 Website' : (o.source.platform === 'ios' ? '📱 iOS app' : o.source.platform === 'android' ? '📱 Android app' : '📱 App')}</span>` : ''}
-      <span class="meta-chip paid">PAID ${INR(o.total)}</span>
+      <span class="meta-chip paid">${o.test ? 'TEST ORDER' : 'PAID ' + INR(o.total)}</span>
     </div>
     ${riderBox}
     <div class="oc-actions">
@@ -539,6 +539,7 @@ async function loadSettings() {
   const d = await api('/api/admin/settings');
   const s = d.settings;
   $('#stDelOn').checked = !!s.deliveryEnabled;
+  $('#stOutNanded').checked = s.outletsOpen.nanded !== false; $('#stOutShivane').checked = s.outletsOpen.shivane !== false;
   $('#stFee').value = s.deliveryFee; $('#stFree').value = s.freeDeliveryAbove; $('#stRadius').value = s.deliveryRadiusKm;
   $('#stMinDel').value = s.minOrderDelivery; $('#stMin').value = s.minOrderValue;
   const p = d.payments || {};
@@ -549,9 +550,18 @@ $('#stSave').addEventListener('click', async () => {
   const msg = $('#stMsg'); msg.textContent = 'Saving...';
   try {
     const r = await api('/api/admin/settings', { method: 'POST', body: JSON.stringify({
+      outletsOpen: { nanded: $('#stOutNanded').checked, shivane: $('#stOutShivane').checked },
       deliveryEnabled: $('#stDelOn').checked, deliveryFee: $('#stFee').value, freeDeliveryAbove: $('#stFree').value,
       deliveryRadiusKm: $('#stRadius').value, minOrderDelivery: $('#stMinDel').value, minOrderValue: $('#stMin').value
     }) });
     msg.style.color = '#1c7c31'; msg.textContent = r.ok ? 'Saved. Live on the website and app now.' : 'Could not save.';
   } catch (e) { msg.style.color = '#b3271e'; msg.textContent = 'Could not save.'; }
+});
+
+$('#toGo').addEventListener('click', async () => {
+  const msg = $('#toMsg'); msg.style.color = ''; msg.textContent = 'Creating...';
+  try {
+    const r = await api('/api/admin/test-order', { method: 'POST', body: JSON.stringify({ mode: $('#toMode').value, outlet: $('#toOutlet').value }) });
+    msg.style.color = '#1c7c31'; msg.textContent = r.ok ? 'Test order ' + r.order.id + ' is on the Orders board.' : 'Could not create.';
+  } catch (e) { msg.style.color = '#b3271e'; msg.textContent = 'Could not create.'; }
 });

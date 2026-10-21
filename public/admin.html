@@ -126,7 +126,10 @@
     <div class="pane-head"><h2>Store settings</h2></div>
     <p class="mm-sub">Delivery rules apply instantly on the website, the app and the digital menu order link. Customers outside the radius cannot place a delivery order.</p>
     <div class="mm-add card-panel">
-      <h3>Delivery</h3>
+      <h3>Outlets taking online orders</h3>
+      <label class="mm-desc" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="stOutNanded" style="width:auto" /> Nanded City</label>
+      <label class="mm-desc" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="stOutShivane" style="width:auto" /> Shivane (Khadakwasla)</label>
+      <h3 style="margin-top:18px">Delivery</h3>
       <label class="mm-desc" style="display:flex;align-items:center;gap:10px"><input type="checkbox" id="stDelOn" style="width:auto" /> Delivery is on</label>
       <div class="mm-add-grid">
         <label>Delivery fee (Rs)<input id="stFee" type="number" min="0" max="500" /></label>
@@ -140,6 +143,16 @@
       </div>
       <button class="btn-accent" id="stSave">Save settings</button>
       <div class="mm-msg" id="stMsg"></div>
+    </div>
+    <div class="mm-add card-panel">
+      <h3>Staff test order</h3>
+      <p class="mm-sub">Creates a free test order on the board (cheapest item, never charged, never sent to the POS, left out of revenue). Use it to rehearse the kitchen flow.</p>
+      <div class="mm-add-grid">
+        <label>Type<select id="toMode"><option value="takeaway">Takeaway</option><option value="dinein">Dine-in</option><option value="delivery">Delivery</option></select></label>
+        <label>Outlet<select id="toOutlet"><option value="nanded">Nanded City</option><option value="shivane">Shivane</option></select></label>
+      </div>
+      <button class="btn-accent" id="toGo">Create test order</button>
+      <div class="mm-msg" id="toMsg"></div>
     </div>
     <div class="mm-add card-panel">
       <h3>Payments</h3>
