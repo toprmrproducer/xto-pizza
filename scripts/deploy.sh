@@ -2,7 +2,7 @@
 # XTO Pizza deploy (run ON the VPS as root). Code-only sync: never touches
 # data/ (orders, offers, menu edits) or persist-images/ (uploaded photos).
 set -e
-rsync -a --delete --exclude data --exclude persist-images --exclude _keys /tmp/xto-src/ /opt/xto-pizza/
+rsync -a --delete --exclude data --exclude persist-images --exclude _keys --exclude cashfree.env /tmp/xto-src/ /opt/xto-pizza/
 # the menu catalog travels with deploys; db.json (orders) never does
 mkdir -p /opt/xto-pizza/data
 cp /tmp/xto-src/data/menu.json /opt/xto-pizza/data/menu.json
