@@ -91,7 +91,7 @@ PAGE = r'''<!DOCTYPE html>
 <meta name="theme-color" content="#ffefe0" />
 <link rel="icon" href="images/icon-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" /></noscript>
 <style>
 :root{--ink:#2a1a10;--muted:#8a7667;--red:#b3271e;--orange:#f0731d;--peach:#ffefe0;--peach2:#ffe3cc;--card:#fff;--line:#f1dcc8;--veg:#1c7c31;--sh:0 10px 30px -16px rgba(120,60,20,.35);--disp:'Bricolage Grotesque','Inter',system-ui,sans-serif}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -274,7 +274,7 @@ RENDER = r'''}
     var sizes='';
     if(g.length>1) sizes='<div class="sz-l">Size</div><div class="szs">'+g.map(function(x,n){return '<button type="button" class="sz'+(n===0?' on':'')+'" data-id="'+esc(x.id)+'" data-p="'+x.price+'">'+esc(x.sizeLabel||'')+'<b>&#8377;'+x.price+'</b></button>'}).join('')+'</div>';
     else if(f.sizeLabel) sizes='<div class="sz-l">Size</div><div class="szs"><span class="sz on">'+esc(f.sizeLabel)+'<b>&#8377;'+f.price+'</b></span></div>';
-    return '<article class="card'+(sold?' so':'')+'" data-name="'+esc((name+' '+(f.desc||'')).toLowerCase())+'"><div class="ph"><img src="/images/'+esc(f.img)+'.jpg" alt="'+esc(name)+'" loading="lazy" onerror="this.onerror=null;this.src=\'/images/ai/feature-veg-pull.jpg\'"><span class="vg" title="Pure veg"></span></div><div class="cb"><div class="t"><h3>'+esc(name)+'</h3><span class="pr">'+(g.length>1?'from ':'')+'<b class="pv">&#8377;'+g[0].price+'</b></span></div><p>'+esc(f.desc||'')+'</p>'+sizes+'<button type="button" class="addbtn" data-id="'+esc(g[0].id)+'"'+(sold?' disabled':'')+'>'+(sold?'Sold out':'+ Add')+'</button></div></article>';
+    return '<article class="card'+(sold?' so':'')+'" data-name="'+esc((name+' '+(f.desc||'')).toLowerCase())+'"><div class="ph"><img src="/images/'+esc(f.img)+'.jpg" alt="'+esc(name)+'" loading="lazy" decoding="async" width="300" height="300" onerror="this.onerror=null;this.src=\'/images/ai/feature-veg-pull.jpg\'"><span class="vg" title="Pure veg"></span></div><div class="cb"><div class="t"><h3>'+esc(name)+'</h3><span class="pr">'+(g.length>1?'from ':'')+'<b class="pv">&#8377;'+g[0].price+'</b></span></div><p>'+esc(f.desc||'')+'</p>'+sizes+'<button type="button" class="addbtn" data-id="'+esc(g[0].id)+'"'+(sold?' disabled':'')+'>'+(sold?'Sold out':'+ Add')+'</button></div></article>';
   }
   var OUT={shivane:{n:'XTO Pizza Shivane (Khadakwasla)',a:'NDA Rd, near Add Mart, Shivane, Pune 411023',h:'11 am - 10:30 pm',t:'+917030000776',tl:'+91 70300 00776',m:'https://maps.google.com/?q=XTO+PIZZA+Shivane+Pune'},
            nanded:{n:'XTO Pizza Nanded City',a:'Survey No.1,2, Destination Centre, Shop F-65, Sinhagad Rd, Nanded City, Pune 411068',h:'11 am - 11 pm',t:'+917030000886',tl:'+91 70300 00886',m:'https://maps.google.com/?q=XTO+Pizza+Nanded+City+Pune'}};
@@ -310,6 +310,7 @@ RENDER = r'''}
 </body>
 </html>'''
 live = live.replace(tail, RENDER)
+live = live.replace('<link rel="preconnect" href="https://fonts.googleapis.com" />', '<link rel="preload" as="fetch" href="/api/menu" crossorigin="anonymous" /><link rel="preload" as="fetch" href="/api/settings" crossorigin="anonymous" /><link rel="preconnect" href="https://fonts.googleapis.com" />', 1)
 live = live.replace('</body>', '<div class="cartbar" id="cb" style="display:none"><span></span><a href="/order?cart=1">Checkout</a></div></body>', 1)
 live = live.replace('</style>', '.addbtn{margin-top:10px;width:100%;padding:11px;border-radius:999px;border:1.5px solid var(--red);background:#fff;color:var(--red);font:700 .9rem Inter;cursor:pointer}.addbtn.ok{background:var(--red);color:#fff}.addbtn:disabled{opacity:.5;cursor:not-allowed}.cartbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:60;background:#1b120c;color:#fff;border-radius:999px;padding:10px 10px 10px 22px;gap:18px;align-items:center;box-shadow:0 12px 30px -10px rgba(0,0,0,.5);font:600 .95rem Inter}.cartbar a{background:var(--orange);color:#fff;padding:10px 22px;border-radius:999px;font-weight:800}</style>', 1)
 live = live.replace('<a class="order" href="' + MAIN + '/#menu"', '<a class="order" href="/order"')

@@ -1,6 +1,6 @@
 /* XTO Pizza service worker: images cache-first, everything else passes through to the network */
 'use strict';
-const CACHE = 'xto-images-v1';
+const CACHE = 'xto-images-v2';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll([

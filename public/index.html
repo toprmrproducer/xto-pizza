@@ -10,7 +10,11 @@
 <meta name="theme-color" content="#b3271e" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" /></noscript>
+<link rel="preload" as="fetch" href="/api/menu" crossorigin="anonymous" />
+<link rel="preload" as="fetch" href="/api/outlets" crossorigin="anonymous" />
+<link rel="preload" as="fetch" href="/api/settings" crossorigin="anonymous" />
+<link rel="preload" as="fetch" href="/api/config" crossorigin="anonymous" />
 <link rel="stylesheet" href="/css/site.css" />
 <link rel="stylesheet" href="/css/home.css" />
 <link rel="apple-touch-icon" href="/images/icon-192.png" />
@@ -44,9 +48,9 @@
       <div class="xhero-open" id="openNow"><i></i><span>Checking outlet hours...</span></div>
     </div>
     <div class="xcollage" aria-hidden="false">
-      <img class="big" src="/images/ai/feature-veg-pull.jpg" alt="XTO veggie pizza with a long cheese pull" />
-      <img src="/images/ai/feature-feast-1.jpg" alt="Veg burgers, fries and pizza" />
-      <img src="/images/ai/feature-margherita-pull-1.jpg" alt="Margherita pizza slice" />
+      <img class="big" src="/images/ai/feature-veg-pull.jpg" alt="XTO veggie pizza with a long cheese pull" fetchpriority="high" decoding="async" />
+      <img src="/images/ai/feature-feast-1.jpg" alt="Veg burgers, fries and pizza" loading="lazy" decoding="async" />
+      <img src="/images/ai/feature-margherita-pull-1.jpg" alt="Margherita pizza slice" loading="lazy" decoding="async" />
       <div class="badge">Pizzas from<b>&#8377;59</b></div>
     </div>
   </div>
@@ -310,10 +314,10 @@
 
 <div class="toast" id="toast"></div>
 
-<link rel="stylesheet" href="/leaflet/leaflet.css" />
-<script src="/leaflet/leaflet.js"></script>
-<script src="/js/layout.js"></script>
-<script src="/js/pay.js"></script>
-<script src="/js/site.js"></script>
+<link rel="stylesheet" href="/leaflet/leaflet.css" media="print" onload="this.media='all'" />
+<script defer src="/leaflet/leaflet.js"></script>
+<script defer src="/js/layout.js"></script>
+<script defer src="/js/pay.js"></script>
+<script defer src="/js/site.js"></script>
 </body>
 </html>

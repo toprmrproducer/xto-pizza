@@ -8,8 +8,7 @@ mkdir -p /opt/xto-pizza/data
 cp /tmp/xto-src/data/menu.json /opt/xto-pizza/data/menu.json
 # menu catalog already copied above; fresh build images into the persisted volume
 mkdir -p /opt/xto-pizza/persist-images/ai /opt/xto-pizza/persist-images/pdfmenu
-cp -rf /tmp/xto-src/public/images/ai/. /opt/xto-pizza/persist-images/ai/ || true
-cp -rf /tmp/xto-src/public/images/pdfmenu/. /opt/xto-pizza/persist-images/pdfmenu/ || true
+cp -rf /tmp/xto-src/public/images/. /opt/xto-pizza/persist-images/ || true
 cd /opt/xto-pizza
 docker build -q -t xto-app .
 docker rm -f xto-app >/dev/null

@@ -462,13 +462,51 @@ const MIME = {
   '.json': 'application/json', '.webmanifest': 'application/manifest+json', '.png': 'image/png', '.jpg': 'image/jpeg',
   '.jpeg': 'image/jpeg', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.webp': 'image/webp', '.woff2': 'font/woff2'
 };
+const BUILD_ID = Date.now().toString(36); // changes on every deploy; stamped into css/js URLs so they can be cached for a year
+const ASSET_RE = /(href|src)="(\/(?:css|js|leaflet|vendor)\/[^"?#]+)"/g;
 function serveFile(res, absPath, status) {
-  fs.readFile(absPath, (err, buf) => {
-    if (err) { json(res, 404, { error: 'Not found' }); return; }
-    const ext = path.extname(absPath).toLowerCase();
-    res.writeHead(status || 200, { 'Content-Type': MIME[ext] || 'application/octet-stream' });
-    res.end(buf);
+  const req = res.req;
+  const ext = path.extname(absPath).toLowerCase();
+  const rel = path.relative(PUBLIC, absPath).split(path.sep).join('/');
+  // modern browsers get the smaller .webp twin of a photo at the same URL
+  let file = absPath, type = MIME[ext] || 'application/octet-stream', vary = null;
+  if ((ext === '.jpg' || ext === '.jpeg') && rel.startsWith('images/')) {
+    vary = 'Accept';
+    const accept = String((req && req.headers.accept) || '');
+    const wp = absPath.replace(/\.jpe?g$/i, '.webp');
+    if (/image\/webp/.test(accept) && fs.existsSync(wp)) { file = wp; type = 'image/webp'; }
+  }
+  fs.stat(file, (err, st) => {
+    if (err || !st.isFile()) { json(res, 404, { error: 'Not found' }); return; }
+    const headers = { 'Content-Type': type };
+    if (vary) headers.Vary = vary;
+    if (ext === '.html') {
+      fs.readFile(file, 'utf8', (e2, txt) => {
+        if (e2) { json(res, 404, { error: 'Not found' }); return; }
+        const body = Buffer.from(txt.replace(ASSET_RE, '$1="$2?v=' + BUILD_ID + '"'));
+        const etag = 'W/"' + crypto.createHash('md5').update(body).digest('hex').slice(0, 16) + '"';
+        headers.ETag = etag; headers['Cache-Control'] = 'no-cache';
+        if (req && req.headers['if-none-match'] === etag) { res.writeHead(304, headers); return res.end(); }
+        res.writeHead(status || 200, headers); res.end(body);
+      });
+      return;
+    }
+    const etag = 'W/"' + st.size.toString(16) + '-' + Math.floor(st.mtimeMs).toString(16) + '"';
+    headers.ETag = etag; headers['Last-Modified'] = st.mtime.toUTCString();
+    if (/^(css|js|leaflet|vendor)\//.test(rel)) headers['Cache-Control'] = 'public, max-age=31536000, immutable'; // URLs carry ?v=BUILD_ID
+    else if (rel.startsWith('images/')) headers['Cache-Control'] = 'public, max-age=604800, stale-while-revalidate=86400';
+    else if (rel === 'sw.js') headers['Cache-Control'] = 'no-cache';
+    else headers['Cache-Control'] = 'public, max-age=3600';
+    if (req && req.headers['if-none-match'] === etag) { res.writeHead(304, headers); return res.end(); }
+    fs.readFile(file, (e3, buf) => {
+      if (e3) { json(res, 404, { error: 'Not found' }); return; }
+      res.writeHead(status || 200, headers); res.end(buf);
+    });
   });
+}
+function jsonCached(res, code, obj, maxAge) {
+  res.writeHead(code, { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'public, max-age=' + maxAge + ', stale-while-revalidate=60' });
+  res.end(JSON.stringify(obj));
 }
 
 
@@ -630,10 +668,10 @@ const server = http.createServer(async (req, res) => {
   // ---- public API ----------------------------------------------------------
   if (p === '/api/menu' && method === 'GET') {
     const items = menu.items.map((i) => Object.assign({}, i, { available: isAvailable(i.id) }));
-    return json(res, 200, { categories: menu.categories, items, addons: menu.addons || [], deliveryFee: menu.deliveryFee, freeDeliveryAbove: menu.freeDeliveryAbove, currency: 'INR' });
+    return jsonCached(res, 200, { categories: menu.categories, items, addons: menu.addons || [], deliveryFee: menu.deliveryFee, freeDeliveryAbove: menu.freeDeliveryAbove, currency: 'INR' }, 20);
   }
-  if (p === '/api/outlets' && method === 'GET') return json(res, 200, { outlets: outlets.filter((o) => outletOpen(o.id)) });
-  if (p === '/api/config' && method === 'GET') return json(res, 200, { brand: config.brand, razorpay: { keyId: config.razorpay.keyId, live: config.razorpay.live }, vapid: vapid.pub, outletsGeo: Object.fromEntries(Object.entries(RIDER_HOME).filter(([id]) => outletOpen(id))) });
+  if (p === '/api/outlets' && method === 'GET') return jsonCached(res, 200, { outlets: outlets.filter((o) => outletOpen(o.id)) }, 20);
+  if (p === '/api/config' && method === 'GET') return jsonCached(res, 200, { brand: config.brand, razorpay: { keyId: config.razorpay.keyId, live: config.razorpay.live }, vapid: vapid.pub, outletsGeo: Object.fromEntries(Object.entries(RIDER_HOME).filter(([id]) => outletOpen(id))) }, 20);
 
   if (p === '/api/push/subscribe' && method === 'POST') {
     const body = await readBody(req);
@@ -684,7 +722,7 @@ const server = http.createServer(async (req, res) => {
     return json(res, 201, { ok: true, id: row.id });
   }
 
-  if (p === '/api/settings' && method === 'GET') return json(res, 200, { settings: db.settings, payments: paymentsInfo() });
+  if (p === '/api/settings' && method === 'GET') return jsonCached(res, 200, { settings: db.settings, payments: paymentsInfo() }, 20);
 
   // ---- checkout: price on the server, open a Cashfree order, confirm only after Cashfree says PAID ----
   if (p === '/api/checkout/start' && method === 'POST') {
