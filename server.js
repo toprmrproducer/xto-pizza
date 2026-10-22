@@ -278,6 +278,13 @@ function orderSource(body, req) {
     : 'This purchase came from the ' + (platform === 'android' ? 'Android app' : platform === 'ios' ? 'iOS app' : 'app (web)');
   return { channel, platform, label };
 }
+// Petpooja short codes for our menu items (from the Petpooja Menu Management export, see data/pos-map.json)
+const posMap = (readJSON(path.join(DATA, 'pos-map.json'), { items: {} }).items) || {};
+function posFields(itemId) {
+  const e = posMap[itemId];
+  if (!e) return {};
+  return { pos_short_code: e.pos ? e.pos.shortCode : null, pos_name: e.pos ? e.pos.name : null, pos_online_short_code: e.online ? e.online.shortCode : null, size: e.size || null };
+}
 function petpoojaPayload(order) {
   return {
     outlet_id: petpooja.outletMap[order.outlet] || order.outlet,
@@ -288,7 +295,7 @@ function petpoojaPayload(order) {
     order_type: order.mode === 'delivery' ? 'delivery' : 'takeaway',
     ordered_at: order.createdAt,
     customer: { name: order.customer.name, phone: order.customer.phone },
-    items: order.items.map((i) => ({ name: i.name, qty: i.qty, price: i.price, total: i.price * i.qty })),
+    items: order.items.map((i) => Object.assign({ id: i.id, name: i.name, qty: i.qty, price: i.price, total: i.price * i.qty }, posFields(i.id))),
     item_total: order.itemTotal,
     delivery_charge: order.deliveryFee,
     order_total: order.total,

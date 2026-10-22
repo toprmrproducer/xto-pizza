@@ -6,6 +6,7 @@ rsync -a --delete --exclude data --exclude persist-images --exclude _keys --excl
 # the menu catalog travels with deploys; db.json (orders) never does
 mkdir -p /opt/xto-pizza/data
 cp /tmp/xto-src/data/menu.json /opt/xto-pizza/data/menu.json
+cp /tmp/xto-src/data/pos-map.json /opt/xto-pizza/data/pos-map.json 2>/dev/null || true
 # menu catalog already copied above; fresh build images into the persisted volume
 mkdir -p /opt/xto-pizza/persist-images/ai /opt/xto-pizza/persist-images/pdfmenu
 cp -rf /tmp/xto-src/public/images/. /opt/xto-pizza/persist-images/ || true

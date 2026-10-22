@@ -1,0 +1,1596 @@
+{
+ "source": "Petpooja Menu Management screenshots, 22 Oct 2026 (restaurant 362057, Nanded City)",
+ "note": "shortCode is the Petpooja short code, NOT its internal item ID. pos = dine-in/POS item, online = item exposed for online order ([O] categories, higher prices). Sizes (Regular/Medium/Large) are Petpooja variants whose IDs and prices are not in the screenshots.",
+ "items": {
+  "tomato-and-cheese-6-in": {
+   "name": "Tomato & Cheese (6 in)",
+   "size": "six",
+   "ourPrice": 59,
+   "pos": {
+    "shortCode": "1",
+    "name": "Tomato & Cheese Pizza Small",
+    "price": 59.0,
+    "category": "Magic Mania Pizza Small"
+   },
+   "online": {
+    "shortCode": "AP 1",
+    "name": "Tomato & Cheese Pizza [o]",
+    "price": 99.0,
+    "category": "Magic Mania Pizza [ Regular ] [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "onion-and-cheese-6-in": {
+   "name": "Onion & Cheese (6 in)",
+   "size": "six",
+   "ourPrice": 69,
+   "pos": {
+    "shortCode": "2",
+    "name": "Onion & Cheese Pizza Small",
+    "price": 69.0,
+    "category": "Magic Mania Pizza Small"
+   },
+   "online": {
+    "shortCode": "AP 2",
+    "name": "Onion & Cheese Pizza [o]",
+    "price": 119.0,
+    "category": "Magic Mania Pizza [ Regular ] [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "margherita-regular": {
+   "name": "Margherita (Regular)",
+   "size": "regular",
+   "ourPrice": 99,
+   "pos": {
+    "shortCode": "margherita pizza",
+    "name": "Margherita Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "margherita pizza [o]",
+    "name": "Margherita Pizza [o]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "margherita-medium": {
+   "name": "Margherita (Medium)",
+   "size": "medium",
+   "ourPrice": 199,
+   "pos": {
+    "shortCode": "margherita pizza",
+    "name": "Margherita Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "margherita pizza [o]",
+    "name": "Margherita Pizza [o]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "margherita-large": {
+   "name": "Margherita (Large)",
+   "size": "large",
+   "ourPrice": 399,
+   "pos": {
+    "shortCode": "margherita pizza",
+    "name": "Margherita Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "margherita pizza [o]",
+    "name": "Margherita Pizza [o]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "corn-and-cheese-regular": {
+   "name": "Corn & Cheese (Regular)",
+   "size": "regular",
+   "ourPrice": 139,
+   "pos": {
+    "shortCode": "4",
+    "name": "Corn & Cheese",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 4",
+    "name": "Corn & Cheese [O]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "corn-and-cheese-medium": {
+   "name": "Corn & Cheese (Medium)",
+   "size": "medium",
+   "ourPrice": 299,
+   "pos": {
+    "shortCode": "4",
+    "name": "Corn & Cheese",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 4",
+    "name": "Corn & Cheese [O]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "corn-and-cheese-large": {
+   "name": "Corn & Cheese (Large)",
+   "size": "large",
+   "ourPrice": 439,
+   "pos": {
+    "shortCode": "4",
+    "name": "Corn & Cheese",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 4",
+    "name": "Corn & Cheese [O]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "paneer-makhani-regular": {
+   "name": "Paneer Makhani (Regular)",
+   "size": "regular",
+   "ourPrice": 149,
+   "pos": {
+    "shortCode": "5",
+    "name": "Paneer Makhni",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "paneer makhni pizza",
+    "name": "Paneer Makhni Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "paneer-makhani-medium": {
+   "name": "Paneer Makhani (Medium)",
+   "size": "medium",
+   "ourPrice": 349,
+   "pos": {
+    "shortCode": "5",
+    "name": "Paneer Makhni",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "paneer makhni pizza",
+    "name": "Paneer Makhni Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "paneer-makhani-large": {
+   "name": "Paneer Makhani (Large)",
+   "size": "large",
+   "ourPrice": 459,
+   "pos": {
+    "shortCode": "5",
+    "name": "Paneer Makhni",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "paneer makhni pizza",
+    "name": "Paneer Makhni Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "dil-desi-regular": {
+   "name": "Dil Desi (Regular)",
+   "size": "regular",
+   "ourPrice": 189,
+   "pos": {
+    "shortCode": "6",
+    "name": "Dil Desi Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 5",
+    "name": "Dil Desi Pizza [O]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "dil-desi-medium": {
+   "name": "Dil Desi (Medium)",
+   "size": "medium",
+   "ourPrice": 369,
+   "pos": {
+    "shortCode": "6",
+    "name": "Dil Desi Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 5",
+    "name": "Dil Desi Pizza [O]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "dil-desi-large": {
+   "name": "Dil Desi (Large)",
+   "size": "large",
+   "ourPrice": 449,
+   "pos": {
+    "shortCode": "6",
+    "name": "Dil Desi Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 5",
+    "name": "Dil Desi Pizza [O]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "farmers-delight-regular": {
+   "name": "Farmer's Delight (Regular)",
+   "size": "regular",
+   "ourPrice": 209,
+   "pos": {
+    "shortCode": "7",
+    "name": "Farmer's Delight Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 6",
+    "name": "Farmer's Delight Pizza [o]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "farmers-delight-medium": {
+   "name": "Farmer's Delight (Medium)",
+   "size": "medium",
+   "ourPrice": 379,
+   "pos": {
+    "shortCode": "7",
+    "name": "Farmer's Delight Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 6",
+    "name": "Farmer's Delight Pizza [o]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "farmers-delight-large": {
+   "name": "Farmer's Delight (Large)",
+   "size": "large",
+   "ourPrice": 489,
+   "pos": {
+    "shortCode": "7",
+    "name": "Farmer's Delight Pizza",
+    "price": 0.0,
+    "category": "Premium Pizza"
+   },
+   "online": {
+    "shortCode": "AP 6",
+    "name": "Farmer's Delight Pizza [o]",
+    "price": 0.0,
+    "category": "Premium Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "tandoori-paneer-tikka-regular": {
+   "name": "Tandoori Paneer Tikka (Regular)",
+   "size": "regular",
+   "ourPrice": 229,
+   "pos": {
+    "shortCode": "13",
+    "name": "Tandoori Paneer Tikka Pizza",
+    "price": 0.0,
+    "category": "Legend Pizza"
+   },
+   "online": {
+    "shortCode": "AP 10",
+    "name": "Tandoori Paneer Tikka Pizza [o]",
+    "price": 0.0,
+    "category": "Legend Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "tandoori-paneer-tikka-medium": {
+   "name": "Tandoori Paneer Tikka (Medium)",
+   "size": "medium",
+   "ourPrice": 389,
+   "pos": {
+    "shortCode": "13",
+    "name": "Tandoori Paneer Tikka Pizza",
+    "price": 0.0,
+    "category": "Legend Pizza"
+   },
+   "online": {
+    "shortCode": "AP 10",
+    "name": "Tandoori Paneer Tikka Pizza [o]",
+    "price": 0.0,
+    "category": "Legend Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "tandoori-paneer-tikka-large": {
+   "name": "Tandoori Paneer Tikka (Large)",
+   "size": "large",
+   "ourPrice": 509,
+   "pos": {
+    "shortCode": "13",
+    "name": "Tandoori Paneer Tikka Pizza",
+    "price": 0.0,
+    "category": "Legend Pizza"
+   },
+   "online": {
+    "shortCode": "AP 10",
+    "name": "Tandoori Paneer Tikka Pizza [o]",
+    "price": 0.0,
+    "category": "Legend Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "tangy-paneer-pizza-regular": {
+   "name": "Tangy Paneer Pizza (Regular)",
+   "size": "regular",
+   "ourPrice": 239,
+   "pos": {
+    "shortCode": "tangy paneer pizza",
+    "name": "Tangy Paneer Pizza",
+    "price": 0.0,
+    "category": "Legend Pizza"
+   },
+   "online": {
+    "shortCode": "AP 11",
+    "name": "Tangy Paneer Pizza [o]",
+    "price": 0.0,
+    "category": "Legend Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "tangy-paneer-pizza-medium": {
+   "name": "Tangy Paneer Pizza (Medium)",
+   "size": "medium",
+   "ourPrice": 379,
+   "pos": {
+    "shortCode": "tangy paneer pizza",
+    "name": "Tangy Paneer Pizza",
+    "price": 0.0,
+    "category": "Legend Pizza"
+   },
+   "online": {
+    "shortCode": "AP 11",
+    "name": "Tangy Paneer Pizza [o]",
+    "price": 0.0,
+    "category": "Legend Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "tangy-paneer-pizza-large": {
+   "name": "Tangy Paneer Pizza (Large)",
+   "size": "large",
+   "ourPrice": 509,
+   "pos": {
+    "shortCode": "tangy paneer pizza",
+    "name": "Tangy Paneer Pizza",
+    "price": 0.0,
+    "category": "Legend Pizza"
+   },
+   "online": {
+    "shortCode": "AP 11",
+    "name": "Tangy Paneer Pizza [o]",
+    "price": 0.0,
+    "category": "Legend Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "veggie-mexican-regular": {
+   "name": "Veggie Mexican (Regular)",
+   "size": "regular",
+   "ourPrice": 249,
+   "pos": {
+    "shortCode": "18",
+    "name": "Veggie Mexican Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 12",
+    "name": "Veggie Mexican Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "veggie-mexican-medium": {
+   "name": "Veggie Mexican (Medium)",
+   "size": "medium",
+   "ourPrice": 399,
+   "pos": {
+    "shortCode": "18",
+    "name": "Veggie Mexican Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 12",
+    "name": "Veggie Mexican Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "veggie-mexican-large": {
+   "name": "Veggie Mexican (Large)",
+   "size": "large",
+   "ourPrice": 579,
+   "pos": {
+    "shortCode": "18",
+    "name": "Veggie Mexican Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 12",
+    "name": "Veggie Mexican Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "pesto-painting-regular": {
+   "name": "Pesto Painting (Regular)",
+   "size": "regular",
+   "ourPrice": 259,
+   "pos": {
+    "shortCode": "19",
+    "name": "Pesto Painting Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 13",
+    "name": "Pesto Painting Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "pesto-painting-medium": {
+   "name": "Pesto Painting (Medium)",
+   "size": "medium",
+   "ourPrice": 429,
+   "pos": {
+    "shortCode": "19",
+    "name": "Pesto Painting Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 13",
+    "name": "Pesto Painting Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "pesto-painting-large": {
+   "name": "Pesto Painting (Large)",
+   "size": "large",
+   "ourPrice": 599,
+   "pos": {
+    "shortCode": "19",
+    "name": "Pesto Painting Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 13",
+    "name": "Pesto Painting Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "chefs-special-paneer-tikka-regular": {
+   "name": "Chef's Special Paneer Tikka (Regular)",
+   "size": "regular",
+   "ourPrice": 239,
+   "pos": {
+    "shortCode": "14",
+    "name": "Chef's Special Paneer Tikka Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 14",
+    "name": "Chef's Special Paneer Tikka Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "chefs-special-paneer-tikka-medium": {
+   "name": "Chef's Special Paneer Tikka (Medium)",
+   "size": "medium",
+   "ourPrice": 429,
+   "pos": {
+    "shortCode": "14",
+    "name": "Chef's Special Paneer Tikka Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 14",
+    "name": "Chef's Special Paneer Tikka Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "chefs-special-paneer-tikka-large": {
+   "name": "Chef's Special Paneer Tikka (Large)",
+   "size": "large",
+   "ourPrice": 599,
+   "pos": {
+    "shortCode": "14",
+    "name": "Chef's Special Paneer Tikka Pizza",
+    "price": 0.0,
+    "category": "Gourmet Selection"
+   },
+   "online": {
+    "shortCode": "AP 14",
+    "name": "Chef's Special Paneer Tikka Pizza [O]",
+    "price": 0.0,
+    "category": "Gourmet Selection Pizza [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "arabiatta-pasta-half": {
+   "name": "Arabiatta Pasta (Half)",
+   "size": "half",
+   "ourPrice": 169,
+   "pos": {
+    "shortCode": "26",
+    "name": "Arabiatta Pasta",
+    "price": 0.0,
+    "category": "Pasta Mania"
+   },
+   "online": {
+    "shortCode": "AP 21",
+    "name": "Arabiatta Pasta [O]",
+    "price": 349.0,
+    "category": "Pasta Mania [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "arabiatta-pasta-full": {
+   "name": "Arabiatta Pasta (Full)",
+   "size": "full",
+   "ourPrice": 269,
+   "pos": {
+    "shortCode": "26",
+    "name": "Arabiatta Pasta",
+    "price": 0.0,
+    "category": "Pasta Mania"
+   },
+   "online": {
+    "shortCode": "AP 21",
+    "name": "Arabiatta Pasta [O]",
+    "price": 349.0,
+    "category": "Pasta Mania [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "veg-alfredo-half": {
+   "name": "Veg Alfredo (Half)",
+   "size": "half",
+   "ourPrice": 169,
+   "pos": {
+    "shortCode": "27",
+    "name": "Veg Alfredo",
+    "price": 0.0,
+    "category": "Pasta Mania"
+   },
+   "online": {
+    "shortCode": "AP 22",
+    "name": "Veg Alfredo [O]",
+    "price": 349.0,
+    "category": "Pasta Mania [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "veg-alfredo-full": {
+   "name": "Veg Alfredo (Full)",
+   "size": "full",
+   "ourPrice": 269,
+   "pos": {
+    "shortCode": "27",
+    "name": "Veg Alfredo",
+    "price": 0.0,
+    "category": "Pasta Mania"
+   },
+   "online": {
+    "shortCode": "AP 22",
+    "name": "Veg Alfredo [O]",
+    "price": 349.0,
+    "category": "Pasta Mania [O]"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "tandoori-pasta-half": {
+   "name": "Tandoori Pasta (Half)",
+   "size": "half",
+   "ourPrice": 189,
+   "pos": {
+    "shortCode": "29",
+    "name": "Tandoori Pasta",
+    "price": 0.0,
+    "category": "Pasta Mania"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "tandoori-pasta-full": {
+   "name": "Tandoori Pasta (Full)",
+   "size": "full",
+   "ourPrice": 289,
+   "pos": {
+    "shortCode": "29",
+    "name": "Tandoori Pasta",
+    "price": 0.0,
+    "category": "Pasta Mania"
+   },
+   "needsPetpoojaVariantId": true
+  },
+  "chefs-special-pasta": {
+   "name": "Chef's Special Pasta",
+   "size": null,
+   "ourPrice": 299,
+   "pos": {
+    "shortCode": "chef's special pasta",
+    "name": "Chef's Special Pasta",
+    "price": 299.0,
+    "category": "Pasta Mania"
+   },
+   "online": {
+    "shortCode": "chef's spl pasta [O]",
+    "name": "Chef's Special Pasta [o]",
+    "price": 379.0,
+    "category": "Pasta Mania [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "garlic-bread": {
+   "name": "Garlic Bread",
+   "size": null,
+   "ourPrice": 99,
+   "pos": {
+    "shortCode": "23",
+    "name": "Garlic Bread",
+    "price": 99.0,
+    "category": "The Oven Bits Garlic Bread"
+   },
+   "online": {
+    "shortCode": "AP 18",
+    "name": "Garlic Bread [O]",
+    "price": 109.0,
+    "category": "The Oven Bits - Garlic Bread [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "cheese-chilli-tost": {
+   "name": "Cheese Chilli Tost",
+   "size": null,
+   "ourPrice": 149,
+   "pos": {
+    "shortCode": "25",
+    "name": "Cheese Chilli Toast",
+    "price": 129.0,
+    "category": "The Oven Bits Garlic Bread"
+   },
+   "online": {
+    "shortCode": "cheeae chilli tost",
+    "name": "Cheese Chilli Tost",
+    "price": 149.0,
+    "category": "The Oven Bits - Garlic Bread [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "cheesy-garlic-bread": {
+   "name": "Cheesy Garlic Bread",
+   "size": null,
+   "ourPrice": 159,
+   "pos": {
+    "shortCode": "24",
+    "name": "Cheesy Garlic Bread",
+    "price": 149.0,
+    "category": "The Oven Bits Garlic Bread"
+   },
+   "online": {
+    "shortCode": "AP 19",
+    "name": "Cheesy Garlic Bread [O]",
+    "price": 119.0,
+    "category": "The Oven Bits - Garlic Bread [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "veg-grilled-sandwich": {
+   "name": "Veg Grilled Sandwich",
+   "size": null,
+   "ourPrice": 89,
+   "pos": {
+    "shortCode": "VG",
+    "name": "Veg Grilled Sandwich",
+    "price": 89.0,
+    "category": "Sandwich"
+   },
+   "online": {
+    "shortCode": "veg grilled sandwich",
+    "name": "Veg Grilled Sandwich [o]",
+    "price": 99.0,
+    "category": "Sandwich [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "cheese-corn-sandwich": {
+   "name": "Cheese Corn Sandwich",
+   "size": null,
+   "ourPrice": 139,
+   "pos": {
+    "shortCode": "35",
+    "name": "Cheese Corn Sandwich Panini",
+    "price": 139.0,
+    "category": "Sandwich"
+   },
+   "online": {
+    "shortCode": "CCS",
+    "name": "Cheese Corn Sandwich [o]",
+    "price": 119.0,
+    "category": "Sandwich [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "paneer-tikka-sandwich": {
+   "name": "Paneer Tikka Sandwich",
+   "size": null,
+   "ourPrice": 169,
+   "pos": {
+    "shortCode": "paneer tikka sandwic",
+    "name": "Paneer Tikka Sandwich",
+    "price": 169.0,
+    "category": "Sandwich"
+   },
+   "online": {
+    "shortCode": "PB",
+    "name": "Paneer Tikka Sandwich [o]",
+    "price": 199.0,
+    "category": "Sandwich [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "veg-burger": {
+   "name": "Veg Burger",
+   "size": null,
+   "ourPrice": 59,
+   "pos": {
+    "shortCode": "51",
+    "name": "Veg Burger",
+    "price": 59.0,
+    "category": "Burger"
+   },
+   "online": {
+    "shortCode": "AP 37",
+    "name": "Veg Burger [O]",
+    "price": 79.0,
+    "category": "Burgers [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "crispy-veg-burger": {
+   "name": "Crispy Veg Burger",
+   "size": null,
+   "ourPrice": 99,
+   "pos": {
+    "shortCode": "52",
+    "name": "Crispy Veg Burger",
+    "price": 99.0,
+    "category": "Burger"
+   },
+   "online": {
+    "shortCode": "AP 38",
+    "name": "Crispy Veg Burger [O]",
+    "price": 119.0,
+    "category": "Burgers [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "cheese-veg-burger": {
+   "name": "Cheese Veg Burger",
+   "size": null,
+   "ourPrice": 119,
+   "pos": {
+    "shortCode": "53",
+    "name": "Cheese Burger",
+    "price": 119.0,
+    "category": "Burger"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "double-cheese-veg-burger": {
+   "name": "Double Cheese Veg Burger",
+   "size": null,
+   "ourPrice": 139,
+   "pos": {
+    "shortCode": "56",
+    "name": "Double Cheese Burger",
+    "price": 139.0,
+    "category": "Burger"
+   },
+   "online": {
+    "shortCode": "AP 40",
+    "name": "Double Cheese Burger [O]",
+    "price": 169.0,
+    "category": "Burgers [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "tandoori-paneer-burger": {
+   "name": "Tandoori Paneer Burger",
+   "size": null,
+   "ourPrice": 149,
+   "pos": {
+    "shortCode": "54",
+    "name": "Tandoori Paneer Burger",
+    "price": 149.0,
+    "category": "Burger"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "spicy-paneer-veg-burger": {
+   "name": "Spicy Paneer Veg Burger",
+   "size": null,
+   "ourPrice": 149,
+   "pos": {
+    "shortCode": "55",
+    "name": "Spicy Paneer Burger",
+    "price": 149.0,
+    "category": "Burger"
+   },
+   "online": {
+    "shortCode": "AP 39",
+    "name": "Spicy Paneer Burger [O]",
+    "price": 179.0,
+    "category": "Burgers [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "tower-veg-burger": {
+   "name": "Tower Veg Burger",
+   "size": null,
+   "ourPrice": 169,
+   "pos": {
+    "shortCode": "57",
+    "name": "Tower Burger",
+    "price": 169.0,
+    "category": "Burger"
+   },
+   "online": {
+    "shortCode": "AP 41",
+    "name": "Tower Burger [O]",
+    "price": 199.0,
+    "category": "Burgers [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "french-fries": {
+   "name": "French Fries",
+   "size": null,
+   "ourPrice": 89,
+   "pos": {
+    "shortCode": "39",
+    "name": "French Fries",
+    "price": 89.0,
+    "category": "Light Bite: French Fries | Nachos"
+   },
+   "online": {
+    "shortCode": "AP 30",
+    "name": "French Fries [O]",
+    "price": 0.0,
+    "category": "French Fries [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "peri-peri-fries": {
+   "name": "Peri Peri Fries",
+   "size": null,
+   "ourPrice": 139,
+   "pos": {
+    "shortCode": "PPF",
+    "name": "Peri Peri Fries",
+    "price": 139.0,
+    "category": "Light Bite: French Fries | Nachos"
+   },
+   "online": {
+    "shortCode": "peri peri fries [O]",
+    "name": "Peri Peri French Fries [o]",
+    "price": 179.0,
+    "category": "French Fries [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "cheese-jalapeno-french-fries": {
+   "name": "Cheese Jalapeno French Fries",
+   "size": null,
+   "ourPrice": 169,
+   "pos": {
+    "shortCode": "40",
+    "name": "Cheese Jalapeno French Fries",
+    "price": 169.0,
+    "category": "Light Bite: French Fries | Nachos"
+   },
+   "online": {
+    "shortCode": "AP 31",
+    "name": "Cheese Jalapeno French Fries [O]",
+    "price": 0.0,
+    "category": "French Fries [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "salsa-nachos": {
+   "name": "Salsa Nachos",
+   "size": null,
+   "ourPrice": 159,
+   "pos": {
+    "shortCode": "42",
+    "name": "Salsa Nachos",
+    "price": 159.0,
+    "category": "Light Bite: French Fries | Nachos"
+   },
+   "online": {
+    "shortCode": "AP 33",
+    "name": "Salsa Nachos [o]",
+    "price": 0.0,
+    "category": "French Fries [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "creme-cheese-nachos": {
+   "name": "Creme Cheese Nachos",
+   "size": null,
+   "ourPrice": 189,
+   "pos": {
+    "shortCode": "41",
+    "name": "Creme Cheese Nachos",
+    "price": 189.0,
+    "category": "Light Bite: French Fries | Nachos"
+   },
+   "online": {
+    "shortCode": "AP 32",
+    "name": "Creme Cheese Nachos [O]",
+    "price": 0.0,
+    "category": "French Fries [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "cocktail-mayo-dip": {
+   "name": "Cocktail Mayo Dip",
+   "size": null,
+   "ourPrice": 30,
+   "pos": {
+    "shortCode": "cocktail mayo",
+    "name": "Cocktail Mayo",
+    "price": 25.0,
+    "category": "Cheese Dips"
+   },
+   "online": {
+    "shortCode": "cocktail mayo cheese",
+    "name": "Cocktail Mayo Cheese Dip [o]",
+    "price": 30.0,
+    "category": "Cheese Dips [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "cheese-jalapeno-dip": {
+   "name": "Cheese Jalapeno Dip",
+   "size": null,
+   "ourPrice": 30,
+   "pos": {
+    "shortCode": "cheese jalapeno",
+    "name": "Cheese Jalapeno",
+    "price": 30.0,
+    "category": "Cheese Dips"
+   },
+   "online": {
+    "shortCode": "cheese jalapeno dip",
+    "name": "Cheese Jalapeno Dip [o]",
+    "price": 30.0,
+    "category": "Cheese Dips [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "peri-peri-dip": {
+   "name": "Peri Peri Dip",
+   "size": null,
+   "ourPrice": 30,
+   "pos": {
+    "shortCode": "Peri Peri Dip",
+    "name": "Peri Peri Dip",
+    "price": 30.0,
+    "category": "Cheese Dips"
+   },
+   "online": {
+    "shortCode": "peri peri [o]",
+    "name": "Peri Peri [o]",
+    "price": 30.0,
+    "category": "Cheese Dips [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "aloo-verona-wrap": {
+   "name": "Aloo Verona Wrap",
+   "size": null,
+   "ourPrice": 139,
+   "pos": {
+    "shortCode": "58",
+    "name": "Aloo Verona Wrap",
+    "price": 139.0,
+    "category": "Wrap"
+   },
+   "online": {
+    "shortCode": "AP 42",
+    "name": "Aloo Verona Wrap [O]",
+    "price": 139.0,
+    "category": "Wraps [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "paneer-fajita-wrap": {
+   "name": "Paneer Fajita Wrap",
+   "size": null,
+   "ourPrice": 159,
+   "pos": {
+    "shortCode": "59",
+    "name": "Paneer Fajita Wrap",
+    "price": 159.0,
+    "category": "Wrap"
+   },
+   "online": {
+    "shortCode": "AP 43",
+    "name": "Paneer Fajita Wrap [O]",
+    "price": 159.0,
+    "category": "Wraps [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "paneer-tikka-wrap": {
+   "name": "Paneer Tikka Wrap",
+   "size": null,
+   "ourPrice": 159,
+   "pos": {
+    "shortCode": "60",
+    "name": "Paneer Tikka Wrap",
+    "price": 159.0,
+    "category": "Wrap"
+   },
+   "online": {
+    "shortCode": "AP 44",
+    "name": "Paneer Tikka Wrap [O]",
+    "price": 159.0,
+    "category": "Wraps [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "mexican-salad": {
+   "name": "Mexican Salad",
+   "size": null,
+   "ourPrice": 289,
+   "pos": {
+    "shortCode": "38",
+    "name": "Mexican Salad",
+    "price": 289.0,
+    "category": "Salad"
+   },
+   "online": {
+    "shortCode": "AP 28",
+    "name": "Mexican Salad [O]",
+    "price": 289.0,
+    "category": "Salad [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "combo-crush": {
+   "name": "Combo Crush",
+   "size": null,
+   "ourPrice": 159,
+   "pos": {
+    "shortCode": "combo crush",
+    "name": "Combo Crush",
+    "price": 159.0,
+    "category": "Combo"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "magic-combo": {
+   "name": "Magic Combo",
+   "size": null,
+   "ourPrice": 289,
+   "pos": {
+    "shortCode": "magic combo",
+    "name": "Magic Combo",
+    "price": 289.0,
+    "category": "Combo"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "king-combo": {
+   "name": "King Combo",
+   "size": null,
+   "ourPrice": 329,
+   "pos": {
+    "shortCode": "king combo",
+    "name": "King Combo",
+    "price": 329.0,
+    "category": "Combo"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "combo-magambo": {
+   "name": "Combo Magambo",
+   "size": null,
+   "ourPrice": 429,
+   "pos": {
+    "shortCode": "combo mogambo",
+    "name": "COMBO MOGAMBO",
+    "price": 429.0,
+    "category": "Combo"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "party-combo-1": {
+   "name": "Party Combo 1",
+   "size": null,
+   "ourPrice": 449,
+   "pos": {
+    "shortCode": "party combo",
+    "name": "Party Combo-1",
+    "price": 449.0,
+    "category": "Combo"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "party-combo-2": {
+   "name": "Party Combo 2",
+   "size": null,
+   "ourPrice": 899,
+   "pos": {
+    "shortCode": "party combo -2",
+    "name": "Party Combo -2",
+    "price": 899.0,
+    "category": "Combo"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "cold-coffee": {
+   "name": "Cold Coffee",
+   "size": null,
+   "ourPrice": 49,
+   "pos": {
+    "shortCode": "78",
+    "name": "Cold Coffee",
+    "price": 49.0,
+    "category": "Cold Coffee"
+   },
+   "online": {
+    "shortCode": "AP 55",
+    "name": "Cold Coffee [O]",
+    "price": 99.0,
+    "category": "Cold Coffee 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "thick-cold-coffee": {
+   "name": "Thick Cold Coffee",
+   "size": null,
+   "ourPrice": 89,
+   "pos": {
+    "shortCode": "89",
+    "name": "Thick Cold Coffee",
+    "price": 89.0,
+    "category": "Cold Coffee"
+   },
+   "online": {
+    "shortCode": "AP 56",
+    "name": "Thick Cold Coffee [O]",
+    "price": 119.0,
+    "category": "Cold Coffee 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "chocolate-y-iced-mocha": {
+   "name": "Chocolate-y Iced Mocha",
+   "size": null,
+   "ourPrice": 99,
+   "pos": {
+    "shortCode": "85",
+    "name": "Chocolate-Y Iced Mocha",
+    "price": 99.0,
+    "category": "Cold Coffee"
+   },
+   "online": {
+    "shortCode": "AP 58",
+    "name": "Chocolate-Y Iced Mocha [O]",
+    "price": 169.0,
+    "category": "Cold Coffee 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "thick-cold-coffee-with-chocolate-crush": {
+   "name": "Thick Cold Coffee with Chocolate Crush",
+   "size": null,
+   "ourPrice": 109,
+   "pos": {
+    "shortCode": "87",
+    "name": "Thick Coffee With Choclate Crush",
+    "price": 109.0,
+    "category": "Cold Coffee"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "strawberry-margherta": {
+   "name": "Strawberry Margherta",
+   "size": null,
+   "ourPrice": 79,
+   "pos": {
+    "shortCode": "70",
+    "name": "Strawberry Margherta",
+    "price": 79.0,
+    "category": "Mocktails"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "mango-mojito": {
+   "name": "Mango Mojito",
+   "size": null,
+   "ourPrice": 79,
+   "pos": {
+    "shortCode": "76",
+    "name": "Mango Mojito",
+    "price": 79.0,
+    "category": "Mocktails"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "kiwi-crush": {
+   "name": "Kiwi Crush",
+   "size": null,
+   "ourPrice": 79,
+   "pos": {
+    "shortCode": "74",
+    "name": "Kiwi Crush",
+    "price": 79.0,
+    "category": "Mocktails"
+   },
+   "online": {
+    "shortCode": "AP 53",
+    "name": "Kiwi Crush [o]",
+    "price": 79.0,
+    "category": "Mocktails 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "summer-cooler": {
+   "name": "Summer Cooler",
+   "size": null,
+   "ourPrice": 89,
+   "pos": {
+    "shortCode": "75",
+    "name": "Summer Cooler",
+    "price": 89.0,
+    "category": "Mocktails"
+   },
+   "online": {
+    "shortCode": "AP 54",
+    "name": "Summer Cooler [o]",
+    "price": 89.0,
+    "category": "Mocktails 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "blue-lagoon": {
+   "name": "Blue Lagoon",
+   "size": null,
+   "ourPrice": 99,
+   "pos": {
+    "shortCode": "blue lagoon",
+    "name": "Blue Lagoon",
+    "price": 99.0,
+    "category": "Mocktails"
+   },
+   "online": {
+    "shortCode": "blue lagoon [o]",
+    "name": "Blue Lagoon [o]",
+    "price": 99.0,
+    "category": "Mocktails 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "mojito": {
+   "name": "Mojito",
+   "size": null,
+   "ourPrice": 109,
+   "pos": {
+    "shortCode": "72",
+    "name": "Mojito",
+    "price": 109.0,
+    "category": "Mocktails"
+   },
+   "online": {
+    "shortCode": "AP 52",
+    "name": "Mojito [o]",
+    "price": 109.0,
+    "category": "Mocktails 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "strawberry-shake": {
+   "name": "Strawberry Shake",
+   "size": null,
+   "ourPrice": 89,
+   "pos": {
+    "shortCode": "93",
+    "name": "Strawberry Shake",
+    "price": 89.0,
+    "category": "Shakes"
+   },
+   "online": {
+    "shortCode": "AP 63",
+    "name": "Strawberry Shake [O]",
+    "price": 119.0,
+    "category": "Shakes 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "strawberry-kiwi-shake": {
+   "name": "Strawberry Kiwi Shake",
+   "size": null,
+   "ourPrice": 89,
+   "pos": {
+    "shortCode": "98",
+    "name": "Strawberry Kiwi Sheek",
+    "price": 89.0,
+    "category": "Shakes"
+   },
+   "online": {
+    "shortCode": "AP 65",
+    "name": "Strawberry Kiwi Shake [O]",
+    "price": 119.0,
+    "category": "Shakes 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "mango-shake": {
+   "name": "Mango Shake",
+   "size": null,
+   "ourPrice": 89,
+   "pos": {
+    "shortCode": "94",
+    "name": "Mangoshake",
+    "price": 89.0,
+    "category": "Shakes"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "banana-shake": {
+   "name": "Banana Shake",
+   "size": null,
+   "ourPrice": 89,
+   "needsPetpoojaVariantId": false
+  },
+  "oreo-shake": {
+   "name": "Oreo Shake",
+   "size": null,
+   "ourPrice": 99,
+   "pos": {
+    "shortCode": "91",
+    "name": "Oreo Shake",
+    "price": 99.0,
+    "category": "Shakes"
+   },
+   "online": {
+    "shortCode": "oreo shake",
+    "name": "Oreo Shake [o]",
+    "price": 139.0,
+    "category": "Shakes 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "hazelnut-shake": {
+   "name": "Hazelnut Shake",
+   "size": null,
+   "ourPrice": 129,
+   "pos": {
+    "shortCode": "92",
+    "name": "Hazelnut Crunchy Shake",
+    "price": 129.0,
+    "category": "Shakes"
+   },
+   "online": {
+    "shortCode": "AP 67",
+    "name": "Hazelnut Crunchy Shake [O]",
+    "price": 179.0,
+    "category": "Shakes 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "kitkat-shake": {
+   "name": "Kitkat Shake",
+   "size": null,
+   "ourPrice": 129,
+   "pos": {
+    "shortCode": "90",
+    "name": "Kitkat Shake",
+    "price": 129.0,
+    "category": "Shakes"
+   },
+   "online": {
+    "shortCode": "AP 66",
+    "name": "Kitkat Shake [O]",
+    "price": 169.0,
+    "category": "Shakes 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "xto-special-shake": {
+   "name": "XTO Special Shake",
+   "size": null,
+   "ourPrice": 149,
+   "pos": {
+    "shortCode": "95",
+    "name": "Xto Special Shake",
+    "price": 149.0,
+    "category": "Shakes"
+   },
+   "online": {
+    "shortCode": "AP 68",
+    "name": "Xto Special Shake [O]",
+    "price": 229.0,
+    "category": "Shakes 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "ice-tea": {
+   "name": "Ice Tea",
+   "size": null,
+   "ourPrice": 49,
+   "pos": {
+    "shortCode": "100",
+    "name": "Ice Tea",
+    "price": 49.0,
+    "category": "Ice Tea"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "peach-ice-tea": {
+   "name": "Peach Ice Tea",
+   "size": null,
+   "ourPrice": 69,
+   "pos": {
+    "shortCode": "101",
+    "name": "Peach Ice Tea",
+    "price": 69.0,
+    "category": "Ice Tea"
+   },
+   "online": {
+    "shortCode": "AP 70",
+    "name": "Peach Ice Tea [O]",
+    "price": 149.0,
+    "category": "Ice Tea 300 Ml [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "coke": {
+   "name": "Coke",
+   "size": null,
+   "ourPrice": 40,
+   "pos": {
+    "shortCode": "44",
+    "name": "Coke",
+    "price": 0.0,
+    "category": "SOFT DRINKS"
+   },
+   "online": {
+    "shortCode": "AP 71",
+    "name": "Coke [o]",
+    "price": 0.0,
+    "category": "Soft Drinks [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "sprite": {
+   "name": "Sprite",
+   "size": null,
+   "ourPrice": 40,
+   "pos": {
+    "shortCode": "46",
+    "name": "Sprite",
+    "price": 0.0,
+    "category": "SOFT DRINKS"
+   },
+   "online": {
+    "shortCode": "AP 72",
+    "name": "Sprite [o]",
+    "price": 0.0,
+    "category": "Soft Drinks [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "thums-up": {
+   "name": "Thums Up",
+   "size": null,
+   "ourPrice": 40,
+   "pos": {
+    "shortCode": "TU",
+    "name": "Thmbs Up",
+    "price": 0.0,
+    "category": "SOFT DRINKS"
+   },
+   "online": {
+    "shortCode": "AP 73",
+    "name": "Thumbsup [o]",
+    "price": 0.0,
+    "category": "Soft Drinks [O]"
+   },
+   "needsPetpoojaVariantId": false
+  },
+  "diet-coke": {
+   "name": "Diet Coke",
+   "size": null,
+   "ourPrice": 40,
+   "pos": {
+    "shortCode": "DC",
+    "name": "Diet Coke",
+    "price": 0.0,
+    "category": "SOFT DRINKS"
+   },
+   "online": {
+    "shortCode": "AP 74",
+    "name": "Diet Coke [o]",
+    "price": 47.62,
+    "category": "Soft Drinks [O]"
+   },
+   "needsPetpoojaVariantId": false
+  }
+ }
+}
