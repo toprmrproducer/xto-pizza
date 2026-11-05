@@ -52,7 +52,8 @@ function saveDb() { writeJSON(path.join(DATA, 'db.json'), db); }
 const DEFAULT_SETTINGS = { outletsOpen: { shivane: false, nanded: true }, deliveryEnabled: true, deliveryFee: 40, freeDeliveryAbove: 0, deliveryRadiusKm: 5, minOrderValue: 0, minOrderDelivery: 199 };
 db.settings = Object.assign({}, DEFAULT_SETTINGS, db.settings || {});
 db.settings.outletsOpen = Object.assign({}, DEFAULT_SETTINGS.outletsOpen, db.settings.outletsOpen || {});
-function outletOpen(id) { return db.settings.outletsOpen[id] !== false; }
+function posStoreOff(id) { const o = (db.settings.posStoreOff || {})[id]; if (!o) return false; if (o.until && Date.now() >= o.until) { delete db.settings.posStoreOff[id]; saveDb(); return false; } return true; }
+function outletOpen(id) { return db.settings.outletsOpen[id] !== false && !posStoreOff(id); }
 db.pending = db.pending || {};
 function num(x, lo, hi, dflt) { const n = Number(x); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : dflt; }
 function sanitizeSettings(b) {
@@ -168,7 +169,7 @@ function priceOrder(lines) {
       names.push(ad.name);
     }
     itemTotal += unit * qty;
-    items.push({ id: mi.id, name: names.length ? mi.name + ' + ' + names.join(', ') : mi.name, price: unit, qty, addons: ids });
+    items.push({ id: mi.id, name: names.length ? mi.name + ' + ' + names.join(', ') : mi.name, price: unit, qty, addons: ids, addonNames: names });
   }
   if (!items.length) return { error: 'Empty cart' };
   return { items, itemTotal, deliveryFee: 0, total: itemTotal };
@@ -248,24 +249,8 @@ function verifyLiveCapture(body) {
 }
 
 // ---------------------------------------------------------------------------
-// Petpooja POS integration (order push). Configure with env, no code changes:
-//   PETPOOJA_WEBHOOK_URL - endpoint that receives confirmed orders
-//   PETPOOJA_API_KEY     - sent as X-API-KEY header
-//   PETPOOJA_OUTLET_MAP  - JSON, e.g. {"shivane":"111","nanded":"222"}
-// Not configured: every order is logged as skipped, local flow is untouched.
+// Petpooja POS (Online Ordering API v2.1.0): see petpooja.js. Env in /opt/xto-pizza/petpooja.env on the server.
 // ---------------------------------------------------------------------------
-const petpooja = {
-  get configured() { return !!process.env.PETPOOJA_WEBHOOK_URL; },
-  webhookUrl: process.env.PETPOOJA_WEBHOOK_URL || '',
-  apiKey: process.env.PETPOOJA_API_KEY || '',
-  outletMap: (() => { try { return JSON.parse(process.env.PETPOOJA_OUTLET_MAP || '{}'); } catch (e) { return {}; } })()
-};
-const petpoojaLogFile = path.join(DATA, 'petpooja-log.json');
-function logPetpooja(entry) {
-  const log = readJSON(petpoojaLogFile, []);
-  log.unshift(Object.assign({ at: new Date().toISOString() }, entry));
-  writeJSON(petpoojaLogFile, log.slice(0, 200));
-}
 // where an order came from: the website, or the app (Android / iOS / installed web app)
 function orderSource(body, req) {
   const ua = String((req && req.headers && req.headers['user-agent']) || '');
@@ -278,59 +263,8 @@ function orderSource(body, req) {
     : 'This purchase came from the ' + (platform === 'android' ? 'Android app' : platform === 'ios' ? 'iOS app' : 'app (web)');
   return { channel, platform, label };
 }
-// Petpooja short codes for our menu items (from the Petpooja Menu Management export, see data/pos-map.json)
-const posMap = (readJSON(path.join(DATA, 'pos-map.json'), { items: {} }).items) || {};
-function posFields(itemId) {
-  const e = posMap[itemId];
-  if (!e) return {};
-  return { pos_short_code: e.pos ? e.pos.shortCode : null, pos_name: e.pos ? e.pos.name : null, pos_online_short_code: e.online ? e.online.shortCode : null, size: e.size || null };
-}
-function petpoojaPayload(order) {
-  return {
-    outlet_id: petpooja.outletMap[order.outlet] || order.outlet,
-    external_order_id: order.id,
-    source: order.source ? order.source.channel : 'website',
-    source_platform: order.source ? order.source.platform : 'web',
-    description: order.source ? order.source.label : 'This purchase came from the website',
-    order_type: order.mode === 'delivery' ? 'delivery' : 'takeaway',
-    ordered_at: order.createdAt,
-    customer: { name: order.customer.name, phone: order.customer.phone },
-    items: order.items.map((i) => Object.assign({ id: i.id, name: i.name, qty: i.qty, price: i.price, total: i.price * i.qty }, posFields(i.id))),
-    item_total: order.itemTotal,
-    delivery_charge: order.deliveryFee,
-    order_total: order.total,
-    payment_status: 'PAID',
-    payment_mode: 'ONLINE'
-  };
-}
-async function pushToPetpooja(order) {
-  if (!petpooja.configured) {
-    logPetpooja({ order: order.id, status: 'skipped', reason: 'Petpooja not configured' });
-    return;
-  }
-  // Petpooja API approval is bought per outlet. Only outlets listed in PETPOOJA_OUTLET_MAP are pushed
-  // (e.g. {"nanded":"362057"}); orders for any other outlet stay in the admin order board only.
-  const mapped = Object.keys(petpooja.outletMap);
-  if (mapped.length && !petpooja.outletMap[order.outlet]) {
-    logPetpooja({ order: order.id, outlet: order.outlet, status: 'skipped', reason: 'Outlet not on Petpooja (API not bought for this outlet)' });
-    return;
-  }
-  const body = JSON.stringify(petpoojaPayload(order));
-  for (let attempt = 1; attempt <= 3; attempt++) {
-    try {
-      const r = await fetch(petpooja.webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-API-KEY': petpooja.apiKey },
-        body
-      });
-      if (r.ok) { logPetpooja({ order: order.id, status: 'pushed', attempts: attempt }); return; }
-      throw new Error('HTTP ' + r.status);
-    } catch (e) {
-      if (attempt === 3) { logPetpooja({ order: order.id, status: 'failed', reason: String(e.message || e), attempts: 3 }); return; }
-      await new Promise((done) => setTimeout(done, attempt * 2000));
-    }
-  }
-}
+const auth = require('./auth')({ DATA, readJSON, writeJSON, db, saveDb });
+const pp = require('./petpooja')({ DATA, readJSON, writeJSON, db, saveDb, broadcast, menu, outlets, pushTarget, storeOpen: (id) => outletOpen(id) });
 
 // ---------------------------------------------------------------------------
 // Web Push: VAPID (RFC 8292) + aes128gcm payload encryption (RFC 8291), zero deps.
@@ -606,7 +540,7 @@ async function settlePending(orderId) {
   delete db.pending[orderId];
   saveDb();
   broadcast('order:new', adminOrder(order));
-  pushToPetpooja(order);
+  pp.pushOrder(order).catch((e) => console.error("petpooja push", e));
   return { order };
 }
 
@@ -632,6 +566,26 @@ const server = http.createServer(async (req, res) => {
   if (method === 'GET' && p === '/menu') return serveFile(res, path.join(PUBLIC, 'menu.html'));
   // the admin page lives on admin.xtopizza.in only (apex and other hosts do not expose it)
   if (method === 'GET' && (hostName === 'xtopizza.in' || (onXto && sub !== 'admin')) && (p === '/admin' || p === '/rider')) return json(res, 404, { error: 'Not found' });
+
+  // ---- Petpooja webhooks (called by Petpooja). One base URL, fixed names, so the sandbox "Base URL + endpoint" setup works:
+  //   https://xtopizza.in/api/petpooja/{pushmenu|item_stock|item_stock_off|get_store_status|update_store_status|callback}
+  // Auth token accepted three ways: header X-XTO-Token (or Authorization: Bearer), ?t= query, or /menu/<token> path (legacy).
+  if (method === 'POST' && p.startsWith('/api/petpooja/')) {
+    const parts = p.split('/');
+    const name = parts[3] || '';
+    const hdr = String(req.headers['x-xto-token'] || '').trim() || String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
+    const tok = hdr || url.searchParams.get('t') || parts[4] || '';
+    const body = await readBody(req);
+    if (['pushmenu', 'pushmenu_endpoint', 'menu'].includes(name)) {
+      if (!pp.cfg.pushToken || tok !== pp.cfg.pushToken) return json(res, 401, { success: '0', message: 'Unauthorized' });
+      return json(res, 200, pp.handleMenuPush(body));
+    }
+    if (['item_stock', 'item_stock_off', 'get_store_status', 'update_store_status', 'callback'].includes(name)) {
+      const fn = name.startsWith('item_stock') ? pp.handleStock : name === 'get_store_status' ? pp.handleStoreGet : name === 'update_store_status' ? pp.handleStoreSet : pp.handleCallback;
+      const out = fn(body, tok);
+      return json(res, out.code, out.json);
+    }
+  }
 
   // ---- static & pages -----------------------------------------------------
   if (method === 'GET') {
@@ -729,7 +683,23 @@ const server = http.createServer(async (req, res) => {
     return json(res, 201, { ok: true, id: row.id });
   }
 
-  if (p === '/api/settings' && method === 'GET') return jsonCached(res, 200, { settings: db.settings, payments: paymentsInfo() }, 20);
+  // ---- phone sign-up / OTP (see auth.js) ----
+  if (p === '/api/auth/otp/send' && method === 'POST') {
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    const out = await auth.send(await readBody(req), ip);
+    return json(res, out.code, out.json);
+  }
+  if (p === '/api/auth/otp/verify' && method === 'POST') {
+    const out = auth.verify(await readBody(req));
+    return json(res, out.code, out.json);
+  }
+  if (p === '/api/auth/me' && method === 'GET') {
+    const who = auth.fromReq(req);
+    if (!who) return json(res, 401, { error: 'Not signed in' });
+    return json(res, 200, { phone: who.phone, name: (who.customer && who.customer.name) || '' });
+  }
+
+  if (p === '/api/settings' && method === 'GET') return jsonCached(res, 200, { settings: db.settings, payments: paymentsInfo(), auth: { required: auth.required() } }, 20);
 
   // ---- checkout: price on the server, open a Cashfree order, confirm only after Cashfree says PAID ----
   if (p === '/api/checkout/start' && method === 'POST') {
@@ -740,9 +710,16 @@ const server = http.createServer(async (req, res) => {
     if (hits[cip].length >= 30) return json(res, 429, { error: 'Too many checkout attempts. Please wait a few minutes.' });
     hits[cip].push(Date.now());
     const body = await readBody(req);
+    if (auth.required()) {
+      const who = auth.fromReq(req);
+      if (!who) return json(res, 401, { error: 'Please verify your phone number to continue.', needAuth: true });
+      body.customer = Object.assign({}, body.customer, { phone: who.phone });
+      if (!String(body.customer.name || '').trim() && who.customer && who.customer.name) body.customer.name = who.customer.name;
+    }
     const built = buildDraft(body, req);
     if (built.error) return json(res, 400, { error: built.error });
     const draft = built.draft;
+    if (!auth.required()) auth.capture(draft.customer.phone, draft.customer.name);
     for (const k of Object.keys(db.pending)) if (Date.now() - db.pending[k].createdAt > 6 * 3600 * 1000) delete db.pending[k];
     const orderId = 'XTO' + Date.now().toString(36) + crypto.randomBytes(3).toString('hex');
     if (cashfree.configured) {
@@ -803,7 +780,12 @@ const server = http.createServer(async (req, res) => {
     return json(res, 200, { order: publicOrder(order) });
   }
   if (p === '/api/orders' && method === 'GET') {
-    const phone = (url.searchParams.get('phone') || '').replace(/\D/g, '').slice(-10);
+    let phone = (url.searchParams.get('phone') || '').replace(/\D/g, '').slice(-10);
+    if (auth.required()) {
+      const who = auth.fromReq(req);
+      if (!who) return json(res, 401, { error: 'Verify your phone number to see your orders.', needAuth: true });
+      phone = who.phone;
+    }
     const list = db.orders.filter((o) => o.customer.phone === phone).map(publicOrder);
     return json(res, 200, { orders: list });
   }
@@ -854,6 +836,7 @@ const server = http.createServer(async (req, res) => {
       const legacyDone = next === 'DELIVERED' && order.status === 'READY' && order.mode !== 'delivery'; // accept the old label as SERVED
       const valid = next === 'CANCELLED' || legacyDone || (idx > -1 && (idx === curIdx + 1 || idx === curIdx));
       if (!valid) return json(res, 400, { error: 'Bad status transition' });
+      if (next === 'CANCELLED' && order.status !== 'CANCELLED') pp.cancelOnPos(order, body.reason).catch(() => {});
       order.status = next;
       if (body.rider !== undefined) order.rider = body.rider || order.rider;
       order.history.push({ status: next, at: new Date().toISOString() });
@@ -886,6 +869,7 @@ const server = http.createServer(async (req, res) => {
       db.unavailable = db.unavailable.filter((x) => x !== id);
       if (body.available === false) db.unavailable.push(id);
       saveDb();
+      pp.syncStock(id, body.available !== false).catch(() => {});
       broadcast('menu:update', { id, available: body.available !== false });
       return json(res, 200, { ok: true });
     }
@@ -966,6 +950,70 @@ const server = http.createServer(async (req, res) => {
       saveDb();
       broadcast('order:new', adminOrder(order));
       return json(res, 200, { ok: true, order: adminOrder(order) });
+    }
+    // Petpooja sandbox test, raw mode: order items straight from Petpooja's pushed menu by name
+    if (p === '/api/admin/petpooja/sandbox-raw' && method === 'POST') {
+      const body = await readBody(req);
+      const lines = [];
+      for (const spec of (body.lines || [])) { const l = pp.rawLine(spec); if (!l) return json(res, 400, { error: 'Not in Petpooja menu: ' + JSON.stringify(spec) }); lines.push(l); }
+      if (!lines.length) return json(res, 400, { error: 'lines[] required' });
+      const itemTotal = lines.reduce((t, l) => t + l.price * l.qty, 0);
+      const mode = ['dinein', 'takeaway', 'delivery'].includes(body.mode) ? body.mode : 'takeaway';
+      const disc = Math.min(Number(body.discount) || 0, itemTotal - 1);
+      db.orderSeq += 1;
+      const order = {
+        id: 'XT-' + db.orderSeq, createdAt: new Date().toISOString(), status: 'PLACED', test: true, ppForce: true,
+        mode, outlet: body.outlet || 'nanded', customer: { name: 'Sandbox Test', phone: String(body.phone || '9307512816'), tableNumber: mode === 'dinein' ? '1' : '' },
+        items: lines, itemTotal, deliveryFee: 0, coupon: disc ? { code: 'SANDBOX', discount: disc } : null, total: itemTotal - disc,
+        address: mode === 'delivery' ? { line: 'Sandbox test address, Nanded City, Pune', landmark: '', lat: 18.4505, lng: 73.7993, distanceKm: 1 } : null,
+        payment: { method: 'sandbox-test', status: 'paid', paymentId: 'SBX-' + Date.now(), gatewayOrderId: 'SBX' + Date.now() },
+        source: { channel: 'website', platform: 'web', label: 'Petpooja sandbox test order' }, rider: null, etaMin: 15, history: [{ status: 'PLACED', at: new Date().toISOString() }]
+      };
+      db.orders.unshift(order);
+      saveDb();
+      await pp.pushOrder(order);
+      return json(res, 200, { ok: true, orderId: order.id, total: order.total, items: lines.map((l) => l.name + (l.addonNames.length ? ' + ' + l.addonNames.join(', ') : '')), pos: order.pos || null });
+    }
+    // Petpooja sandbox test: builds one of the 5 required test cases (or custom items), pushes it to the POS sandbox, returns the result
+    if (p === '/api/admin/petpooja/sandbox-order' && method === 'POST') {
+      const body = await readBody(req);
+      const pick = (g, size) => menu.items.find((i) => i.groupName === g && i.size === size && isAvailable(i.id));
+      const simple = menu.items.find((i) => i.name === 'Garlic Bread' && isAvailable(i.id)) || menu.items.find((i) => !i.size && isAvailable(i.id) && i.cat !== 'beverage');
+      const sc = Number(body.scenario) || 0;
+      let lines = body.items, discount = Number(body.discount) || 0;
+      const marg = (size) => pick('Margherita', size);
+      if (!lines) {
+        if (sc === 1) lines = [{ id: simple.id, qty: 1 }];
+        else if (sc === 2) lines = [{ id: marg('regular').id, qty: 1, addons: ['extra-cheese'] }];
+        else if (sc === 3) lines = [{ id: marg('medium').id, qty: 1 }];
+        else if (sc === 4) { lines = [{ id: simple.id, qty: 2 }]; discount = discount || 20; }
+        else if (sc === 5) lines = [{ id: marg('large').id, qty: 1, addons: ['extra-cheese', 'extra-topping'] }];
+        else return json(res, 400, { error: 'Give scenario 1-5 or items[]' });
+      }
+      const priced = priceOrder(lines);
+      if (priced.error) return json(res, 400, { error: priced.error });
+      const mode = ['dinein', 'takeaway', 'delivery'].includes(body.mode) ? body.mode : 'takeaway';
+      const outletId = body.outlet || 'nanded';
+      const disc = Math.min(discount, priced.itemTotal - 1);
+      db.orderSeq += 1;
+      const order = {
+        id: 'XT-' + db.orderSeq, createdAt: new Date().toISOString(), status: 'PLACED', test: true, ppForce: true,
+        mode, outlet: outletId, customer: { name: 'Sandbox Test', phone: String(body.phone || '9307512816'), tableNumber: mode === 'dinein' ? '1' : '' },
+        items: priced.items, itemTotal: priced.itemTotal, deliveryFee: 0, coupon: disc ? { code: 'SANDBOX', discount: disc } : null, total: priced.itemTotal - disc,
+        address: mode === 'delivery' ? { line: 'Sandbox test address, Nanded City, Pune', landmark: '', lat: 18.4505, lng: 73.7993, distanceKm: 1 } : null,
+        payment: { method: 'sandbox-test', status: 'paid', paymentId: 'SBX-' + Date.now(), gatewayOrderId: 'SBX' + Date.now() },
+        source: { channel: 'website', platform: 'web', label: 'Petpooja sandbox test order' }, rider: null, etaMin: 15, history: [{ status: 'PLACED', at: new Date().toISOString() }]
+      };
+      db.orders.unshift(order);
+      saveDb();
+      await pp.pushOrder(order);
+      return json(res, 200, { ok: true, orderId: order.id, total: order.total, items: order.items.map((i) => i.name), pos: order.pos || null, payload: body.debug ? (pp.buildOrder(order).payload || null) : undefined });
+    }
+    if ((m = p.match(/^\/api\/admin\/orders\/([^/]+)\/pos-retry$/)) && method === 'POST') {
+      const order = db.orders.find((o) => o.id === m[1]);
+      if (!order) return json(res, 404, { error: 'Order not found' });
+      await pp.pushOrder(order);
+      return json(res, 200, { ok: true, pos: order.pos || null });
     }
     if (p === '/api/admin/offers' && method === 'GET') return json(res, 200, { offers: db.offers || [] });
     if (p === '/api/admin/offers' && method === 'POST') {
@@ -1051,18 +1099,16 @@ const server = http.createServer(async (req, res) => {
       const subs = db.pushSubs || [];
       return json(res, 200, { count: subs.length, withPhone: subs.filter((x) => x.phone).length });
     }
+    if (p === '/api/admin/customers' && method === 'GET') {
+      const list = Object.values(db.customers || {}).sort((x, y) => String(y.lastSeen || y.lastLogin || '').localeCompare(String(x.lastSeen || x.lastLogin || '')));
+      return json(res, 200, { customers: list });
+    }
     if (p === '/api/admin/integrations' && method === 'GET') {
-      const log = readJSON(petpoojaLogFile, []);
       return json(res, 200, {
         razorpay: { live: config.razorpay.live },
         payments: paymentsInfo(),
-        petpooja: {
-          configured: petpooja.configured,
-          outlets: Object.keys(petpooja.outletMap),
-          last: log[0] || null,
-          pushedToday: log.filter((l) => l.status === 'pushed' && isToday(l.at)).length,
-          failures: log.filter((l) => l.status === 'failed').length
-        }
+        petpooja: pp.status(),
+        auth: auth.status()
       });
     }
   }
@@ -1078,6 +1124,6 @@ server.listen(PORT, () => {
   console.log('  Mobile app (PWA):    http://localhost:' + PORT + '/app');
   console.log('  Admin CES:           http://localhost:' + PORT + '/admin   (PIN ' + config.adminPin + ')');
   console.log('  Payments:            ' + (cashfree.configured ? 'Cashfree (' + cashfree.env + ')' : ALLOW_MOCK_PAY ? 'MOCK (ALLOW_MOCK_PAY=1)' : 'CLOSED: set CASHFREE_APP_ID and CASHFREE_SECRET_KEY'));
-  console.log('  Petpooja push:       ' + (petpooja.configured ? 'ON (' + petpooja.webhookUrl + ')' : 'OFF (set PETPOOJA_WEBHOOK_URL)'));
+  console.log('  Petpooja push:       ' + (pp.configured() ? 'ON (' + Object.keys(pp.cfg.outletMap).join(',') + ')' : 'OFF (set PP_SAVE_ORDER_URL, PP_APP_KEY, PP_APP_SECRET, PP_ACCESS_TOKEN)'));
   console.log('  ------------------------------------------------------');
 });

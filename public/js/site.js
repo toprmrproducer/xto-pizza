@@ -380,6 +380,7 @@ function openCheckout() {
   updateLocStatus();
   $('#ckError').textContent = '';
   openModal('checkoutModal');
+  if (window.XAuth) { XAuth.fill(); XAuth.ensure().then(() => XAuth.fill()).catch(() => {}); }
 }
 
 function checkoutPayload() {
@@ -517,7 +518,7 @@ async function trackGo() {
   $('#trackResult').innerHTML = '<div class="empty-note">Looking...</div>';
   if (/^xt-?\d+$/i.test(q)) return trackById(q.toUpperCase().startsWith('XT') ? q : 'XT-' + q);
   const phone = q.replace(/\D/g, '').slice(-10);
-  const r = await fetch('/api/orders?phone=' + phone).then((x) => x.json()).catch(() => null);
+  const r = await (window.XAuth ? XAuth.getJSON('/api/orders?phone=' + phone) : fetch('/api/orders?phone=' + phone).then((x) => x.json())).catch(() => null);
   if (r && r.orders && r.orders.length) {
     const o = r.orders[0];
     renderTimeline($('#trackResult'), o);

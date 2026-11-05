@@ -39,8 +39,20 @@
     });
   };
   XPay.start = function (payload) {
-    return fetch('/api/checkout/start', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
-      .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, json: j }; }); });
+    var send = function () {
+      var h = { 'Content-Type': 'application/json' };
+      if (window.XAuth) { var a = XAuth.headers(); if (a.Authorization) h.Authorization = a.Authorization; }
+      return fetch('/api/checkout/start', { method: 'POST', headers: h, body: JSON.stringify(payload) })
+        .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, status: r.status, json: j }; }); });
+    };
+    if (!window.XAuth) return send();
+    return XAuth.ensure().then(function (who) {
+      if (who) { payload.customer = payload.customer || {}; payload.customer.phone = who.phone; if (!payload.customer.name) payload.customer.name = who.name; }
+      return send();
+    }).then(function (x) {
+      if (x.status === 401 && x.json && x.json.needAuth) { XAuth.signOut(); return XAuth.ensure().then(function (who) { if (who) payload.customer.phone = who.phone; return send(); }); }
+      return x;
+    }).catch(function (e) { return { ok: false, status: 0, json: { error: e && e.message === 'cancelled' ? 'Verify your phone number to place the order.' : 'Could not verify your phone. Try again.' } }; });
   };
   XPay.confirm = function (orderId, tries) {
     tries = tries || 1;

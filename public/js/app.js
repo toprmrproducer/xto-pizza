@@ -299,6 +299,7 @@ function updateCartUI() {
 function openCheckout() {
   $('#ckOutlet').innerHTML = state.outlets.map((o) => `<option value="${o.id}">${o.name}</option>`).join('');
   if (state.phone) { $('#ckPhone').value = state.phone; }
+  if (window.XAuth) { XAuth.fill(); XAuth.ensure().then(() => XAuth.fill()).catch(() => {}); }
   syncModeFields();
   updateLocStatus();
   $('#ckError').textContent = '';
@@ -470,7 +471,7 @@ function renderTimeline(el, order) {
 async function loadOrders() {
   const box = $('#ordersList');
   if (!state.phone) { box.innerHTML = ''; return; }
-  const r = await fetch('/api/orders?phone=' + state.phone).then((x) => x.json()).catch(() => null);
+  const r = await (window.XAuth ? XAuth.getJSON('/api/orders?phone=' + state.phone) : fetch('/api/orders?phone=' + state.phone).then((x) => x.json())).catch(() => null);
   const orders = (r && r.orders) || [];
   if (!orders.length) {
     box.innerHTML = '<div class="empty-state"><b>No orders yet</b>Orders placed on this phone show up here, live.</div>';
@@ -507,7 +508,11 @@ function bindUI() {
   $('#payBtn').addEventListener('click', startPayment);
   $('#rzpPayBtn').addEventListener('click', confirmPayment);
   $('#ckClose').addEventListener('click', () => $('#checkoutSheet').classList.remove('show'));
-  $('#phoneSave').addEventListener('click', () => {
+  $('#phoneSave').addEventListener('click', async () => {
+    if (window.XAuth && await XAuth.isRequired()) {
+      try { const who = await XAuth.ensure(); if (who) { state.phone = who.phone; localStorage.setItem(PHONE_KEY, who.phone); loadOrders(); toast('Orders linked to ' + who.phone); } } catch (e) {}
+      return;
+    }
     const p = $('#phoneInput').value.replace(/\D/g, '').slice(-10);
     if (!/^[6-9]\d{9}$/.test(p)) { toast('Enter a valid 10-digit mobile'); return; }
     state.phone = p;
