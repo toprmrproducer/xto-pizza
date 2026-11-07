@@ -9,19 +9,9 @@
 const path = require('path');
 
 function norm(s) {
-  s = String(s || '').toLowerCase().replace(/\[[o0]\]/g, ' ').replace(/\(.*?\)/g, ' ');
+  s = String(s || '').toLowerCase().replace(/\[[o0]\]/g, ' ');
   s = s.replace(/[^a-z0-9 ]/g, ' ');
-  for (const w of ['pizza', 'small', 'regular', 'medium', 'large', 'dip', 'ml', '300']) s = s.replace(new RegExp('\\b' + w + '\\b', 'g'), ' ');
-  s = s.replace(/margherita|margherta/g, 'margarita').replace(/makhni/g, 'makhani').replace(/arabiatta/g, 'arabiata').replace(/\btost\b/g, 'toast').replace(/thumbsup|thmbs up/g, 'thums up');
   return s.replace(/\s+/g, ' ').trim();
-}
-function dice(a, b) {
-  if (a === b) return 1;
-  if (a.length < 2 || b.length < 2) return 0;
-  const bg = (s) => { const m = new Map(); for (let i = 0; i < s.length - 1; i++) { const k = s.slice(i, i + 2); m.set(k, (m.get(k) || 0) + 1); } return m; };
-  const A = bg(a), B = bg(b); let hit = 0;
-  for (const [k, n] of A) hit += Math.min(n, B.get(k) || 0);
-  return (2 * hit) / (a.length - 1 + b.length - 1);
 }
 const SIZE_WORDS = { six: ['small', '6 in', '6 inch', 'six'], regular: ['regular', '7 in', '7 inch', 'reg'], medium: ['medium', '9 in', '9 inch', 'med'], large: ['large', '11 in', '11 inch'], half: ['half'], full: ['full'] };
 const r2 = (n) => (Math.round(n * 100) / 100).toFixed(2);
@@ -45,19 +35,41 @@ module.exports = function createPetpooja(ctx) {
     writeJSON(logFile, l.slice(0, 300));
   }
   let pm = readJSON(menuFile, null);
+  if (pm && !pm.menusharingcode) {
+    const raw = readJSON(path.join(DATA, "petpooja-menu-raw.json"), null);
+    const restaurant = raw && Array.isArray(raw.restaurants) && raw.restaurants.find((entry) => String(entry.restaurantid) === String(pm.restaurantid));
+    if (restaurant && restaurant.details) pm.menusharingcode = String(restaurant.details.menusharingcode || "");
+  }
 
   /* ---------------- Push Menu receiver ---------------- */
   function handleMenuPush(body) {
-    try { writeJSON(path.join(DATA, 'petpooja-menu-raw.json'), body); } catch (e) {}
-    const rest = (body.restaurants && body.restaurants[0]) || {};
+    if (!body || !Array.isArray(body.restaurants) || body.restaurants.length !== 1 || !Array.isArray(body.items) || !body.items.length || body.items.some((item) => !item || !item.itemid || typeof item.itemname !== "string" || (item.variation !== undefined && !Array.isArray(item.variation)))) {
+      return { success: "0", http_code: 400, message: "Invalid menu payload. Existing menu retained." };
+    }
+    for (const key of ["taxes", "addongroups", "categories"]) {
+      if (body[key] !== undefined && !Array.isArray(body[key])) return { success: "0", http_code: 400, message: "Invalid menu collections. Existing menu retained." };
+    }
+    const validLinks = (links) => links === undefined || (Array.isArray(links) && links.every((link) => link && link.addon_group_id !== undefined && ['addon_min_item', 'addon_max_item'].every((key) => link[key] === undefined || (Number.isInteger(Number(link[key])) && Number(link[key]) >= 0))));
+    if (body.items.some((item) => !validLinks(item.addon) || !Number.isFinite(Number(item.price)) || Number(item.price) < 0 || (item.variation || []).some((variation) => !variation || !variation.id || !variation.variationid || typeof variation.name !== 'string' || !Number.isFinite(Number(variation.price)) || Number(variation.price) < 0 || !validLinks(variation.addon))) ||
+        (body.addongroups || []).some((group) => !group || group.addongroupid === undefined || !Array.isArray(group.addongroupitems) || group.addongroupitems.some((addon) => !addon || addon.addonitemid === undefined || typeof addon.addonitem_name !== 'string' || !Number.isFinite(Number(addon.addonitem_price)) || Number(addon.addonitem_price) < 0)) ||
+        (body.taxes || []).some((tax) => !tax || tax.taxid === undefined || !Number.isFinite(Number(tax.tax)) || Number(tax.tax) < 0) || (body.categories || []).some((category) => !category || typeof category !== 'object')) {
+      return { success: '0', http_code: 400, message: 'Invalid nested menu collections. Existing menu retained.' };
+    }
+    const rest = body.restaurants[0];
+    const menusharingcode = String(rest && rest.details && rest.details.menusharingcode || "");
+    if (!rest || !rest.restaurantid || !Object.values(cfg.outletMap).map(String).includes(menusharingcode)) {
+      return { success: "0", http_code: 422, message: "Menu restaurant is not configured for this integration. Existing menu retained." };
+    }
     const items = (body.items || []).map((i) => ({
       itemid: String(i.itemid), itemname: i.itemname, itemallowvariation: String(i.itemallowvariation || '0'), item_categoryid: i.item_categoryid,
       item_ordertype: i.item_ordertype || '', price: i.price, active: i.active, in_stock: i.in_stock, item_tax: i.item_tax || '', tax_inclusive: ['true', '1'].includes(String(i.tax_inclusive).toLowerCase()),
       itemallowaddon: String(i.itemallowaddon || '0'), addon: i.addon || [], is_combo: i.is_combo || '0',
       variation: (i.variation || []).map((v) => ({ id: String(v.id), variationid: String(v.variationid), name: v.name, price: v.price, active: v.active, addon: v.addon || [] }))
     }));
-    pm = { receivedAt: new Date().toISOString(), restaurantid: rest.restaurantid || '', items, taxes: body.taxes || [], addongroups: body.addongroups || [], categories: body.categories || [] };
-    writeJSON(menuFile, pm);
+    const nextMenu = { receivedAt: new Date().toISOString(), restaurantid: rest.restaurantid, menusharingcode, items, taxes: body.taxes || [], addongroups: body.addongroups || [], categories: body.categories || [] };
+    writeJSON(path.join(DATA, "petpooja-menu-raw.json"), body);
+    writeJSON(menuFile, nextMenu);
+    pm = nextMenu;
     log({ type: 'menu', status: 'received', items: items.length, taxes: pm.taxes.length });
     return { success: '1', message: 'Menu items are successfully listed.' };
   }
@@ -66,48 +78,63 @@ module.exports = function createPetpooja(ctx) {
   function findPp(it) {
     if (!pm || !pm.items.length) return null;
     const base = norm(it.groupName || it.name);
-    let cands = pm.items.filter((x) => x.active !== '0' && norm(x.itemname) === base);
-    if (!cands.length) cands = pm.items.filter((x) => x.active !== '0' && dice(norm(x.itemname), base) >= 0.85);
-    if (!cands.length) return null;
-    const words = SIZE_WORDS[it.size] || [];
-    const varFor = (c) => (c.variation || []).find((v) => v.active !== '0' && words.some((w) => String(v.name).toLowerCase().includes(w)));
-    let best = null, bestScore = -1;
-    for (const c of cands) {
-      const hasVar = c.itemallowvariation === '1' && c.variation.length;
-      let score = 0, v = null;
-      if (hasVar) { v = varFor(c); if (!v) continue; score = 3; }
-      else if (words.some((w) => String(c.itemname).toLowerCase().includes(w))) score = 2;
-      else score = 1;
-      if (score > bestScore) { best = { item: c, variation: v }; bestScore = score; }
+    const words = (SIZE_WORDS[it.size] || (it.size ? [it.size] : [])).map(norm);
+    const matches = [];
+    for (const item of pm.items) {
+      if (String(item.active) === '0') continue;
+      if (String(item.itemallowvariation) === '1') {
+        if (norm(item.itemname) !== base || !words.length) continue;
+        for (const variation of item.variation || []) if (String(variation.active) !== '0' && words.includes(norm(variation.name))) matches.push({ item, variation });
+      } else {
+        const names = words.length ? words.flatMap((size) => [base + ' ' + size, size + ' ' + base]) : [base];
+        if (names.includes(norm(item.itemname))) matches.push({ item, variation: null });
+      }
     }
-    return best;
+    return matches.length === 1 ? matches[0] : null;
+  }
+  function addonLinks(m) {
+    return m.variation ? m.variation.addon || [] : m.item.addon || [];
   }
   function addonFor(m, name) {
-    const groupIds = new Set([...(m.item.addon || []), ...((m.variation && m.variation.addon) || [])].map((a) => String(a.addon_group_id)));
+    const groupIds = new Set(addonLinks(m).map((a) => String(a.addon_group_id)));
     const n = norm(name);
+    const matches = [];
     for (const g of pm.addongroups || []) {
-      if (groupIds.size && !groupIds.has(String(g.addongroupid))) continue;
-      for (const a of g.addongroupitems || []) if (a.active !== '0' && norm(a.addonitem_name) === n) return { id: String(a.addonitemid), name: a.addonitem_name, group_name: g.addongroup_name, price: String(a.addonitem_price), group_id: parseInt(g.addongroupid, 10), quantity: '1' };
+      if (!groupIds.has(String(g.addongroupid)) || String(g.active) === '0') continue;
+      for (const a of g.addongroupitems || []) if (String(a.active) !== '0' && norm(a.addonitem_name) === n && Number.isFinite(Number(a.addonitem_price)) && Number(a.addonitem_price) >= 0 && Number.isInteger(Number(g.addongroupid))) matches.push({ id: String(a.addonitemid), name: a.addonitem_name, group_name: g.addongroup_name, price: String(a.addonitem_price), group_id: Number(g.addongroupid), quantity: '1' });
     }
-    return null;
+    return matches.length === 1 ? matches[0] : null;
+  }
+  function selectedAddons(m, names) {
+    if (!Array.isArray(names)) return null;
+    const addons = names.map((name) => addonFor(m, name));
+    if (addons.some((addon) => !addon) || new Set(addons.map((addon) => addon.group_id + ':' + addon.id)).size !== addons.length) return null;
+    for (const link of addonLinks(m)) {
+      const count = addons.filter((addon) => String(addon.group_id) === String(link.addon_group_id)).length;
+      if (count < Number(link.addon_min_item || 0) || (link.addon_max_item !== undefined && count > Number(link.addon_max_item))) return null;
+    }
+    return addons;
   }
 
 
   /* sandbox testing: order Petpooja's own items by name (their sandbox menu is not ours) */
   function rawFind(spec) {
     if (!pm) return null;
-    const c = pm.items.find((x) => x.active !== '0' && String(x.itemname).trim().toLowerCase() === String(spec.item || '').trim().toLowerCase());
-    if (!c) return null;
-    if (!spec.variation) return { item: c, variation: null };
-    const v = (c.variation || []).find((x) => String(x.name).trim().toLowerCase() === String(spec.variation).trim().toLowerCase());
-    return v ? { item: c, variation: v } : null;
+    const candidates = pm.items.filter((item) => String(item.active) !== '0' && norm(item.itemname) === norm(spec.item));
+    if (candidates.length !== 1) return null;
+    const c = candidates[0];
+    if (!spec.variation) return String(c.itemallowvariation) === '1' ? null : { item: c, variation: null };
+    const variations = (c.variation || []).filter((variation) => String(variation.active) !== '0' && norm(variation.name) === norm(spec.variation));
+    return variations.length === 1 ? { item: c, variation: variations[0] } : null;
   }
   function rawLine(spec) {
     const m = rawFind(spec);
     if (!m) return null;
     const base = Number(m.variation ? m.variation.price : m.item.price) || 0;
     let unit = base; const names = [];
-    for (const an of (spec.addons || [])) { const a = addonFor(m, an); if (a) { unit += Number(a.price) || 0; names.push(a.name); } }
+    const addons = selectedAddons(m, spec.addons || []);
+    if (!addons) return null;
+    for (const addon of addons) { unit += Number(addon.price); names.push(addon.name); }
     return { id: 'pp-' + (m.variation ? m.variation.id : m.item.itemid), name: m.item.itemname + (m.variation ? ' (' + m.variation.name + ')' : ''), price: unit, qty: Math.max(1, parseInt(spec.qty, 10) || 1), addons: [], addonNames: names, ppRaw: spec };
   }
 
@@ -116,6 +143,9 @@ module.exports = function createPetpooja(ctx) {
     const restID = cfg.outletMap[order.outlet];
     if (!restID) return { skip: 'Outlet not on Petpooja' };
     if (!pm) return { error: 'unmapped', reason: 'No menu received from Petpooja yet' };
+    if (String(pm.menusharingcode || "") !== String(restID)) return { error: "unmapped", reason: "The received menu does not belong to this configured Petpooja outlet" };
+    if (order.posMenuReceivedAt && order.posMenuReceivedAt !== pm.receivedAt) return { error: 'unmapped', reason: 'Petpooja menu changed since checkout; paid order requires reconciliation' };
+    if (!Array.isArray(order.items) || !order.items.length || order.items.some((item) => !item || !Number.isFinite(item.price) || item.price < 0 || !Number.isInteger(item.qty) || item.qty < 1) || (order.coupon && (!Number.isFinite(order.coupon.discount) || order.coupon.discount < 0)) || (order.deliveryFee !== undefined && (!Number.isFinite(order.deliveryFee) || order.deliveryFee < 0))) return { error: 'unmapped', reason: 'Invalid order amounts or quantities' };
     const typeId = order.mode === 'delivery' ? '1' : order.mode === 'takeaway' ? '2' : '3';
     const itemTotal = order.items.reduce((s, i) => s + i.price * i.qty, 0);
     const disc = order.coupon ? Math.min(order.coupon.discount, itemTotal) : 0;
@@ -126,7 +156,8 @@ module.exports = function createPetpooja(ctx) {
       const mi = menu.items.find((i) => i.id === li.id);
       const m = li.ppRaw ? rawFind(li.ppRaw) : (mi && findPp(mi));
       if (!m) return { error: 'unmapped', reason: 'No Petpooja item for "' + li.name + '"' };
-      if (m.item.item_ordertype && !m.item.item_ordertype.split(',').includes(typeId)) warnings.push(li.name + ' is not enabled for this order type in Petpooja');
+      if (String(m.item.in_stock) === "0") return { error: "unmapped", reason: li.name + " is out of stock in Petpooja" };
+      if (m.item.item_ordertype && !String(m.item.item_ordertype).split(",").includes(typeId)) return { error: "unmapped", reason: li.name + " is not enabled for this order type in Petpooja" };
       const lineTotal = li.price * li.qty;
       const share = k === order.items.length - 1 ? discLeft : Math.round((disc * lineTotal / itemTotal) * 100) / 100;
       discLeft = Math.round((discLeft - share) * 100) / 100;
@@ -143,8 +174,11 @@ module.exports = function createPetpooja(ctx) {
         taxAgg[t.taxid].tax += amt;
         return { id: String(t.taxid), name: t.taxname, tax_percentage: String(t.tax), amount: r2(amt) };
       });
-      const addons = [];
-      for (const name of (li.addonNames || [])) { const a = addonFor(m, name); if (a) addons.push(a); else warnings.push('Add-on "' + name + '" not found in Petpooja for ' + li.name); }
+      const addons = selectedAddons(m, li.addonNames || []);
+      if (!addons) return { error: 'unmapped', reason: 'Invalid or missing add-on mapping or limits for ' + li.name };
+      const posBase = Number(m.variation ? m.variation.price : m.item.price);
+      const posUnit = posBase + addons.reduce((sum, addon) => sum + Number(addon.price), 0);
+      if (!Number.isFinite(posBase) || posBase < 0 || Math.round(posUnit * 100) !== Math.round(li.price * 100)) return { error: 'unmapped', reason: 'Petpooja price mismatch for ' + li.name };
       lines.push({
         id: m.variation ? m.variation.id : m.item.itemid, name: m.item.itemname.replace(/\s*\[[o0]\]\s*$/i, ''), tax_inclusive: incl, gst_liability: 'restaurant', item_tax,
         item_discount: r2(unitDisc), price: r2(li.price), final_price: r2(li.price - unitDisc), quantity: String(li.qty), description: '',
@@ -154,6 +188,7 @@ module.exports = function createPetpooja(ctx) {
     const now = new Date();
     const dcharge = order.deliveryFee || 0;
     const total = net + exclTax + dcharge;
+    if (order.total !== undefined && (!Number.isFinite(order.total) || Math.round(total * 100) !== Math.round(order.total * 100))) return { error: 'unmapped', reason: 'Petpooja total does not match the paid order total' };
     const loc = order.address || {};
     const info = {
       OrderInfo: {
@@ -190,12 +225,14 @@ module.exports = function createPetpooja(ctx) {
 
   async function pushOrder(order) {
     if (order.test && !order.ppForce) return;
+    if (order.pos && ['processing', 'pushed', 'unknown', 'failed'].includes(order.pos.status)) return;
     if (!configured()) { log({ order: order.id, status: 'skipped', reason: 'Petpooja not configured' }); return; }
+    setPos(order, { status: 'queued' });
     const built = buildOrder(order);
     if (built.skip) { log({ order: order.id, outlet: order.outlet, status: 'skipped', reason: built.skip }); setPos(order, { status: 'skipped', reason: built.skip }); return; }
     if (built.error) { log({ order: order.id, status: 'unmapped', reason: built.reason }); setPos(order, { status: 'unmapped', reason: built.reason }); return; }
-    let lastErr = '';
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    setPos(order, { status: 'processing', attempts: (order.pos.attempts || 0) + 1, restID: String(built.restID), retrySafe: false });
+    const attempt = order.pos.attempts;
       try {
         const r = await post(cfg.orderUrl, built.payload);
         if (r.ok && String(r.json.success) === '1') {
@@ -203,13 +240,31 @@ module.exports = function createPetpooja(ctx) {
           setPos(order, { status: 'pushed', petpoojaOrderId: r.json.orderID || '', attempts: attempt, reason: '', warnings: built.warnings });
           return;
         }
-        lastErr = 'HTTP ' + r.status + ' ' + (r.json.message || '') + ' ' + JSON.stringify(r.json.validation_errors || '').slice(0, 300);
-        if (r.status >= 400 && r.status < 500) break; // a rejected order will not succeed on retry
-      } catch (e) { lastErr = String(e.message || e); }
-      if (attempt < 3) await new Promise((res) => setTimeout(res, attempt * 2500));
+        const reason = 'HTTP ' + r.status + ' ' + (r.json.message || '') + ' ' + JSON.stringify(r.json.validation_errors || '').slice(0, 300);
+        const status = r.status >= 400 && r.status < 500 ? 'failed' : 'unknown';
+        setPos(order, { status, reason, retrySafe: false });
+        log({ order: order.id, status, reason, attempts: attempt });
+      } catch (error) {
+        const retrySafe = ['ENOTFOUND', 'EAI_AGAIN', 'ECONNREFUSED', 'UND_ERR_CONNECT_TIMEOUT'].includes(error.cause && error.cause.code);
+        const status = retrySafe ? 'failed' : 'unknown';
+        setPos(order, { status, reason: 'POS transport outcome requires recovery', retrySafe });
+        log({ order: order.id, status, attempts: attempt, retrySafe });
+      }
+  }
+  async function recoverPendingOrders() {
+    const results = [];
+    for (const order of db.orders) {
+      if (!order.payment || order.payment.status !== 'paid' || (order.test && !order.ppForce)) continue;
+      if (!cfg.outletMap[order.outlet] || ['CANCELLED', 'DELIVERED', 'SERVED'].includes(order.status)) continue;
+      if (!order.pos || order.pos.status === 'processing') {
+        setPos(order, { status: 'unknown', reason: 'Interrupted POS submission; reconcile with Petpooja before retry', retrySafe: false });
+      } else if (order.posMenuReceivedAt && (order.pos.status === 'queued' || (order.pos.status === 'failed' && order.pos.retrySafe))) {
+        setPos(order, { status: 'queued' });
+        await pushOrder(order);
+      }
+      results.push({ id: order.id, status: order.pos && order.pos.status });
     }
-    log({ order: order.id, status: 'failed', reason: lastErr, attempts: 3 });
-    setPos(order, { status: 'failed', reason: lastErr });
+    return results;
   }
 
   /* ---------------- Order callback (Petpooja -> us) ---------------- */
@@ -222,9 +277,11 @@ module.exports = function createPetpooja(ctx) {
     CANCELLED: (o) => 'Sorry, order ' + o.id + ' was cancelled by the restaurant. Your refund will be processed.'
   };
   function handleCallback(body, token) {
-    if (cfg.pushToken && token !== cfg.pushToken) return { code: 401, json: { success: '0', message: 'Unauthorized' } };
+    if (!authed(token)) return { code: 401, json: { success: '0', message: 'Unauthorized' } };
+    if (!body || typeof body !== 'object') return { code: 400, json: { success: '0', message: 'Invalid callback' } };
     const order = db.orders.find((o) => o.id === String(body.orderID));
     if (!order) { log({ type: 'callback', status: 'unknown-order', orderID: body.orderID }); return { code: 200, json: { success: '1', message: 'Order not found, ignored.' } }; }
+    if (!cfg.outletMap[order.outlet] || String(body.restID || '') !== String(cfg.outletMap[order.outlet])) return { code: 400, json: { success: '0', message: 'Callback outlet mismatch' } };
     const st = String(body.status);
     let next = null;
     if (st === '-1') next = 'CANCELLED';
@@ -234,12 +291,20 @@ module.exports = function createPetpooja(ctx) {
     else if (st === '10') next = order.mode === 'delivery' ? 'DELIVERED' : 'SERVED';
     if (!next) return { code: 200, json: { success: '1', message: 'Status ignored.' } };
     const cur = FLOW.indexOf(order.status);
-    if (next !== 'CANCELLED' && (order.status === 'CANCELLED' || FLOW.indexOf(next) <= cur)) return { code: 200, json: { success: '1', message: 'No change.' } };
+    if (next === order.status) {
+      let changed = false;
+      if (!order.riderInfo && typeof body.rider_name === 'string' && body.rider_name) { order.riderInfo = { name: body.rider_name, phone: typeof body.rider_phone_number === 'string' ? body.rider_phone_number : '' }; changed = true; }
+      if (!order.etaMin && Number.isFinite(Number(body.minimum_prep_time)) && Number(body.minimum_prep_time) > 0) { order.etaMin = Number(body.minimum_prep_time); changed = true; }
+      if (changed) setPos(order, { posStatus: st });
+      return { code: 200, json: { success: '1', message: 'No status change.' } };
+    }
+    if (['CANCELLED', 'DELIVERED', 'SERVED'].includes(order.status) || (next !== 'CANCELLED' && FLOW.indexOf(next) <= cur)) return { code: 200, json: { success: '1', message: 'No change.' } };
     order.status = next;
+    order.history = order.history || [];
     order.history.push({ status: next, at: new Date().toISOString(), by: 'petpooja' });
     if (next === 'CANCELLED') { order.cancelReason = body.cancel_reason || ''; order.refundDue = order.payment && order.payment.status === 'paid' && order.payment.method !== 'test'; }
     if (body.rider_name) order.riderInfo = { name: body.rider_name, phone: body.rider_phone_number || '' };
-    if (body.minimum_prep_time) order.etaMin = Number(body.minimum_prep_time) || order.etaMin;
+    if (Number.isFinite(Number(body.minimum_prep_time)) && Number(body.minimum_prep_time) > 0) order.etaMin = Number(body.minimum_prep_time);
     setPos(order, { posStatus: st });
     log({ order: order.id, type: 'callback', status: next, cancel_reason: body.cancel_reason || '' });
     if (LINES[next] && pushTarget) pushTarget(order.customer.phone, { title: 'XTO Pizza', body: LINES[next](order), url: '/track?order=' + order.id }).catch(() => {});
@@ -267,7 +332,7 @@ module.exports = function createPetpooja(ctx) {
 
   /* ---------------- Petpooja -> us: item stock on/off, store status ---------------- */
   const restOutlet = (restID) => Object.keys(cfg.outletMap).find((o) => String(cfg.outletMap[o]) === String(restID));
-  const authed = (token) => !cfg.pushToken || token === cfg.pushToken;
+  const authed = (token) => !!cfg.pushToken && token === cfg.pushToken;
   function handleStock(body, token) {
     if (!authed(token)) return { code: 401, json: { code: 401, status: 'failed', message: 'Unauthorized' } };
     if (!restOutlet(body.restID)) return { code: 400, json: { code: 400, status: 'failed', message: 'Unknown restID' } };
@@ -312,9 +377,10 @@ module.exports = function createPetpooja(ctx) {
     const l = readJSON(logFile, []);
     return {
       configured: configured(), outlets: Object.keys(cfg.outletMap), menuReceivedAt: pm ? pm.receivedAt : null, menuItems: pm ? pm.items.length : 0,
+      menuMatchesConfiguredOutlet: !!(pm && Object.values(cfg.outletMap).map(String).includes(String(pm.menusharingcode || ""))),
       last: l[0] || null, pushedToday: l.filter((x) => x.status === 'pushed' && x.at && x.at.slice(0, 10) === new Date().toISOString().slice(0, 10)).length,
-      failures: l.filter((x) => x.status === 'failed' || x.status === 'unmapped').length
+      failures: l.filter((x) => ["failed", "unmapped", "unknown"].includes(x.status)).length
     };
   }
-  return { cfg, configured, handleMenuPush, buildOrder, pushOrder, handleCallback, handleStock, handleStoreGet, rawLine, handleStoreSet, cancelOnPos, syncStock, status, log, findPp, hasMenu: () => !!pm };
+  return { cfg, configured, handleMenuPush, buildOrder, pushOrder, recoverPendingOrders, resumeQueued: recoverPendingOrders, handleCallback, handleStock, handleStoreGet, rawLine, handleStoreSet, cancelOnPos, syncStock, status, log, findPp, hasMenu: () => !!pm };
 };

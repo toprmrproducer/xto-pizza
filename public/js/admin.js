@@ -297,7 +297,7 @@ $('#mmSearch').addEventListener('input', paintMenuMgr);
 
 if (state.pin) {
   // restore session within the same tab
-  fetch('/api/admin/stats', { headers: { 'x-admin-pin': state.pin } }).then((r) => {
+  fetch('/api/admin/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ pin: state.pin }) }).then((r) => {
     if (r.ok) { $('#gate').classList.add('hidden'); $('#shell').classList.remove('hidden'); boot(); }
     else sessionStorage.removeItem('xto_admin_pin');
   }).catch(() => {});

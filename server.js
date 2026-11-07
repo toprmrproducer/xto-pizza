@@ -91,6 +91,7 @@ const cashfree = {
   get base() { return process.env.CASHFREE_API_BASE || (this.env === 'sandbox' ? 'https://sandbox.cashfree.com/pg' : 'https://api.cashfree.com/pg'); }
 };
 const ALLOW_MOCK_PAY = process.env.ALLOW_MOCK_PAY === '1';
+if (process.env.NODE_ENV === "production" && ALLOW_MOCK_PAY) throw new Error("Mock payments are not allowed in production");
 function cfFetch(pth, opts) {
   return fetch(cashfree.base + pth, Object.assign({
     headers: { 'x-client-id': cashfree.appId, 'x-client-secret': cashfree.secret, 'x-api-version': '2023-08-01', 'Content-Type': 'application/json' }
@@ -265,6 +266,30 @@ function orderSource(body, req) {
 }
 const auth = require('./auth')({ DATA, readJSON, writeJSON, db, saveDb });
 const pp = require('./petpooja')({ DATA, readJSON, writeJSON, db, saveDb, broadcast, menu, outlets, pushTarget, storeOpen: (id) => outletOpen(id) });
+const accessSecret = readJSON(path.join(DATA, "auth-secret.json"), {}).s;
+function readAccess(req, name) {
+  try {
+    const cookie = String(req.headers.cookie || "").split(";").map((entry) => entry.trim()).find((entry) => entry.startsWith(name + "="));
+    if (!cookie) return null;
+    const [encoded, signature] = cookie.slice(name.length + 1).split(".");
+    const expected = crypto.createHmac("sha256", accessSecret).update(name + ":" + encoded).digest("base64url");
+    if (!signature || signature.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+    const payload = JSON.parse(Buffer.from(encoded, "base64url").toString());
+    return payload.exp > Date.now() ? payload : null;
+  } catch (error) { return null; }
+}
+function setAccess(req, res, name, payload, seconds) {
+  const encoded = Buffer.from(JSON.stringify(Object.assign({}, payload, { exp: Date.now() + seconds * 1000 }))).toString("base64url");
+  const signature = crypto.createHmac("sha256", accessSecret).update(name + ":" + encoded).digest("base64url");
+  const secure = process.env.NODE_ENV === "production" ? "; Secure" : "";
+  res.setHeader("Set-Cookie", name + "=" + encoded + "." + signature + "; Path=/; HttpOnly; SameSite=Strict; Max-Age=" + seconds + secure);
+}
+function canReadOrder(req, order) {
+  const who = auth.fromReq(req);
+  if (who && who.phone === order.customer.phone) return true;
+  const access = readAccess(req, "xto_orders");
+  return !!(access && Array.isArray(access.orders) && order.payment && access.orders.includes(order.payment.gatewayOrderId));
+}
 
 // ---------------------------------------------------------------------------
 // Web Push: VAPID (RFC 8292) + aes128gcm payload encryption (RFC 8291), zero deps.
@@ -532,7 +557,7 @@ async function settlePending(orderId) {
     mode: d.mode, outlet: d.outlet, customer: d.customer, items: d.items, itemTotal: d.itemTotal, deliveryFee: d.deliveryFee,
     coupon: d.coupon, total: d.total, address: d.address || null,
     payment: { method: cashfree.configured ? 'cashfree' : 'mock', status: 'paid', paymentId, gatewayOrderId: orderId },
-    source: d.source, rider: null,
+    source: d.source, rider: null, posMenuReceivedAt: d.posMenuReceivedAt || null, pos: { status: "queued" },
     etaMin: d.mode === 'delivery' ? 40 : d.mode === 'dinein' ? 20 : 15,
     history: [{ status: 'PLACED', at: new Date().toISOString() }]
   };
@@ -544,7 +569,7 @@ async function settlePending(orderId) {
   return { order };
 }
 
-const server = http.createServer(async (req, res) => {
+async function handleRequest(req, res) {
   let url;
   try { url = new URL(req.url, 'http://localhost'); } catch (e) { res.writeHead(400); res.end('Bad request'); return; }
   const p = url.pathname;
@@ -577,8 +602,12 @@ const server = http.createServer(async (req, res) => {
     const tok = hdr || url.searchParams.get('t') || parts[4] || '';
     const body = await readBody(req);
     if (['pushmenu', 'pushmenu_endpoint', 'menu'].includes(name)) {
-      if (!pp.cfg.pushToken || tok !== pp.cfg.pushToken) return json(res, 401, { success: '0', message: 'Unauthorized' });
-      return json(res, 200, pp.handleMenuPush(body));
+      if (!pp.cfg.pushToken || tok !== pp.cfg.pushToken) {
+        pp.log({ type: "menu-auth", status: "rejected", endpoint: name, tokenProvided: !!tok });
+        return json(res, 401, { success: "0", message: "Unauthorized" });
+      }
+      const result = pp.handleMenuPush(body);
+      return json(res, result.http_code || 200, result);
     }
     if (['item_stock', 'item_stock_off', 'get_store_status', 'update_store_status', 'callback'].includes(name)) {
       const fn = name.startsWith('item_stock') ? pp.handleStock : name === 'get_store_status' ? pp.handleStoreGet : name === 'update_store_status' ? pp.handleStoreSet : pp.handleCallback;
@@ -608,13 +637,19 @@ const server = http.createServer(async (req, res) => {
     if (p === '/pay/return') return serveFile(res, path.join(PUBLIC, 'pay-return.html'));
     if (p === '/refund') return serveFile(res, path.join(PUBLIC, 'refund.html'));
     if (p === '/track') return serveFile(res, path.join(PUBLIC, 'index.html'));
-    if (p === '/api/events') return sseHandler(req, res);
+    if (p === '/api/events') {
+      const access = readAccess(req, "xto_admin");
+      const version = crypto.createHmac("sha256", accessSecret).update(String(config.adminPin)).digest("hex");
+      if (!access || access.version !== version) return json(res, 401, { error: "Admin sign-in required" });
+      return sseHandler(req, res);
+    }
     if (p === '/healthz') return json(res, 200, { ok: true, uptime: process.uptime() });
     if (p === '/api/offers' && method === 'GET') return json(res, 200, { offers: (db.offers || []).filter((o) => o.active !== false) });
     if (p === '/api/push/key' && method === 'GET') return json(res, 200, { key: vapid.pub });
     if (p === '/api/track/rider' && method === 'GET') {
       const orderId = (url.searchParams.get('order') || '').toUpperCase();
       const order = db.orders.find((o) => o.id === orderId);
+      if (order && !canReadOrder(req, order)) return json(res, 401, { error: "Order access required" });
       if (!order || order.status !== 'OUT_FOR_DELIVERY' || !order.rider) return json(res, 200, { rider: null });
       const rider = db.riders.find((r) => r.name === order.rider || r.id === order.rider) || { name: order.rider, phone: '' };
       const pos = riderState()[rider.id] || null;
@@ -719,6 +754,13 @@ const server = http.createServer(async (req, res) => {
     const built = buildDraft(body, req);
     if (built.error) return json(res, 400, { error: built.error });
     const draft = built.draft;
+    if (pp.configured()) {
+      const preview = pp.buildOrder(Object.assign({ id: "checkout-validation" }, draft));
+      if (preview.error || preview.skip) return json(res, 503, { error: "Online ordering is being connected to the restaurant. No payment has been started. Please try again shortly." });
+      const posTotal = Number(preview.payload.orderinfo.OrderInfo.Order.details.total);
+      if (!Number.isFinite(posTotal) || Math.abs(posTotal - draft.total) > 0.01) return json(res, 409, { error: "The restaurant prices are being updated. No payment has been started. Please try again shortly." });
+      draft.posMenuReceivedAt = pp.status().menuReceivedAt;
+    }
     if (!auth.required()) auth.capture(draft.customer.phone, draft.customer.name);
     for (const k of Object.keys(db.pending)) if (Date.now() - db.pending[k].createdAt > 6 * 3600 * 1000) delete db.pending[k];
     const orderId = 'XTO' + Date.now().toString(36) + crypto.randomBytes(3).toString('hex');
@@ -756,7 +798,12 @@ const server = http.createServer(async (req, res) => {
   if (p === '/api/checkout/confirm' && method === 'POST') {
     const body = await readBody(req);
     const out = await settlePending(String(body.orderId || ''));
-    if (out.order) return json(res, 200, { ok: true, order: publicOrder(out.order) });
+    if (out.order) {
+      const access = readAccess(req, "xto_orders");
+      const owned = access && Array.isArray(access.orders) ? access.orders : [];
+      setAccess(req, res, "xto_orders", { orders: Array.from(new Set(owned.concat(out.order.payment.gatewayOrderId))).slice(-20) }, 30 * 24 * 3600);
+      return json(res, 200, { ok: true, order: publicOrder(out.order) });
+    }
     if (out.pending) return json(res, 202, { pending: true, status: out.status || 'PENDING' });
     return json(res, out.status || 400, { error: out.error || 'Could not confirm payment' });
   }
@@ -768,7 +815,10 @@ const server = http.createServer(async (req, res) => {
     if (sig.length !== expected.length || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) return json(res, 401, { error: 'Bad signature' });
     let ev = {}; try { ev = JSON.parse(raw); } catch (e) {}
     const oid = ev && ev.data && ev.data.order && ev.data.order.order_id;
-    if (oid && /PAYMENT_SUCCESS/.test(String(ev.type || ''))) await settlePending(String(oid));
+    if (oid && /PAYMENT_SUCCESS/.test(String(ev.type || ''))) {
+      const settled = await settlePending(String(oid));
+      if (settled.error || settled.pending) return json(res, settled.error ? 503 : 409, { error: "Payment settlement requires retry" });
+    }
     return json(res, 200, { ok: true });
   }
   if (p === '/api/orders' && method === 'POST') return json(res, 410, { error: 'Please refresh the page and checkout again.' });
@@ -777,16 +827,11 @@ const server = http.createServer(async (req, res) => {
     const id = p.split('/')[3];
     const order = db.orders.find((o) => o.id.toUpperCase() === String(id).toUpperCase());
     if (!order) return json(res, 404, { error: 'Order not found' });
+    if (!canReadOrder(req, order)) return json(res, 401, { error: "Use the browser that placed this order or verify your phone number." });
     return json(res, 200, { order: publicOrder(order) });
   }
   if (p === '/api/orders' && method === 'GET') {
-    let phone = (url.searchParams.get('phone') || '').replace(/\D/g, '').slice(-10);
-    if (auth.required()) {
-      const who = auth.fromReq(req);
-      if (!who) return json(res, 401, { error: 'Verify your phone number to see your orders.', needAuth: true });
-      phone = who.phone;
-    }
-    const list = db.orders.filter((o) => o.customer.phone === phone).map(publicOrder);
+    const list = db.orders.filter((order) => canReadOrder(req, order)).map(publicOrder);
     return json(res, 200, { orders: list });
   }
 
@@ -794,6 +839,7 @@ const server = http.createServer(async (req, res) => {
   const pin = req.headers['x-admin-pin'];
   const adminOk = pin && pin === String(config.adminPin);
   if (p.startsWith('/api/admin')) {
+    if (process.env.NODE_ENV === "production" && ["/api/admin/petpooja/sandbox-raw", "/api/admin/petpooja/sandbox-order"].includes(p)) return json(res, 404, { error: "Sandbox order tools are disabled in production" });
     // brute-force guard: 8 wrong PINs per IP per 10 minutes, then 429
     const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
     const now = Date.now();
@@ -802,7 +848,10 @@ const server = http.createServer(async (req, res) => {
     if (fails[ip].length >= 8) return json(res, 429, { error: 'Too many attempts. Try again in 10 minutes.' });
     if (p === '/api/admin/login' && method === 'POST') {
       const body = await readBody(req);
-      if (String(body.pin) === String(config.adminPin)) return json(res, 200, { ok: true });
+      if (String(body.pin) === String(config.adminPin)) {
+        setAccess(req, res, "xto_admin", { version: crypto.createHmac("sha256", accessSecret).update(String(config.adminPin)).digest("hex") }, 12 * 3600);
+        return json(res, 200, { ok: true });
+      }
       fails[ip].push(now);
       return json(res, 401, { error: 'Wrong PIN' });
     }
@@ -1114,15 +1163,24 @@ const server = http.createServer(async (req, res) => {
   }
 
   json(res, 404, { error: 'No route' });
+}
+
+const server = http.createServer((req, res) => {
+  handleRequest(req, res).catch(() => {
+    console.error("Request handler failed", req.method);
+    if (!res.headersSent) json(res, 500, { error: "Request could not be completed. Please try again." });
+    else res.end();
+  });
 });
 
 server.listen(PORT, () => {
+  pp.recoverPendingOrders().catch(() => console.error("POS recovery requires review"));
   console.log('');
   console.log('  XTO Pizza stack is up. Zero dependencies, pure Node.');
   console.log('  ------------------------------------------------------');
   console.log('  Website (customer):  http://localhost:' + PORT + '/');
   console.log('  Mobile app (PWA):    http://localhost:' + PORT + '/app');
-  console.log('  Admin CES:           http://localhost:' + PORT + '/admin   (PIN ' + config.adminPin + ')');
+  console.log('  Admin CES:           http://localhost:' + PORT + '/admin');
   console.log('  Payments:            ' + (cashfree.configured ? 'Cashfree (' + cashfree.env + ')' : ALLOW_MOCK_PAY ? 'MOCK (ALLOW_MOCK_PAY=1)' : 'CLOSED: set CASHFREE_APP_ID and CASHFREE_SECRET_KEY'));
   console.log('  Petpooja push:       ' + (pp.configured() ? 'ON (' + Object.keys(pp.cfg.outletMap).join(',') + ')' : 'OFF (set PP_SAVE_ORDER_URL, PP_APP_KEY, PP_APP_SECRET, PP_ACCESS_TOKEN)'));
   console.log('  ------------------------------------------------------');

@@ -13,6 +13,14 @@ const path = require('path');
 module.exports = function createAuth(ctx) {
   const { DATA, readJSON, writeJSON, db, saveDb } = ctx;
   const E = process.env;
+  if (E.NODE_ENV === 'production') {
+    if (E.OTP_DEV === '1') {
+      throw new Error('Invalid production OTP configuration: OTP_DEV=1 is forbidden. Unset OTP_DEV before starting.');
+    }
+    if (E.REVIEW_PHONE !== undefined || E.REVIEW_CODE !== undefined) {
+      throw new Error('Invalid production OTP configuration: REVIEW_PHONE and REVIEW_CODE are forbidden. Unset both before starting.');
+    }
+  }
   const cfg = {
     authKey: E.MSG91_AUTHKEY || '', templateId: E.MSG91_TEMPLATE_ID || '',
     base: E.MSG91_BASE || 'https://control.msg91.com/api/v5', dev: E.OTP_DEV === '1', reviewPhone: E.REVIEW_PHONE || '', reviewCode: E.REVIEW_CODE || '', forceOff: E.XTO_REQUIRE_OTP === '0'

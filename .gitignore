@@ -8,3 +8,8 @@ node_modules/
 .DS_Store
 *.log
 _keys/
+*.env
+*.env.*
+data/auth-secret.json
+data/petpooja-menu.json
+data/petpooja-menu-raw.json
