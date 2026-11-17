@@ -717,6 +717,7 @@ function ensureRiderMap(containerId) {
 async function renderRiderMap(containerId, orderId) {
   const data = await fetch('/api/track/rider?order=' + encodeURIComponent(orderId)).then((r) => r.json()).catch(() => null);
   let holder = $('#' + containerId + ' .rider-map');
+  if (!data || !data.rider) { const w = $('#' + containerId + ' .rider-wrap'); if (w) w.remove(); return; } // nothing to show until a rider exists
   if (!holder) {
     const wrap = document.createElement('div');
     wrap.className = 'rider-wrap';
@@ -725,7 +726,14 @@ async function renderRiderMap(containerId, orderId) {
     holder = $('.rider-map', wrap);
   }
   if (!holder) return;
-  if (!data || !data.rider || !data.pos) { holder.innerHTML = '<div class="rider-map-empty">Rider map appears when your order is out for delivery.</div>'; return; }
+  if (!data.pos) { // rider known, no live GPS: show name and call link, no empty map box
+    holder.style.display = 'none';
+    const cap0 = $('#' + containerId + ' .rider-cap');
+    if (cap0) cap0.innerHTML = String(data.rider.name || 'Your rider').replace(/</g, '&lt;') + ' is on the way' + (data.rider.phone ? ' - <a href="tel:' + String(data.rider.phone).replace(/[^+\d]/g, '') + '">call ' + String(data.rider.phone).replace(/[^+\d ]/g, '') + '</a>' : '');
+    clearInterval(state['riderTimer_' + containerId]);
+    state['riderTimer_' + containerId] = setInterval(() => { if (document.body.contains(holder)) renderRiderMap(containerId, orderId); else clearInterval(state['riderTimer_' + containerId]); }, 8000);
+    return;
+  }
   holder.style.display = '';
   const map = ensureRiderMap(containerId);
   if (!map) return;

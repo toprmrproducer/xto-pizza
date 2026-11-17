@@ -742,8 +742,8 @@ async function handleRequest(req, res) {
       const orderId = (url.searchParams.get('order') || '').toUpperCase();
       const order = db.orders.find((o) => o.id === orderId);
       if (order && !canReadOrder(req, order)) return json(res, 401, { error: "Order access required" });
-      if (!order || order.status !== 'OUT_FOR_DELIVERY' || !order.rider) return json(res, 200, { rider: null });
-      const rider = db.riders.find((r) => r.name === order.rider || r.id === order.rider) || { name: order.rider, phone: '' };
+      if (!order || order.status !== 'OUT_FOR_DELIVERY' || !(order.rider || (order.riderInfo && order.riderInfo.name))) return json(res, 200, { rider: null });
+      const rider = order.rider ? (db.riders.find((r) => r.name === order.rider || r.id === order.rider) || { name: order.rider, phone: '' }) : { name: order.riderInfo.name, phone: order.riderInfo.phone || '' }; // rider assigned in admin, or sent by Petpooja
       const pos = riderState()[rider.id] || null;
       const outletGeo = RIDER_HOME[order.outlet] || RIDER_HOME.shivane;
       return json(res, 200, { rider: { name: rider.name, phone: rider.phone }, pos, outletGeo });
