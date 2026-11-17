@@ -1,0 +1,27 @@
+# XTO Pizza
+
+> XTO Pizza is a pure vegetarian pizza, burger, pasta and shake cafe in Pune, India, with outlets in Nanded City (Sinhagad Road) and Shivane (near NDA, Khadakwasla). Dine-in, takeaway and online delivery within 5 km.
+
+Key facts: pure veg only. Margherita pizza from Rs 99, burgers from Rs 59, combos from Rs 159. Online delivery currently runs from the Nanded City outlet within 5 km, minimum order Rs 199, free on orders of Rs 250 or more including GST, Rs 50 below that. Nanded City open 11:00 am to 11:00 pm, Shivane 11:00 am to 10:30 pm.
+
+## Core pages
+- [Home and online ordering](https://xtopizza.in/): menu, ordering for dine-in, takeaway and delivery
+- [AI facts page](https://xtopizza.in/ai): verified facts, who it suits, honest FAQs
+- [Contact and outlet details](https://xtopizza.in/contact): addresses, phones, hours, directions
+- [Franchise enquiry](https://xtopizza.in/franchise): enquiry form for franchise interest
+- [Careers](https://xtopizza.in/careers): jobs at the outlets
+
+## Guides
+- [Pizza delivery in Nanded City and Sinhagad Road](https://xtopizza.in/blog/pizza-delivery-nanded-city-sinhagad-road): delivery range, charges, tracking, refunds
+- [XTO Pizza combos](https://xtopizza.in/blog/xto-pizza-combos-pune): what is inside each combo and the price
+- [Pizza near NDA Road, Khadakwasla and Shivane](https://xtopizza.in/blog/pizza-near-nda-khadakwasla-shivane)
+- [Best pure veg pizza in Pune](https://xtopizza.in/blog/best-pure-veg-pizza-in-pune)
+- [Birthday and group party pizza in Pune](https://xtopizza.in/blog/birthday-and-group-party-pizza-pune)
+
+## Policies
+- [Refund policy](https://xtopizza.in/refund)
+- [Terms and conditions](https://xtopizza.in/terms)
+- [Privacy policy](https://xtopizza.in/privacy)
+
+## Full text
+- [llms-full.txt](https://xtopizza.in/llms-full.txt): readable text of the site plus the live menu with prices

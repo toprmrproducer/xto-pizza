@@ -788,6 +788,23 @@ async function handleRequest(req, res) {
     if (p === '/order') return serveFile(res, path.join(PUBLIC, 'index.html'));
     if (p === '/pay/return') return serveFile(res, path.join(PUBLIC, 'pay-return.html'));
     if (p === '/refund') return serveFile(res, path.join(PUBLIC, 'refund.html'));
+    if (p === '/ai') return serveFile(res, path.join(PUBLIC, 'ai.html'));
+    if (p === '/llms-full.txt') {
+      const L = ['# XTO Pizza - full text', '', 'XTO Pizza is a pure vegetarian pizza, burger, pasta and shake cafe in Pune, India, operated by Ardur Foods Pvt Ltd. Order online at https://xtopizza.in for dine-in, takeaway or delivery.', ''];
+      L.push('## Outlets');
+      for (const o of outlets) L.push('- ' + o.name + ': ' + o.address + '. Hours ' + o.hours + '. Phone ' + o.phone + '.');
+      L.push('', '## Delivery and payment', '- Online delivery is served from the ' + outlets.filter((o) => outletOpen(o.id)).map((o) => o.name).join(' and ') + ' outlet within ' + ((db.settings && db.settings.deliveryRadiusKm) || 5) + ' km, minimum order Rs ' + ((db.settings && db.settings.minOrderDelivery) || 0) + '.', '- Free delivery on orders of Rs ' + ((db.settings && db.settings.freeDeliveryAbove) || 250) + ' or more including GST, otherwise Rs ' + ((db.settings && db.settings.deliveryFee) || 50) + '.', '- Pay online by UPI, cards or netbanking. If the outlet rejects the order or does not confirm in time, the payment is refunded automatically in full.', '- Delivery orders show the rider, a live map, distance and an estimate once the order is out for delivery.', '');
+      L.push('## Live menu (prices in INR, includes only items currently available)');
+      for (const c of menu.categories) {
+        const items = menu.items.filter((i) => i.cat === c.id && isAvailable(i.id));
+        if (!items.length) continue;
+        L.push('', '### ' + c.name);
+        for (const i of items) L.push('- ' + i.name + ' - Rs ' + i.price + (i.desc ? ': ' + i.desc : ''));
+      }
+      L.push('', '## Pages', '- https://xtopizza.in/ai - facts and FAQs', '- https://xtopizza.in/blog/xto-pizza-combos-pune - what is inside each combo', '- https://xtopizza.in/blog/pizza-delivery-nanded-city-sinhagad-road - delivery details', '- https://xtopizza.in/contact - contact and directions', '- https://xtopizza.in/franchise - franchise enquiry', '');
+      res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=600' });
+      return res.end(L.join('\n'));
+    }
     if (p === '/track') return serveFile(res, path.join(PUBLIC, 'index.html'));
     if (p === '/api/events') {
       const access = readAccess(req, "xto_admin");
