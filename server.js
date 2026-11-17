@@ -274,14 +274,15 @@ function verifyLiveCapture(body) {
 // where an order came from: the website, or the app (Android / iOS / installed web app)
 function orderSource(body, req) {
   const ua = String((req && req.headers && req.headers['user-agent']) || '');
-  const channel = body && body.source === 'app' ? 'app' : 'website';
-  let platform = 'web';
+  const native = body && body.source === 'ios';
+  const channel = body && (body.source === 'app' || native) ? 'app' : 'website';
+  let platform = native ? 'ios' : 'web';
   if (/Android/i.test(ua)) platform = 'android';
-  else if (/iPhone|iPad|iPod/i.test(ua)) platform = 'ios';
+  else if (!native && /iPhone|iPad|iPod/i.test(ua)) platform = 'ios';
   const label = channel === 'website'
     ? 'This purchase came from the website'
     : 'This purchase came from the ' + (platform === 'android' ? 'Android app' : platform === 'ios' ? 'iOS app' : 'app (web)');
-  return { channel, platform, label };
+  return native ? { channel, platform, native: true, label } : { channel, platform, label };
 }
 const auth = require('./auth')({ DATA, readJSON, writeJSON, db, saveDb });
 const pp = require('./petpooja')({ DATA, readJSON, writeJSON, db, saveDb, broadcast, menu, outlets, pushTarget, storeOpen: (id) => outletOpen(id) });
@@ -788,6 +789,7 @@ async function handleRequest(req, res) {
     if (p === '/order') return serveFile(res, path.join(PUBLIC, 'index.html'));
     if (p === '/pay/return') return serveFile(res, path.join(PUBLIC, 'pay-return.html'));
     if (p === '/refund') return serveFile(res, path.join(PUBLIC, 'refund.html'));
+    if (p === '/pay/app') return serveFile(res, path.join(PUBLIC, 'pay-app.html'));
     if (p === '/ai') return serveFile(res, path.join(PUBLIC, 'ai.html'));
     if (p === '/llms-full.txt') {
       const L = ['# XTO Pizza - full text', '', 'XTO Pizza is a pure vegetarian pizza, burger, pasta and shake cafe in Pune, India, operated by Ardur Foods Pvt Ltd. Order online at https://xtopizza.in for dine-in, takeaway or delivery.', ''];
@@ -990,6 +992,19 @@ async function handleRequest(req, res) {
   if (p === '/api/settings' && method === 'GET') return jsonCached(res, 200, { settings: db.settings, payments: paymentsInfo(), auth: { required: auth.required() } }, 20);
 
   // ---- checkout: price on the server, open a Cashfree order, confirm only after Cashfree says PAID ----
+  if (p === '/api/checkout/quote' && method === 'POST') {
+    // price a cart without opening a payment: the native app shows this total before the customer pays
+    const qip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    if (!rateOk('quote:' + qip, 120, 600000)) return json(res, 429, { error: 'Too many requests. Please wait a moment.' });
+    const qb = await readBody(req);
+    qb.customer = Object.assign({ name: 'Guest', phone: '9000000000' }, qb.customer || {});
+    if (!String(qb.customer.name || '').trim()) qb.customer.name = 'Guest';
+    if (!/^[6-9]\d{9}$/.test(String(qb.customer.phone || '').replace(/\D/g, '').slice(-10))) qb.customer.phone = '9000000000';
+    const q = buildDraft(qb, req);
+    if (q.error) return json(res, 400, { error: q.error });
+    const d = q.draft;
+    return json(res, 200, { itemTotal: d.itemTotal, discount: d.coupon ? d.coupon.discount : 0, gst: d.gst, deliveryFee: d.deliveryFee, total: d.total, distanceKm: d.address ? d.address.distanceKm : null });
+  }
   if (p === '/api/checkout/start' && method === 'POST') {
     // abuse guard: 30 checkout starts per IP per 10 minutes (each one opens a gateway order)
     const cip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
@@ -1025,7 +1040,7 @@ async function handleRequest(req, res) {
         r = await cfFetch('/orders', { method: 'POST', body: JSON.stringify({
           order_id: orderId, order_amount: Number(draft.total.toFixed(2)), order_currency: 'INR',
           customer_details: { customer_id: 'cust_' + draft.customer.phone, customer_phone: draft.customer.phone, customer_name: draft.customer.name },
-          order_meta: { return_url: origin + '/pay/return?order_id={order_id}&src=' + draft.source.channel, notify_url: origin + '/api/cashfree/webhook' },
+          order_meta: { return_url: origin + '/pay/return?order_id={order_id}&src=' + (draft.source.native ? 'ios' : draft.source.channel), notify_url: origin + '/api/cashfree/webhook' },
           order_note: ('XTO ' + draft.mode + ' ' + draft.outlet).slice(0, 190)
         }) });
         j = await r.json();

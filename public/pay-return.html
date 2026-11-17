@@ -17,13 +17,14 @@ h1{font-size:1.3rem;margin-bottom:8px}p{color:#6f5c4d;line-height:1.6}a{color:#b
 (function(){
   var q = new URLSearchParams(location.search), oid = q.get('order_id'), src = q.get('src');
   var home = src === 'app' ? '/app' : '/';
+  var native = src === 'ios';
   var tries = 0;
-  function fail(msg){ document.getElementById('sp').style.display='none'; document.getElementById('h').textContent=msg; document.getElementById('p').innerHTML='If money was deducted, it is safe and your order will appear shortly. <a href="'+home+'">Back to XTO Pizza</a>'; }
+  function fail(msg){ if (native) { setTimeout(function(){ location.replace('xtopizza://failed?order=' + encodeURIComponent(oid || '')); }, 2500); } document.getElementById('sp').style.display='none'; document.getElementById('h').textContent=msg; document.getElementById('p').innerHTML='If money was deducted, it is safe and your order will appear shortly. <a href="'+home+'">Back to XTO Pizza</a>'; }
   function go(){
     fetch('/api/checkout/confirm',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({orderId:oid})})
       .then(function(r){return r.json().then(function(j){return {s:r.status,j:j}})})
       .then(function(x){
-        if (x.j && x.j.ok && x.j.order) { location.replace(home + '#order=' + encodeURIComponent(x.j.order.id)); return; }
+        if (x.j && x.j.ok && x.j.order) { if (native) { location.replace('xtopizza://paid?order=' + encodeURIComponent(oid)); return; } location.replace(home + '#order=' + encodeURIComponent(x.j.order.id)); return; }
         if (x.j && x.j.pending && ++tries < 12) { setTimeout(go, 2000); return; }
         fail(x.j && x.j.pending ? 'Payment not completed' : (x.j && x.j.error) || 'Could not confirm payment');
       }).catch(function(){ if (++tries < 12) setTimeout(go, 2000); else fail('Connection problem'); });

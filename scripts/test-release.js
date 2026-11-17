@@ -126,6 +126,15 @@ async function run() {
     const del = (qty) => ({ ...cart, mode: 'delivery', items: [{ id: 'margarita-regular', qty }], address: { line: 'Test address, Nanded City, Pune', landmark: '', lat: 18.4572, lng: 73.8029 } });
     assert.equal((await request('/api/checkout/start', del(2))).data.amount, 260); // 200 + 10 GST + 50 delivery
     assert.equal((await request('/api/checkout/start', del(3))).data.amount, 315); // 300 + 15 GST, delivery free
+    // native iOS app: price quote without paying, and orders are tagged as coming from the iOS app
+    const quote = await request('/api/checkout/quote', { ...del(3), source: 'ios' });
+    assert.equal(quote.code, 200, JSON.stringify(quote.data));
+    assert.equal(quote.data.total, 315);
+    assert.equal(quote.data.deliveryFee, 0);
+    assert.equal((await request('/api/checkout/quote', { ...del(1), source: 'ios' })).code, 400); // below the delivery minimum
+    const istart = await request('/api/checkout/start', { ...cart, source: 'ios' });
+    assert.equal(istart.code, 200);
+    assert.equal((await fetch(origin + '/pay/app')).status, 200);
     // riders: signup -> pending -> admin approval -> PIN login -> claim -> pickup -> live track -> delivered
     const adm = { 'x-admin-pin': 'synthetic-admin' };
     assert.equal((await request('/api/rider/signup', { name: 'Ravi Rider', phone: '9222222222', pin: '12' })).code, 400);
