@@ -49,7 +49,7 @@
         '</div>' +
         '<div><h4>Quick links</h4>' +
           '<a href="/#menu">Full menu</a><a href="/#offers">Offers</a><a href="/#outlets">Store locator</a>' +
-          '<a href="/franchise">Franchise enquiry</a><a href="/careers">Jobs &amp; careers</a><a href="/contact">Contact us</a><a href="/app">Get the app</a>' +
+          '<a href="/franchise">Franchise enquiry</a><a href="/careers">Jobs &amp; careers</a><a href="/rider">Ride with us</a><a href="/contact">Contact us</a><a href="/app">Get the app</a>' +
         '</div>' +
         '<div><h4>Outlets</h4>' +
           '<p data-outlet="shivane"><b style="color:#fff">Shivane (Khadakwasla)</b><br>NDA Rd, near Add Mart, Shivane, Pune 411023<br><a href="tel:+917030000776">+91 70300 00776</a> &middot; 11 am - 10:30 pm</p>' +

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>XTO Pizza | Rider</title>
+<title>XTO Pizza | Ride with us</title>
 <meta name="theme-color" content="#12100a" />
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" /><noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" /></noscript>
 <style>
@@ -27,71 +27,162 @@
   .status b { font-family:'Sora'; }
   .err { color:#ff8b7c; font-size:13px; margin-top:10px; min-height:18px; }
   .note { margin-top:16px; font-size:12px; color:rgba(255,246,233,.45); text-align:center; line-height:1.6; }
+  .tabs { display:flex; gap:8px; margin-bottom:18px; }
+  .tabs button { flex:1; border:1px solid rgba(255,255,255,.16); background:transparent; color:#fff6e9; font:700 13px 'Sora'; padding:11px; border-radius:12px; cursor:pointer; }
+  .tabs button.on { background:rgba(240,115,29,.18); border-color:#f0731d; }
+  select { width:100%; background:rgba(255,255,255,.07); border:1px solid rgba(255,255,255,.16); color:#fff6e9; border-radius:12px; padding:13px 14px; font:600 16px 'Inter'; outline:none; margin-bottom:14px; }
+  select option { color:#000; }
+  .hide { display:none !important; }
+  .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .top small { color:rgba(255,246,233,.55); font-size:12px; }
+  .link { background:none; border:none; color:#f0731d; font:700 12px 'Sora'; cursor:pointer; }
+  .sec { font:700 11px 'Sora'; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,246,233,.55); margin:20px 0 10px; }
+  .ord { background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:14px; margin-bottom:12px; font-size:13.5px; line-height:1.6; }
+  .ord b.id { font:800 15px 'Sora'; }
+  .ord .row { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; }
+  .ord a.btn, .ord button.btn { flex:1; min-width:100px; text-align:center; text-decoration:none; border:none; border-radius:12px; padding:12px 8px; font:800 13px 'Sora'; cursor:pointer; background:rgba(255,255,255,.12); color:#fff6e9; }
+  .ord .btn.go { background:linear-gradient(120deg,#f0731d,#ff8f3d); color:#1c1206; }
+  .ord .btn.ok { background:#2e9d46; color:#fff; }
+  .pill { display:inline-block; font:700 10px 'Sora'; letter-spacing:1px; padding:3px 8px; border-radius:99px; background:rgba(255,255,255,.12); margin-left:6px; }
+  .empty { color:rgba(255,246,233,.5); font-size:13px; padding:10px 0; }
+  .ok-msg { color:#7ce38b; font-size:13.5px; line-height:1.6; margin-top:10px; }
 </style>
+
 </head>
 <body>
 <div class="card">
   <div class="brand"><img src="/images/mark.svg" alt="" /><b>XTO RIDER</b></div>
-  <h1>Share your live location</h1>
-  <p class="sub">Keep this page open while you ride. The kitchen sees you on their map and the customer watches you approach.</p>
-  <label>Your rider phone number</label>
-  <input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel" />
-  <button class="big" id="toggle">Start sharing location</button>
-  <div class="err" id="err"></div>
-  <div class="status" id="status"></div>
-  <p class="note">Location is only used for delivery tracking during your shift. Close the page or press stop to end sharing.</p>
+
+  <section id="auth">
+    <h1>Ride with XTO Pizza</h1>
+    <p class="sub">Deliver hot pizza around Nanded City and Shivane. Apply here, the kitchen approves you, then you pick deliveries on your phone.</p>
+    <div class="tabs"><button id="tLogin" class="on">Log in</button><button id="tSignup">Apply to ride</button></div>
+    <div id="fSignup" class="hide">
+      <label>Full name</label><input id="sName" maxlength="60" autocomplete="name" />
+      <label>Vehicle</label><select id="sVeh"><option>Bike</option><option>Scooter</option><option>Cycle</option></select>
+    </div>
+    <label>Mobile number</label>
+    <input id="phone" type="tel" inputmode="numeric" maxlength="10" placeholder="10-digit mobile" autocomplete="tel" />
+    <label id="pinLabel">Your PIN</label>
+    <input id="pin" type="password" inputmode="numeric" maxlength="8" placeholder="4 to 8 digits" autocomplete="current-password" />
+    <button class="big" id="authBtn">Log in</button>
+    <div class="err" id="err"></div>
+    <div class="ok-msg" id="msg"></div>
+  </section>
+
+  <section id="app" class="hide">
+    <div class="top"><div><b id="who"></b><br><small id="meta"></small></div><button class="link" id="logout">Log out</button></div>
+    <button class="big" id="toggle">Go online</button>
+    <div class="status" id="status"></div>
+    <div class="err" id="err2"></div>
+    <div class="sec">My deliveries</div>
+    <div id="mine"><div class="empty">Nothing assigned.</div></div>
+    <div class="sec">Available deliveries</div>
+    <div id="avail"><div class="empty">Go online to see deliveries.</div></div>
+    <p class="note">Keep this page open and the screen on while you ride. Your location is shared only while you are online, and only the customer you are delivering to can see it.</p>
+  </section>
 </div>
 <script>
   'use strict';
   const $ = (s) => document.querySelector(s);
-  const KEY = 'xto_rider_phone';
-  $('#phone').value = localStorage.getItem(KEY) || '';
-  let timer = null, watchId = null, currentOrder = null;
+  const TK = 'xto_rider_token';
+  let mode = 'login', token = localStorage.getItem(TK) || '', me = null, watchId = null, poll = null, lastPing = 0, wake = null;
+  const esc = (t) => String(t == null ? '' : t).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  async function api(path, body) {
+    const r = await fetch(path, { method: body === undefined ? 'GET' : 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, token ? { Authorization: 'Bearer ' + token } : {}), body: body === undefined ? undefined : JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 401 && token && path !== '/api/rider/login') { logout(); }
+    j._status = r.status; return j;
+  }
+  function setMode(m) {
+    mode = m;
+    $('#tLogin').classList.toggle('on', m === 'login'); $('#tSignup').classList.toggle('on', m === 'signup');
+    $('#fSignup').classList.toggle('hide', m === 'login');
+    $('#authBtn').textContent = m === 'login' ? 'Log in' : 'Apply to ride';
+    $('#pinLabel').textContent = m === 'login' ? 'Your PIN' : 'Choose a PIN (4 to 8 digits)';
+    $('#err').textContent = ''; $('#msg').textContent = '';
+  }
+  $('#tLogin').onclick = () => setMode('login'); $('#tSignup').onclick = () => setMode('signup');
+  $('#phone').value = localStorage.getItem('xto_rider_phone') || '';
+  $('#authBtn').onclick = async () => {
+    $('#err').textContent = ''; $('#msg').textContent = '';
+    const phone = $('#phone').value.replace(/\D/g, ''), pin = $('#pin').value.replace(/\D/g, '');
+    if (!/^[6-9]\d{9}$/.test(phone)) return $('#err').textContent = 'Enter your 10-digit mobile number.';
+    if (!/^\d{4,8}$/.test(pin)) return $('#err').textContent = 'PIN must be 4 to 8 digits.';
+    localStorage.setItem('xto_rider_phone', phone);
+    if (mode === 'signup') {
+      const name = $('#sName').value.trim();
+      if (name.length < 2) return $('#err').textContent = 'Enter your full name.';
+      const r = await api('/api/rider/signup', { name, phone, pin, vehicle: $('#sVeh').value });
+      if (r.error) return $('#err').textContent = r.error;
+      setMode('login'); $('#msg').textContent = 'Application sent. The kitchen will review it. Log in later with the same number and PIN to check.';
+      return;
+    }
+    const r = await api('/api/rider/login', { phone, pin });
+    if (r.error) return $('#err').textContent = r.error;
+    if (r.status === 'pending') return $('#msg').textContent = 'Thanks ' + r.name + ', your application is waiting for the kitchen to approve. Check again later.';
+    token = r.token; localStorage.setItem(TK, token); me = r.rider; showApp();
+  };
+  function logout() {
+    stopGps(); clearInterval(poll); token = ''; me = null; localStorage.removeItem(TK);
+    $('#app').classList.add('hide'); $('#auth').classList.remove('hide'); $('#pin').value = '';
+  }
+  $('#logout').onclick = async () => { if (me && me.online) await api('/api/rider/online', { online: false }); logout(); };
 
-  function paint(on, riderName) {
-    const btn = $('#toggle');
-    btn.textContent = on ? 'Stop sharing' : 'Start sharing location';
-    btn.classList.toggle('stop', on);
+  function showApp() {
+    $('#auth').classList.add('hide'); $('#app').classList.remove('hide');
+    $('#who').textContent = me.name; $('#meta').textContent = me.vehicle + ' - ' + me.phone;
+    paintOnline(false); refresh(); clearInterval(poll); poll = setInterval(refresh, 8000);
+  }
+  function paintOnline(on) {
+    $('#toggle').textContent = on ? 'Go offline' : 'Go online'; $('#toggle').classList.toggle('stop', on);
     $('#status').className = 'status' + (on ? ' live' : '');
-    if (!on) { $('#status').innerHTML = 'Sharing off.'; return; }
-    $('#status').innerHTML = '<span class="live-dot2"></span><b>LIVE</b> as ' + (riderName || 'rider') +
-      (currentOrder ? '<br>Carrying <b>' + currentOrder.id + '</b> for ' + currentOrder.customer + '<br>' + currentOrder.address : '<br>No delivery assigned yet. The kitchen sees your position.');
+    $('#status').innerHTML = on ? '<span class="live-dot2"></span><b>ONLINE</b> and sharing your location' : '';
   }
-  async function ping(lat, lng) {
-    try {
-      const r = await fetch('/api/rider/ping', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone: $('#phone').value.replace(/\D/g, ''), lat, lng, orderId: currentOrder ? currentOrder.orderId : undefined })
-      }).then((x) => x.json());
-      if (r.error) { $('#err').textContent = r.error; return stop(); }
-      if (r.order) { currentOrder = { id: r.order.id, customer: r.order.customer, address: r.order.address, orderId: r.order.id }; }
-      else if (!currentOrder) currentOrder = null;
-      paint(true, r.rider);
-      $('#err').textContent = '';
-    } catch (e) { $('#err').textContent = 'Network hiccup, retrying...'; }
+  function startGps() {
+    if (!navigator.geolocation) { $('#err2').textContent = 'This browser has no location support.'; return false; }
+    if (navigator.wakeLock) navigator.wakeLock.request('screen').then((l) => { wake = l; }).catch(() => {});
+    watchId = navigator.geolocation.watchPosition((p) => {
+      if (Date.now() - lastPing < 4000) return; lastPing = Date.now();
+      api('/api/rider/ping', { lat: p.coords.latitude, lng: p.coords.longitude }).then((r) => { if (r.error && r._status === 409) { $('#err2').textContent = r.error; } });
+    }, () => { $('#err2').textContent = 'Location blocked. Allow location for this page, then go online again.'; goOffline(); }, { enableHighAccuracy: true, maximumAge: 4000 });
+    return true;
   }
-  function start() {
-    const phone = $('#phone').value.replace(/\D/g, '');
-    if (!/^[6-9]\d{9}$/.test(phone)) { $('#err').textContent = 'Enter the 10-digit phone the kitchen registered for you.'; return; }
-    localStorage.setItem(KEY, phone);
-    if (!navigator.geolocation) { $('#err').textContent = 'This browser has no location support.'; return; }
-    $('#err').textContent = '';
-    paint(true);
-    watchId = navigator.geolocation.watchPosition(
-      (p) => ping(p.coords.latitude, p.coords.longitude),
-      (e) => { $('#err').textContent = 'Location blocked: allow location access for this page.'; stop(); },
-      { enableHighAccuracy: true, maximumAge: 4000 }
-    );
-    timer = setInterval(() => { if (watchId !== null && navigator.geolocation) navigator.geolocation.getCurrentPosition((p) => ping(p.coords.latitude, p.coords.longitude), () => {}); }, 8000);
+  function stopGps() { if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; } if (wake) { try { wake.release(); } catch (e) {} wake = null; } }
+  async function goOffline() { stopGps(); await api('/api/rider/online', { online: false }); me.online = false; paintOnline(false); refresh(); }
+  $('#toggle').onclick = async () => {
+    $('#err2').textContent = '';
+    if (me.online) return goOffline();
+    const r = await api('/api/rider/online', { online: true });
+    if (r.error) return $('#err2').textContent = r.error;
+    if (!startGps()) { await api('/api/rider/online', { online: false }); return; }
+    me.online = true; paintOnline(true); refresh();
+  };
+
+  const itemsTxt = (o) => o.items.map((i) => i.qty + ' x ' + esc(i.name)).join(', ');
+  const outletName = (o) => o.outlet === 'shivane' ? 'Shivane' : 'Nanded City';
+  async function refresh() {
+    const r = await api('/api/rider/orders');
+    if (r.error) return;
+    if (!!r.online !== !!me.online) { me.online = !!r.online; if (me.online && watchId === null) startGps(); paintOnline(me.online); }
+    $('#mine').innerHTML = r.mine.length ? r.mine.map((o) => {
+      const dest = o.address ? o.address.lat + ',' + o.address.lng : '';
+      const nav = (o.status === 'OUT_FOR_DELIVERY' && dest) ? 'https://www.google.com/maps/dir/?api=1&destination=' + dest + '&travelmode=two-wheeler'
+        : 'https://www.google.com/maps/dir/?api=1&destination=' + o.outletGeo[0] + ',' + o.outletGeo[1] + '&travelmode=two-wheeler';
+      return '<div class="ord"><b class="id">' + o.id + '</b><span class="pill">' + (o.status === 'OUT_FOR_DELIVERY' ? 'ON THE WAY' : o.status === 'READY' ? 'READY, PICK UP' : 'KITCHEN COOKING') + '</span><br>' +
+        itemsTxt(o) + '<br>Pickup: <b>XTO ' + outletName(o) + '</b><br>Customer: <b>' + esc(o.customer.name) + '</b><br>' +
+        (o.address ? esc(o.address.line) + (o.address.landmark ? ' (' + esc(o.address.landmark) + ')' : '') : '') +
+        '<div class="row"><a class="btn go" target="_blank" rel="noopener" href="' + nav + '">' + (o.status === 'OUT_FOR_DELIVERY' ? 'Navigate to customer' : 'Navigate to outlet') + '</a>' +
+        '<a class="btn" href="tel:' + esc(o.customer.phone) + '">Call customer</a></div><div class="row">' +
+        (o.status === 'OUT_FOR_DELIVERY' ? '<button class="btn ok" data-st="DELIVERED" data-id="' + o.id + '">Delivered</button>' : '<button class="btn ok" data-st="OUT_FOR_DELIVERY" data-id="' + o.id + '">Picked up</button>') + '</div></div>';
+    }).join('') : '<div class="empty">Nothing assigned.</div>';
+    $('#avail').innerHTML = !r.online ? '<div class="empty">Go online to see deliveries.</div>' : r.available.length ? r.available.map((o) =>
+      '<div class="ord"><b class="id">' + o.id + '</b><span class="pill">' + (o.status === 'READY' ? 'READY' : 'COOKING') + '</span><br>' + itemsTxt(o) + '<br>Pickup: XTO ' + outletName(o) + (o.distanceKm != null ? ' - ' + o.distanceKm + ' km away' : '') +
+      '<div class="row"><button class="btn go" data-acc="' + o.id + '">Accept delivery</button></div></div>').join('') : '<div class="empty">No deliveries waiting. Stay online.</div>';
+    document.querySelectorAll('[data-acc]').forEach((b) => b.onclick = async () => { const x = await api('/api/rider/orders/' + b.dataset.acc + '/accept', {}); if (x.error) $('#err2').textContent = x.error; else $('#err2').textContent = ''; refresh(); });
+    document.querySelectorAll('[data-st]').forEach((b) => b.onclick = async () => { const x = await api('/api/rider/orders/' + b.dataset.id + '/status', { status: b.dataset.st }); $('#err2').textContent = x.error || ''; refresh(); });
   }
-  function stop() {
-    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
-    clearInterval(timer);
-    currentOrder = null;
-    paint(false);
-  }
-  $('#toggle').addEventListener('click', () => { if (watchId === null) start(); else stop(); });
-  paint(false);
+  if (token) { api('/api/rider/me').then((r) => { if (r.rider) { me = r.rider; showApp(); } }); }
 </script>
 </body>
 </html>

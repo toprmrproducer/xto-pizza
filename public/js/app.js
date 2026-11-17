@@ -666,9 +666,10 @@ async function renderAppRiderMap(container, orderId) {
   setTimeout(() => map.invalidateSize(), 60);
   if (state.appMaps[id + '_r']) map.removeLayer(state.appMaps[id + '_r']);
   state.appMaps[id + '_r'] = L.marker([data.pos.lat, data.pos.lng]).addTo(map).bindPopup('<b>' + data.rider.name + '</b> is on the way');
-  map.setView([data.pos.lat, data.pos.lng], 15);
+  if (state.appMaps[id + '_d']) map.removeLayer(state.appMaps[id + '_d']);
+  if (data.dest) { state.appMaps[id + '_d'] = L.marker(data.dest).addTo(map).bindPopup('Your delivery location'); map.fitBounds([[data.pos.lat, data.pos.lng], data.dest], { padding: [40, 40], maxZoom: 16 }); } else map.setView([data.pos.lat, data.pos.lng], 15);
   const cap = container.querySelector('.rider-cap') || (() => { const d = document.createElement('div'); d.className = 'rider-cap'; container.appendChild(d); return d; })();
-  cap.textContent = data.rider.name + ' is riding to you';
+  cap.textContent = data.rider.name + ' is riding to you' + (data.away != null ? ' - about ' + data.away + ' km away, ' + data.etaMin + ' min' : '');
 }
 
 /* ---------------- push subscribe ---------------- */

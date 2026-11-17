@@ -20,18 +20,19 @@ async function run() {
   let paid = false;
   let pushes = 0;
   const refunds = [];
+  const amounts = {};
   const gateway = http.createServer((req, res) => {
     let raw = '';
     req.on('data', (chunk) => { raw += chunk; });
     req.on('end', () => {
       res.setHeader('Content-Type', 'application/json');
       if (req.url === '/orders' && req.method === 'POST') {
-        creates++;
-        res.end(JSON.stringify({ payment_session_id: 'synthetic-session', order_id: JSON.parse(raw).order_id }));
+        creates++; const cb = JSON.parse(raw); amounts[cb.order_id] = cb.order_amount;
+        res.end(JSON.stringify({ payment_session_id: 'synthetic-session', order_id: cb.order_id }));
       } else if (req.url.endsWith('/refunds') && req.method === 'POST') {
         refunds.push(JSON.parse(raw)); res.end(JSON.stringify({ refund_status: 'PENDING' }));
       } else if (req.url.endsWith('/payments')) res.end(JSON.stringify([{ payment_status: 'SUCCESS', cf_payment_id: 'synthetic-payment' }]));
-      else if (req.url.startsWith('/orders/')) res.end(JSON.stringify({ order_status: paid ? 'PAID' : 'ACTIVE', order_amount: 105 }));
+      else if (req.url.startsWith('/orders/')) res.end(JSON.stringify({ order_status: paid ? 'PAID' : 'ACTIVE', order_amount: amounts[decodeURIComponent(req.url.split('/')[2].split('?')[0])] || 105 }));
       else if (req.url === '/save_order') { pushes++; res.end(JSON.stringify({ success: '1', orderID: 'synthetic-pos' })); }
       else { res.statusCode = 404; res.end('{}'); }
     });
@@ -125,6 +126,47 @@ async function run() {
     const del = (qty) => ({ ...cart, mode: 'delivery', items: [{ id: 'margarita-regular', qty }], address: { line: 'Test address, Nanded City, Pune', landmark: '', lat: 18.4572, lng: 73.8029 } });
     assert.equal((await request('/api/checkout/start', del(2))).data.amount, 260); // 200 + 10 GST + 50 delivery
     assert.equal((await request('/api/checkout/start', del(3))).data.amount, 315); // 300 + 15 GST, delivery free
+    // riders: signup -> pending -> admin approval -> PIN login -> claim -> pickup -> live track -> delivered
+    const adm = { 'x-admin-pin': 'synthetic-admin' };
+    assert.equal((await request('/api/rider/signup', { name: 'Ravi Rider', phone: '9222222222', pin: '12' })).code, 400);
+    assert.equal((await request('/api/rider/signup', { name: 'Ravi Rider', phone: '9222222222', pin: '4821', vehicle: 'Bike' })).code, 201);
+    const pend = await request('/api/rider/login', { phone: '9222222222', pin: '4821' });
+    assert.equal(pend.data.status, 'pending');
+    assert.equal(pend.data.token, undefined);
+    assert.equal((await request('/api/rider/login', { phone: '9222222222', pin: '0000' })).code, 401);
+    assert.equal((await request('/api/rider/ping', { phone: '9222222222', lat: 18.45, lng: 73.8 })).code, 401); // old phone-only ping is dead
+    const rl = await request('/api/admin/riders', undefined, adm);
+    assert.ok(!JSON.stringify(rl.data).includes('pinHash'));
+    const rid = rl.data.riders.find((x) => x.phone === '9222222222').id;
+    assert.equal((await request('/api/admin/riders/' + rid + '/approve', { approve: true }, adm)).code, 200);
+    const rlog = await request('/api/rider/login', { phone: '9222222222', pin: '4821' });
+    assert.ok(rlog.data.token);
+    const ra = { Authorization: 'Bearer ' + rlog.data.token };
+    assert.equal((await request('/api/rider/online', { online: true }, ra)).code, 200);
+    const dstart = await request('/api/checkout/start', del(3));
+    assert.equal(dstart.code, 200, JSON.stringify(dstart.data)); const dconf = await request('/api/checkout/confirm', { orderId: dstart.data.orderId }); assert.equal(dconf.code, 200, JSON.stringify(dconf.data));
+    const dord = dconf.data.order, dcookie = dconf.cookie;
+    assert.equal((await request('/api/admin/orders/' + dord.id + '/status', { status: 'ACCEPTED' }, adm)).code, 200);
+    const av = await request('/api/rider/orders', undefined, ra);
+    const offer = av.data.available.find((x) => x.id === dord.id);
+    assert.ok(offer);
+    assert.equal(offer.customer, undefined); // no customer details before the rider claims it
+    assert.equal(offer.address, undefined);
+    assert.equal((await request('/api/rider/orders/' + dord.id + '/accept', {}, ra)).code, 200);
+    const mine = (await request('/api/rider/orders', undefined, ra)).data.mine[0];
+    assert.equal(mine.customer.phone, '9000000000');
+    assert.ok(mine.address.lat);
+    assert.equal((await request('/api/rider/orders/' + dord.id + '/status', { status: 'OUT_FOR_DELIVERY' }, ra)).code, 409); // kitchen not ready yet
+    assert.equal((await request('/api/petpooja/callback', { orderID: dord.id, restID: 'production-code', status: '5' }, token)).code, 200);
+    assert.equal((await request('/api/rider/orders/' + dord.id + '/status', { status: 'OUT_FOR_DELIVERY' }, ra)).code, 200);
+    assert.equal((await request('/api/rider/ping', { lat: 18.4600, lng: 73.8050 }, ra)).code, 200);
+    assert.equal((await request('/api/track/rider?order=' + dord.id)).code, 401); // anonymous cannot follow a rider
+    const tr = await request('/api/track/rider?order=' + dord.id, undefined, { Cookie: dcookie });
+    assert.equal(tr.data.rider.name, 'Ravi Rider');
+    assert.ok(tr.data.pos && tr.data.dest && tr.data.etaMin >= 1);
+    assert.equal((await request('/api/rider/orders/' + dord.id + '/status', { status: 'DELIVERED' }, ra)).code, 200);
+    assert.equal((await request('/api/orders/' + dord.id, undefined, { Cookie: dcookie })).data.order.status, 'DELIVERED');
+    assert.equal((await request('/api/rider/orders/' + dord.id + '/accept', {}, ra)).code, 409);
     // unanswered order past its window is auto-rejected and refunded by the sweeper
     await new Promise((resolve) => setTimeout(resolve, 21000));
     const seeded = await request('/api/admin/orders', undefined, { 'x-admin-pin': 'synthetic-admin' });
@@ -132,7 +174,7 @@ async function run() {
     assert.equal(seed.status, 'CANCELLED');
     assert.equal(seed.refund.status, 'done');
     assert.equal(refunds.length, 2);
-    console.log('PASS: 44 release assertions using isolated synthetic Cashfree/Petpooja servers; no live credentials or external calls.');
+    console.log('PASS: 70 release assertions using isolated synthetic Cashfree/Petpooja servers; no live credentials or external calls.');
   } finally {
     server.kill('SIGTERM');
     if (server.exitCode === null && server.signalCode === null) await new Promise((resolve) => server.once('exit', resolve));

@@ -743,11 +743,12 @@ async function renderRiderMap(containerId, orderId) {
   state[layerKey] = [];
   const mk = (c, opts) => { const m = L.marker(c, opts).addTo(map); state[layerKey].push(m); return m; };
   mk(data.outletGeo, { title: 'Outlet' }).bindPopup('XTO Pizza outlet');
+  if (data.dest) mk(data.dest, { title: 'You' }).bindPopup('Your delivery location');
   const riderM = mk([data.pos.lat, data.pos.lng], { title: data.rider.name });
   riderM.bindPopup('<b>' + data.rider.name + '</b> is on the way' + (data.rider.phone ? '<br><a href="tel:' + data.rider.phone + '">Call rider</a>' : ''));
-  map.setView([data.pos.lat, data.pos.lng], 15);
+  if (data.dest) map.fitBounds([[data.pos.lat, data.pos.lng], data.dest], { padding: [40, 40], maxZoom: 16 }); else map.setView([data.pos.lat, data.pos.lng], 15);
   const cap = $('#' + containerId + ' .rider-cap');
-  if (cap) cap.textContent = data.rider.name + ' is riding to you' + (data.rider.phone ? ' - call ' + data.rider.phone : '');
+  if (cap) cap.textContent = data.rider.name + ' is riding to you' + (data.away != null ? ' - about ' + data.away + ' km away, ' + data.etaMin + ' min' : '') + (data.rider.phone ? ' - call ' + data.rider.phone : '');
   clearInterval(state['riderTimer_' + containerId]);
   state['riderTimer_' + containerId] = setInterval(() => { if (document.body.contains(holder)) renderRiderMap(containerId, orderId); else clearInterval(state['riderTimer_' + containerId]); }, 5000);
 }

@@ -441,6 +441,66 @@ setInterval(() => {
   if (moved) broadcast('rider:pos', riderState());
 }, 3000);
 
+
+// ---------------------------------------------------------------------------
+// Rider accounts: signup (pending) -> admin approves -> phone + PIN login -> claim deliveries.
+// Legacy roster riders (added in admin, no status field) count as approved.
+// ---------------------------------------------------------------------------
+const riderHits = new Map();
+function rateOk(key, max, windowMs) {
+  const now = Date.now();
+  const arr = (riderHits.get(key) || []).filter((t) => now - t < windowMs);
+  if (arr.length >= max) { riderHits.set(key, arr); return false; }
+  arr.push(now); riderHits.set(key, arr); return true;
+}
+function riderSecret() { if (!db.riderSecret) { db.riderSecret = crypto.randomBytes(32).toString('hex'); saveDb(); } return db.riderSecret; }
+function riderPinHash(pin, salt) { return crypto.scryptSync(String(pin), salt, 32).toString('hex'); }
+function riderPinOk(r, pin) {
+  if (!r.pinHash || !r.pinSalt) return false;
+  const a = Buffer.from(riderPinHash(pin, r.pinSalt), 'hex'), b = Buffer.from(r.pinHash, 'hex');
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+function riderSetPin(r, pin) { r.pinSalt = crypto.randomBytes(16).toString('hex'); r.pinHash = riderPinHash(pin, r.pinSalt); }
+function riderToken(r) {
+  const body = Buffer.from(JSON.stringify({ id: r.id, v: String(r.pinHash || '').slice(0, 8), exp: Date.now() + 14 * 24 * 3600 * 1000 })).toString('base64url');
+  return body + '.' + crypto.createHmac('sha256', riderSecret()).update(body).digest('base64url');
+}
+function riderFromReq(req) {
+  const h = String(req.headers.authorization || '');
+  const [body, sig] = (h.startsWith('Bearer ') ? h.slice(7) : '').split('.');
+  if (!body || !sig) return null;
+  const want = crypto.createHmac('sha256', riderSecret()).update(body).digest('base64url');
+  const a = Buffer.from(sig), b = Buffer.from(want);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return null;
+  try {
+    const o = JSON.parse(Buffer.from(body, 'base64url').toString());
+    const r = db.riders.find((x) => x.id === o.id);
+    if (!r || o.exp < Date.now() || o.v !== String(r.pinHash || '').slice(0, 8)) return null; // a PIN reset kills old tokens
+    return r;
+  } catch (e) { return null; }
+}
+const riderStatus = (r) => r.status || 'approved';
+const riderCanWork = (r) => riderStatus(r) === 'approved' && r.active !== false;
+function riderLive(r) { const p = riderState()[r.id]; return !!(r.online && p && Date.now() - new Date(p.at).getTime() < 3 * 60000); }
+function riderView(r) {
+  return { id: r.id, name: r.name, phone: r.phone, vehicle: r.vehicle || 'Bike', status: riderStatus(r), active: r.active !== false, online: !!r.online, live: riderLive(r), hasPin: !!r.pinHash, appliedAt: r.appliedAt || null, deliveries: r.deliveries || 0 };
+}
+const RIDER_MAX_ACTIVE = 2;
+const riderActiveOrders = (r) => db.orders.filter((o) => o.riderId === r.id && !['DELIVERED', 'CANCELLED'].includes(o.status));
+function riderOrderView(o, mine) {
+  const out = { id: o.id, outlet: o.outlet, status: o.status, items: o.items.map((i) => ({ name: i.name, qty: i.qty })), total: o.total, distanceKm: o.address ? o.address.distanceKm : null, placedAt: o.createdAt };
+  if (mine) {
+    const g = RIDER_HOME[o.outlet] || RIDER_HOME.shivane;
+    out.customer = { name: o.customer.name, phone: o.customer.phone };
+    out.address = o.address ? { line: o.address.line, landmark: o.address.landmark || '', lat: o.address.lat, lng: o.address.lng } : null;
+    out.outletGeo = g;
+  }
+  return out;
+}
+function riderAvailable() {
+  return db.orders.filter((o) => o.mode === 'delivery' && ['ACCEPTED', 'PREPARING', 'READY'].includes(o.status) && !o.riderId && !o.rider && !(o.pos && o.pos.status === 'held'));
+}
+
 const MIME = {
   '.xml': 'application/xml; charset=utf-8', '.txt': 'text/plain; charset=utf-8',
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
@@ -675,7 +735,7 @@ async function handleRequest(req, res) {
   }
   if (method === 'GET' && p === '/menu') return serveFile(res, path.join(PUBLIC, 'menu.html'));
   // the admin page lives on admin.xtopizza.in only (apex and other hosts do not expose it)
-  if (method === 'GET' && (hostName === 'xtopizza.in' || (onXto && sub !== 'admin')) && (p === '/admin' || p === '/rider')) return json(res, 404, { error: 'Not found' });
+  if (method === 'GET' && (hostName === 'xtopizza.in' || (onXto && sub !== 'admin')) && (p === '/admin')) return json(res, 404, { error: 'Not found' });
 
   // ---- Petpooja webhooks (called by Petpooja). One base URL, fixed names, so the sandbox "Base URL + endpoint" setup works:
   //   https://xtopizza.in/api/petpooja/{pushmenu|item_stock|item_stock_off|get_store_status|update_store_status|callback}
@@ -743,10 +803,14 @@ async function handleRequest(req, res) {
       const order = db.orders.find((o) => o.id === orderId);
       if (order && !canReadOrder(req, order)) return json(res, 401, { error: "Order access required" });
       if (!order || order.status !== 'OUT_FOR_DELIVERY' || !(order.rider || (order.riderInfo && order.riderInfo.name))) return json(res, 200, { rider: null });
-      const rider = order.rider ? (db.riders.find((r) => r.name === order.rider || r.id === order.rider) || { name: order.rider, phone: '' }) : { name: order.riderInfo.name, phone: order.riderInfo.phone || '' }; // rider assigned in admin, or sent by Petpooja
-      const pos = riderState()[rider.id] || null;
+      const rider = order.rider ? (db.riders.find((r) => r.id === order.riderId) || db.riders.find((r) => r.name === order.rider || r.id === order.rider) || { name: order.rider, phone: '' }) : { name: order.riderInfo.name, phone: order.riderInfo.phone || '' }; // rider assigned in admin, or sent by Petpooja
+      let pos = riderState()[rider.id] || null;
+      if (pos && Date.now() - new Date(pos.at).getTime() > 3 * 60000) pos = null; // stale GPS: show name and call only
       const outletGeo = RIDER_HOME[order.outlet] || RIDER_HOME.shivane;
-      return json(res, 200, { rider: { name: rider.name, phone: rider.phone }, pos, outletGeo });
+      const dest = order.address && Number.isFinite(order.address.lat) ? [order.address.lat, order.address.lng] : null;
+      let away = null, etaMin = null;
+      if (pos && dest) { away = Math.round(distanceKm([pos.lat, pos.lng], dest) * 1.3 * 10) / 10; etaMin = Math.max(1, Math.round(away / 20 * 60)); } // straight line x1.3 for roads, ~20 km/h city speed: free, no maps API
+      return json(res, 200, { rider: { name: rider.name, phone: rider.phone }, pos, outletGeo, dest, away, etaMin });
     }
     const safe = path.normalize(p).replace(/^(\.\.[/\\])+/, '');
     const abs = path.join(PUBLIC, safe);
@@ -777,14 +841,94 @@ async function handleRequest(req, res) {
     if (out.error) return json(res, 400, { error: out.error });
     return json(res, 200, out);
   }
-  if (p === '/api/rider/ping' && method === 'POST') {
-    const body = await readBody(req);
-    const rider = (db.riders || []).find((r) => r.phone === String(body.phone || '').replace(/\D/g, '').slice(-10) && r.active !== false);
-    if (!rider) return json(res, 403, { error: 'Rider not on the roster' });
-    setRiderPos(rider.id, Number(body.lat), Number(body.lng), body.orderId);
-    broadcast('rider:pos', riderState());
-    const order = body.orderId ? db.orders.find((o) => o.id === body.orderId) : null;
-    return json(res, 200, { ok: true, rider: rider.name, order: order ? { id: order.id, customer: order.customer.name, phone: order.customer.phone, address: order.customer.address, mode: order.mode } : null });
+  if (p.startsWith('/api/rider/')) {
+    const ip = String(req.headers['x-forwarded-for'] || req.socket.remoteAddress || '').split(',')[0].trim();
+    if (p === '/api/rider/signup' && method === 'POST') {
+      const b = await readBody(req);
+      const phone = String(b.phone || '').replace(/\D/g, '').slice(-10), name = String(b.name || '').trim().slice(0, 60), pin = String(b.pin || '');
+      if (!rateOk('rs:' + ip, 5, 3600000)) return json(res, 429, { error: 'Too many sign-ups from this network. Try again later.' });
+      if (name.length < 2) return json(res, 400, { error: 'Enter your full name.' });
+      if (!/^[6-9]\d{9}$/.test(phone)) return json(res, 400, { error: 'Enter a valid 10-digit mobile number.' });
+      if (!/^\d{4,8}$/.test(pin)) return json(res, 400, { error: 'Choose a PIN of 4 to 8 digits.' });
+      const vehicle = ['Bike', 'Scooter', 'Cycle'].includes(b.vehicle) ? b.vehicle : 'Bike';
+      const existing = db.riders.find((r) => r.phone === phone);
+      if (existing) return json(res, 400, { error: riderStatus(existing) === 'pending' ? 'You have already applied. Wait for the kitchen to approve you, then log in.' : 'This number is already registered. Log in instead.' });
+      db.riderSeq = (db.riderSeq || 0) + 1;
+      const rider = { id: 'R-' + (100 + db.riderSeq), name, phone, vehicle, status: 'pending', active: false, online: false, appliedAt: new Date().toISOString() };
+      riderSetPin(rider, pin);
+      db.riders.push(rider);
+      saveDb();
+      broadcast('rider:applied', { id: rider.id, name: rider.name });
+      return json(res, 201, { ok: true, status: 'pending' });
+    }
+    if (p === '/api/rider/login' && method === 'POST') {
+      const b = await readBody(req);
+      const phone = String(b.phone || '').replace(/\D/g, '').slice(-10);
+      if (!rateOk('rl:' + phone, 8, 900000) || !rateOk('rli:' + ip, 40, 900000)) return json(res, 429, { error: 'Too many tries. Wait 15 minutes.' });
+      const rider = db.riders.find((r) => r.phone === phone);
+      if (!rider || !rider.pinHash) return json(res, 401, { error: rider ? 'No PIN set for this rider yet. Ask the kitchen to set one.' : 'Wrong number or PIN.' });
+      if (!riderPinOk(rider, b.pin)) return json(res, 401, { error: 'Wrong number or PIN.' });
+      if (riderStatus(rider) === 'pending') return json(res, 200, { status: 'pending', name: rider.name });
+      if (!riderCanWork(rider)) return json(res, 403, { status: riderStatus(rider) === 'rejected' ? 'rejected' : 'paused', error: riderStatus(rider) === 'rejected' ? 'Your application was not approved.' : 'Your account is paused. Contact the kitchen.' });
+      return json(res, 200, { status: 'approved', token: riderToken(rider), rider: riderView(rider) });
+    }
+    const rider = riderFromReq(req);
+    if (!rider || !riderCanWork(rider)) return json(res, 401, { error: 'Please log in again.' });
+    if (p === '/api/rider/me' && method === 'GET') {
+      return json(res, 200, { rider: riderView(rider), onlineCount: db.riders.filter(riderLive).length });
+    }
+    if (p === '/api/rider/online' && method === 'POST') {
+      const b = await readBody(req);
+      rider.online = !!b.online;
+      if (!rider.online) delete riderState()[rider.id];
+      saveDb(); broadcast('rider:pos', riderState());
+      return json(res, 200, { ok: true, online: rider.online });
+    }
+    if (p === '/api/rider/orders' && method === 'GET') {
+      const mine = riderActiveOrders(rider).map((o) => riderOrderView(o, true));
+      const available = rider.online && mine.length < RIDER_MAX_ACTIVE ? riderAvailable().map((o) => riderOrderView(o, false)) : [];
+      return json(res, 200, { mine, available, online: !!rider.online, deliveries: rider.deliveries || 0 });
+    }
+    if (p === '/api/rider/ping' && method === 'POST') {
+      const b = await readBody(req);
+      if (!rider.online) return json(res, 409, { error: 'You are offline. Go online first.' });
+      const lat = Number(b.lat), lng = Number(b.lng);
+      if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180) return json(res, 400, { error: 'Bad location' });
+      const act = riderActiveOrders(rider).sort((a, c) => (c.status === 'OUT_FOR_DELIVERY') - (a.status === 'OUT_FOR_DELIVERY'))[0];
+      setRiderPos(rider.id, lat, lng, act && act.id);
+      broadcast('rider:pos', riderState());
+      return json(res, 200, { ok: true });
+    }
+    let rm;
+    if ((rm = p.match(/^\/api\/rider\/orders\/([^/]+)\/accept$/)) && method === 'POST') {
+      const order = db.orders.find((o) => o.id === rm[1]);
+      if (!rider.online) return json(res, 409, { error: 'Go online first.' });
+      if (!order || !riderAvailable().includes(order)) return json(res, 409, { error: 'Someone else took this one, or it is no longer available.' });
+      if (riderActiveOrders(rider).length >= RIDER_MAX_ACTIVE) return json(res, 409, { error: 'Finish your current deliveries first.' });
+      order.rider = rider.name; order.riderId = rider.id; order.riderAcceptedAt = new Date().toISOString();
+      saveDb(); broadcast('order:update', adminOrder(order));
+      return json(res, 200, { ok: true, order: riderOrderView(order, true) });
+    }
+    if ((rm = p.match(/^\/api\/rider\/orders\/([^/]+)\/status$/)) && method === 'POST') {
+      const order = db.orders.find((o) => o.id === rm[1]);
+      if (!order || order.riderId !== rider.id) return json(res, 404, { error: 'Not your order.' });
+      const b = await readBody(req);
+      if (b.status === 'OUT_FOR_DELIVERY') {
+        if (order.status === 'OUT_FOR_DELIVERY') return json(res, 200, { ok: true });
+        if (order.status !== 'READY') return json(res, 409, { error: 'The kitchen has not marked this order ready yet.' });
+      } else if (b.status === 'DELIVERED') {
+        if (order.status === 'DELIVERED') return json(res, 200, { ok: true });
+        if (order.status !== 'OUT_FOR_DELIVERY') return json(res, 409, { error: 'Mark it picked up first.' });
+      } else return json(res, 400, { error: 'Bad status' });
+      order.status = b.status;
+      order.history.push({ status: b.status, at: new Date().toISOString(), by: 'rider' });
+      if (b.status === 'DELIVERED') { rider.deliveries = (rider.deliveries || 0) + 1; const pos = riderState()[rider.id]; if (pos) pos.orderId = null; }
+      saveDb(); broadcast('order:update', adminOrder(order));
+      const line = b.status === 'OUT_FOR_DELIVERY' ? 'Order ' + order.id + ' is out for delivery. ' + rider.name + ' is on the way!' : 'Order ' + order.id + ' delivered. Enjoy! Rate us on Google.';
+      if ((db.pushSubs || []).some((x) => x.phone === order.customer.phone)) pushTarget(order.customer.phone, { title: 'XTO Pizza', body: line, url: '/track?order=' + order.id }).catch(() => {});
+      return json(res, 200, { ok: true });
+    }
+    return json(res, 404, { error: 'Not found' });
   }
   if (p === '/api/enquiries' && method === 'POST') {
     const b = await readBody(req);
@@ -951,7 +1095,7 @@ async function handleRequest(req, res) {
 
     if (p === '/api/admin/orders' && method === 'GET') {
       const list = db.orders.map(adminOrder);
-      return json(res, 200, { orders: list, riders: db.riders });
+      return json(res, 200, { orders: list, riders: db.riders.map(riderView) });
     }
     if (p === '/api/admin/stats' && method === 'GET') {
       const todays = db.orders.filter((o) => isToday(o.createdAt) && o.status !== 'CANCELLED' && !o.test);
@@ -1007,7 +1151,9 @@ async function handleRequest(req, res) {
       const order = db.orders.find((o) => o.id === m[1]);
       if (!order) return json(res, 404, { error: 'Order not found' });
       const body = await readBody(req);
-      order.rider = body.rider || null;
+      const pick = body.rider ? db.riders.find((r) => (r.id === body.rider || r.name === body.rider) && riderCanWork(r)) : null;
+      if (body.rider && !pick) return json(res, 400, { error: 'That rider is not approved' });
+      order.rider = pick ? pick.name : null; order.riderId = pick ? pick.id : null;
       saveDb();
       broadcast('order:update', adminOrder(order));
       return json(res, 200, { ok: true });
@@ -1038,7 +1184,7 @@ async function handleRequest(req, res) {
       return json(res, 200, { items: menu.items.map((i) => Object.assign({}, i, { available: isAvailable(i.id) })) });
     }
     if (p === '/api/admin/riders' && method === 'GET') {
-      return json(res, 200, { riders: db.riders, pos: riderState(), sim: Object.keys(db.sim || {}) });
+      return json(res, 200, { riders: db.riders.map(riderView), pos: riderState(), sim: Object.keys(db.sim || {}) });
     }
     if (p === '/api/admin/riders' && method === 'POST') {
       const body = await readBody(req);
@@ -1047,12 +1193,27 @@ async function handleRequest(req, res) {
       if (!/^[6-9]\d{9}$/.test(phone)) return json(res, 400, { error: 'Valid 10-digit phone required' });
       if (db.riders.some((r) => r.phone === phone)) return json(res, 400, { error: 'This phone is already a rider' });
       db.riderSeq = (db.riderSeq || 0) + 1;
-      const rider = { id: 'R-' + (100 + db.riderSeq), name: String(body.name).trim(), phone, vehicle: String(body.vehicle || 'Bike').trim(), active: true };
+      const rider = { id: 'R-' + (100 + db.riderSeq), name: String(body.name).trim(), phone, vehicle: String(body.vehicle || 'Bike').trim(), active: true, status: 'approved', online: false };
+      if (/^\d{4,8}$/.test(String(body.pin || ''))) riderSetPin(rider, String(body.pin));
       db.riders.push(rider);
       const home = RIDER_HOME[body.home] || RIDER_HOME.shivane;
       setRiderPos(rider.id, home[0] + (Math.random() - 0.5) * 0.004, home[1] + (Math.random() - 0.5) * 0.004);
       saveDb();
-      return json(res, 201, { ok: true, rider });
+      return json(res, 201, { ok: true, rider: riderView(rider) });
+    }
+    if ((m = p.match(/^\/api\/admin\/riders\/([^/]+)\/approve$/)) && method === 'POST') {
+      const rider = db.riders.find((r) => r.id === m[1]);
+      if (!rider) return json(res, 404, { error: 'Rider not found' });
+      const body = await readBody(req);
+      rider.status = body.approve === false ? 'rejected' : 'approved'; rider.active = rider.status === 'approved'; if (!rider.active) { rider.online = false; delete riderState()[rider.id]; }
+      saveDb(); return json(res, 200, { ok: true, rider: riderView(rider) });
+    }
+    if ((m = p.match(/^\/api\/admin\/riders\/([^/]+)\/pin$/)) && method === 'POST') {
+      const rider = db.riders.find((r) => r.id === m[1]);
+      if (!rider) return json(res, 404, { error: 'Rider not found' });
+      const body = await readBody(req);
+      if (!/^\d{4,8}$/.test(String(body.pin || ''))) return json(res, 400, { error: 'PIN must be 4 to 8 digits' });
+      riderSetPin(rider, String(body.pin)); saveDb(); return json(res, 200, { ok: true });
     }
     if ((m = p.match(/^\/api\/admin\/riders\/([^/]+)\/state$/)) && method === 'POST') {
       const rider = db.riders.find((r) => r.id === m[1]);
@@ -1068,7 +1229,7 @@ async function handleRequest(req, res) {
         } else delete (db.sim || {})[rider.id];
       }
       saveDb();
-      return json(res, 200, { ok: true, rider });
+      return json(res, 200, { ok: true, rider: riderView(rider) });
     }
     if (p === '/api/admin/settings' && method === 'GET') return json(res, 200, { settings: db.settings, payments: paymentsInfo() });
     if (p === '/api/admin/settings' && method === 'POST') {

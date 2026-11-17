@@ -145,7 +145,10 @@ function statusMini(s) {
 function cardHTML(o) {
   const act = nextAction(o);
   const outlet = o.outlet === 'shivane' ? 'Shivane' : 'Nanded City';
-  const riderBox = ''; // sit-down and takeaway only: no dispatch leg
+  const pool = (state.riders || []).filter((r) => r.status === 'approved' && r.active);
+  const riderBox = (o.mode === 'delivery' && ['ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY'].includes(o.status))
+    ? `<div class="oc-rider" style="margin:6px 0;font-size:.85rem">${o.rider ? 'Rider: <b>' + o.rider + '</b>' : '<span style="color:#b3271e">No rider yet. Riders online can accept it.</span>'}
+      ${o.status !== 'OUT_FOR_DELIVERY' ? `<div style="display:flex;gap:6px;margin-top:4px"><select data-rider-sel="${o.id}" style="flex:1"><option value="">Assign a rider</option>${pool.map((r) => `<option value="${r.id}"${o.rider === r.name ? ' selected' : ''}>${r.name}${r.live ? ' (live)' : r.online ? ' (online)' : ''}</option>`).join('')}</select><button class="rr-btn" data-rider-set="${o.id}">Assign</button></div>` : ''}</div>` : '';
   return `<div class="ocard ${o.status === 'PLACED' ? 'fresh' : ''}" data-order="${o.id}">
     <div class="oc-top"><b>${o.id}</b><span class="oc-time">${timeAgo(o.createdAt)}</span></div>
     <div class="oc-cust">${o.customer.name} &bull; ${o.customer.phone}<a href="tel:${o.customer.phone}">call</a><br />
@@ -213,7 +216,7 @@ function bindBoard() {
     if (!sel.value) { toast('Pick a rider first'); return; }
     await api(`/api/admin/orders/${id}/rider`, { method: 'POST', body: JSON.stringify({ rider: sel.value }) });
     await refreshOrders();
-    toast(sel.value + ' assigned to ' + id);
+    toast('Rider assigned to ' + id);
   }));
 }
 
@@ -266,6 +269,7 @@ function connectSSE() {
   es.addEventListener('order:update', () => { refreshOrders(); refreshStats(); });
   es.addEventListener('enquiry:new', (e) => { const q = JSON.parse(e.data); beep(); toast('New ' + (q.type || '') + ' enquiry from ' + q.name); refreshEnquiries(); });
   es.addEventListener('menu:update', () => { menuItems = []; renderMenuMgr(); });
+  es.addEventListener('rider:applied', (e) => { try { toast(JSON.parse(e.data).name + ' applied to ride. Open the Riders tab.'); } catch (x) {} refreshRiders(); });
   es.addEventListener('rider:pos', (e) => { state.riderPos = JSON.parse(e.data); paintRidersOnMap(); paintRidersList(); });
   es.addEventListener('offers:update', () => { if (!$('#offersPane').classList.contains('hidden')) refreshOffers(); });
   es.onerror = () => $('#liveDot').textContent = 'RECONNECTING';
@@ -344,21 +348,35 @@ function paintRidersOnMap() {
 function paintRidersList() {
   const pos = state.riderPos || {};
   const sim = state.riderSim || [];
-  $('#ridersList').innerHTML = (state.riders || []).map((r) => {
+  const rows = state.riders || [];
+  const pending = rows.filter((r) => r.status === 'pending');
+  const live = rows.filter((r) => r.live).length, online = rows.filter((r) => r.online).length;
+  const head = `<div class="rider-row" style="font-weight:700"><div class="rr-main"><b>${live} live now, ${online} online, ${rows.filter((r) => r.status === 'approved' && r.active).length} approved</b><span>${pending.length ? pending.length + ' application' + (pending.length > 1 ? 's' : '') + ' waiting for you' : 'No applications waiting'}</span></div></div>`;
+  const ordered = pending.concat(rows.filter((r) => r.status !== 'pending'));
+  $('#ridersList').innerHTML = head + ordered.map((r) => {
     const p = pos[r.id];
     const order = p && p.orderId ? (state.orders || []).find((o) => o.id === p.orderId) : null;
     const when = p ? timeAgo(p.at) : 'never seen';
+    const chip = r.status === 'pending' ? '<span style="color:#b36b00;font-weight:700"> PENDING</span>' : r.status === 'rejected' ? '<span style="color:#b3271e;font-weight:700"> REJECTED</span>' : !r.active ? ' (paused)' : '';
+    const btns = r.status === 'pending'
+      ? `<button class="rr-btn on" data-appr="${r.id}">Approve</button><button class="rr-btn danger" data-rej="${r.id}">Reject</button>`
+      : `<button class="rr-btn${sim.includes(r.id) ? ' on' : ''}" data-sim="${r.id}">${sim.includes(r.id) ? 'Stop sim' : 'Simulate'}</button><button class="rr-btn" data-pin="${r.id}">${r.hasPin ? 'Reset PIN' : 'Set PIN'}</button><button class="rr-btn danger" data-rider-off="${r.id}">${r.active ? 'Pause' : 'Activate'}</button>`;
     return `<div class="rider-row${r.active ? '' : ' off'}">
       <div class="rr-main">
-        <b>${r.name}</b><span>${r.vehicle || 'Bike'} - ${r.phone}</span>
-        <span class="rr-live">${p ? (order ? 'On order ' + order.id + ' - ' + (order.customer.name || '') : 'Live, free') + ' - ' + when : 'No GPS yet'}</span>
+        <b>${r.name}${chip}</b><span>${r.vehicle || 'Bike'} - <a href="tel:${r.phone}">${r.phone}</a></span>
+        <span class="rr-live">${r.status === 'pending' ? 'Applied ' + (r.appliedAt ? timeAgo(r.appliedAt) : '') : (p ? (order ? 'On order ' + order.id + ' - ' + (order.customer.name || '') : (r.live ? 'Live, free' : 'Offline')) + ' - ' + when : 'No GPS yet') + ' - ' + r.deliveries + ' delivered'}</span>
       </div>
-      <div class="rr-actions">
-        <button class="rr-btn${sim.includes(r.id) ? ' on' : ''}" data-sim="${r.id}">${sim.includes(r.id) ? 'Stop sim' : 'Simulate'}</button>
-        <button class="rr-btn danger" data-rider-off="${r.id}">${r.active ? 'Pause' : 'Activate'}</button>
-      </div>
+      <div class="rr-actions">${btns}</div>
     </div>`;
   }).join('');
+  $$('[data-appr]').forEach((b) => b.addEventListener('click', async () => { await api(`/api/admin/riders/${b.dataset.appr}/approve`, { method: 'POST', body: JSON.stringify({ approve: true }) }); toast('Rider approved. They can log in now.'); refreshRiders(); }));
+  $$('[data-rej]').forEach((b) => b.addEventListener('click', async () => { if (!confirm('Reject this application?')) return; await api(`/api/admin/riders/${b.dataset.rej}/approve`, { method: 'POST', body: JSON.stringify({ approve: false }) }); refreshRiders(); }));
+  $$('[data-pin]').forEach((b) => b.addEventListener('click', async () => {
+    const pin = prompt('New 4 to 8 digit PIN for this rider (tell them in person or on WhatsApp):');
+    if (!pin) return;
+    const r = await api(`/api/admin/riders/${b.dataset.pin}/pin`, { method: 'POST', body: JSON.stringify({ pin }) }).catch((e) => ({ error: e.message }));
+    toast(r && r.error ? r.error : 'PIN saved. Old logins are signed out.');
+  }));
   $$('[data-sim]').forEach((b) => b.addEventListener('click', async () => {
     const id = b.dataset.sim;
     const on = sim.includes(id);
