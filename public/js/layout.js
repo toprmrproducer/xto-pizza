@@ -29,6 +29,7 @@
           '<input id="headSearch" type="search" placeholder="Search for pizzas, burgers, shakes..." autocomplete="off" />' +
         '</form>' +
         '<div class="xh-actions">' +
+          '<button class="xh-pill" id="locBtn" type="button" aria-label="Get my current location"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/><circle cx="12" cy="12" r="8"/></svg><span class="t" id="locTxt">Get my location</span></button>' +
           '<a class="xh-pill" href="#" id="trackLink">' + ICON_TRACK + '<span class="t">Track</span></a>' +
           '<button class="xh-pill cart" id="cartBtn" type="button" aria-label="Open cart">' + ICON_CART + '<span class="t">Cart</span><span class="cart-count" id="cartCount">0</span></button>' +
         '</div>' +
@@ -55,7 +56,7 @@
           '<p><b style="color:#fff">Nanded City</b><br>Destination Centre, F-65, Sinhagad Rd, Pune 411068<br><a href="tel:+917030000886">+91 70300 00886</a> &middot; 11 am - 11 pm</p>' +
         '</div>' +
         '<div><h4>Connect</h4>' +
-          '<a href="mailto:info@xtopizza.com">info@xtopizza.com</a><a href="mailto:ordernow@xtopizza.com">ordernow@xtopizza.com</a>' +
+          '<a href="mailto:xtopizza@gmail.com">xtopizza@gmail.com</a>' +
           '<a href="https://xtopizza.com" target="_blank" rel="noopener">xtopizza.com</a>' +
           '<p style="margin-top:10px">Dine-in and takeaway. UPI, cards and netbanking via Razorpay. GST and packaging charges extra.</p>' +
         '</div>' +
@@ -99,4 +100,33 @@
       var c = document.getElementById('cartCount'); if (c) c.textContent = n;
     } catch (e) {}
   }
+})();
+
+/* Get current location (every page): distance to each outlet and delivery reach */
+(function () {
+  var btn = document.getElementById('locBtn'), txt = document.getElementById('locTxt');
+  if (!btn || !txt) return;
+  function km(a, b) { var R = 6371, r = Math.PI / 180, dLa = (b[0] - a[0]) * r, dLo = (b[1] - a[1]) * r;
+    var h = Math.sin(dLa / 2) * Math.sin(dLa / 2) + Math.cos(a[0] * r) * Math.cos(b[0] * r) * Math.sin(dLo / 2) * Math.sin(dLo / 2);
+    return 2 * R * Math.asin(Math.sqrt(h)); }
+  var NAMES = { nanded: 'Nanded City', shivane: 'Shivane' };
+  function show(loc, geo, radius) {
+    var best = null;
+    Object.keys(geo || {}).forEach(function (id) { var d = km(geo[id], [loc.lat, loc.lng]); if (!best || d < best.d) best = { id: id, d: d }; });
+    if (!best) { txt.textContent = 'Location saved'; return; }
+    var ok = !radius || best.d <= radius;
+    txt.textContent = best.d.toFixed(1) + ' km from ' + (NAMES[best.id] || best.id) + (ok ? '' : ' (out of delivery range)');
+    btn.title = ok ? 'We deliver to you from ' + (NAMES[best.id] || best.id) : 'Outside our ' + radius + ' km delivery range. Takeaway and dine-in are available.';
+  }
+  function info() { return Promise.all([fetch('/api/config').then(function (r) { return r.json(); }), fetch('/api/settings').then(function (r) { return r.json(); })]).then(function (a) { return { geo: a[0].outletsGeo || {}, radius: (a[1].settings || {}).deliveryRadiusKm }; }); }
+  try { var saved = JSON.parse(localStorage.getItem('xto_loc') || 'null'); if (saved && Date.now() - saved.t < 6 * 3600 * 1000) info().then(function (i) { show(saved, i.geo, i.radius); }).catch(function () {}); } catch (e) {}
+  btn.addEventListener('click', function () {
+    if (!navigator.geolocation) { txt.textContent = 'Location not available'; return; }
+    txt.textContent = 'Finding you...';
+    navigator.geolocation.getCurrentPosition(function (p) {
+      var loc = { lat: p.coords.latitude, lng: p.coords.longitude, t: Date.now() };
+      try { localStorage.setItem('xto_loc', JSON.stringify(loc)); } catch (e) {}
+      info().then(function (i) { show(loc, i.geo, i.radius); }).catch(function () { txt.textContent = 'Location saved'; });
+    }, function () { txt.textContent = 'Allow location to continue'; }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 });
+  });
 })();

@@ -1422,17 +1422,17 @@
       "id": "extra-topping",
       "name": "Extra topping",
       "prices": {
-        "regular": 30,
-        "medium": 40,
-        "large": 60
+        "regular": 50,
+        "medium": 60,
+        "large": 70
       }
     },
     {
       "id": "extra-cheese",
       "name": "Extra cheese",
       "prices": {
-        "regular": 40,
-        "medium": 60,
+        "regular": 60,
+        "medium": 70,
         "large": 80
       }
     },
@@ -1440,8 +1440,8 @@
       "id": "cheese-burst",
       "name": "Cheese burst",
       "prices": {
-        "regular": 40,
-        "medium": 70,
+        "regular": 70,
+        "medium": 80,
         "large": 120
       }
     },
@@ -1449,9 +1449,9 @@
       "id": "thin-crust",
       "name": "Thin crust base",
       "prices": {
-        "regular": 20,
-        "medium": 30,
-        "large": 40
+        "regular": 30,
+        "medium": 40,
+        "large": 50
       }
     }
   ]

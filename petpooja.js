@@ -75,8 +75,25 @@ module.exports = function createPetpooja(ctx) {
   }
 
   /* ---------------- our item -> Petpooja item / variation ---------------- */
+  // Explicit site-item -> Petpooja item (and variation) pairs where the POS spells the name differently (verified against the 17 Nov 2026 production menu, restaurant 362057)
+  const ALIAS = {
+    'tomato-and-cheese-6-in': { item: 'Tomato & Cheese' }, 'onion-and-cheese-6-in': { item: 'Onion & Cheese' },
+    'margherita-regular': { item: 'Margarita', variation: 'Regular' }, 'margherita-medium': { item: 'Margarita', variation: 'Medium' }, 'margherita-large': { item: 'Margarita', variation: 'Large' },
+    'paneer-makhani-regular': { item: 'Paneer Makhni', variation: 'Regular' }, 'paneer-makhani-medium': { item: 'Paneer Makhni', variation: 'Medium' }, 'paneer-makhani-large': { item: 'Paneer Makhni', variation: 'Large' },
+    'chefs-special-pasta': { item: 'Chef Special Pasta' }, 'cheese-chilli-tost': { item: 'Cheese Chilli Toast' }, 'tandoori-paneer-burger': { item: 'Tandoori Burger' },
+    'cocktail-mayo-dip': { item: 'COCKTAIL MAYO' }, 'cheese-jalapeno-dip': { item: 'CHEESE JALEPENO' }, 'peri-peri-dip': { item: 'Peri Peri' },
+    'combo-magambo': { item: 'Combo Mogambo' }, 'hazelnut-shake': { item: 'Hazelnut Crunchy Shake' }
+  };
   function findPp(it) {
     if (!pm || !pm.items.length) return null;
+    if (ALIAS[it.id]) {
+      const spec = ALIAS[it.id];
+      const cands = pm.items.filter((item) => String(item.active) !== '0' && norm(item.itemname) === norm(spec.item));
+      if (cands.length !== 1) return null;
+      if (!spec.variation) return String(cands[0].itemallowvariation) === '1' ? null : { item: cands[0], variation: null };
+      const vs = (cands[0].variation || []).filter((v) => String(v.active) !== '0' && norm(v.name) === norm(spec.variation));
+      return vs.length === 1 ? { item: cands[0], variation: vs[0] } : null;
+    }
     const base = norm(it.groupName || it.name);
     const words = (SIZE_WORDS[it.size] || (it.size ? [it.size] : [])).map(norm);
     const matches = [];
@@ -91,6 +108,14 @@ module.exports = function createPetpooja(ctx) {
       }
     }
     return matches.length === 1 ? matches[0] : null;
+  }
+  // An item may be sold online only when it maps one-to-one to a Petpooja item at the same base price and is in stock.
+  function orderable(mi) {
+    if (!configured() || !pm || !Object.values(cfg.outletMap).map(String).includes(String(pm.menusharingcode || ''))) return true;
+    const m = findPp(mi);
+    if (!m || String(m.item.in_stock) === '0') return false;
+    const base = Number(m.variation ? m.variation.price : m.item.price);
+    return Number.isFinite(base) && Math.round(base * 100) === Math.round(Number(mi.price) * 100);
   }
   function addonLinks(m) {
     return m.variation ? m.variation.addon || [] : m.item.addon || [];
@@ -382,5 +407,5 @@ module.exports = function createPetpooja(ctx) {
       failures: l.filter((x) => ["failed", "unmapped", "unknown"].includes(x.status)).length
     };
   }
-  return { cfg, configured, handleMenuPush, buildOrder, pushOrder, recoverPendingOrders, resumeQueued: recoverPendingOrders, handleCallback, handleStock, handleStoreGet, rawLine, handleStoreSet, cancelOnPos, syncStock, status, log, findPp, hasMenu: () => !!pm };
+  return { cfg, configured, handleMenuPush, buildOrder, pushOrder, recoverPendingOrders, resumeQueued: recoverPendingOrders, handleCallback, handleStock, handleStoreGet, rawLine, handleStoreSet, cancelOnPos, syncStock, status, log, findPp, orderable, hasMenu: () => !!pm };
 };

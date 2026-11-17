@@ -55,7 +55,7 @@
           '<p><b style="color:#fff">Nanded City</b><br>Destination Centre, F-65, Sinhagad Rd, Pune 411068<br><a href="tel:+917030000886">+91 70300 00886</a> &middot; 11 am - 11 pm</p>' +
         '</div>' +
         '<div><h4>Connect</h4>' +
-          '<a href="mailto:info@xtopizza.com">info@xtopizza.com</a><a href="mailto:ordernow@xtopizza.com">ordernow@xtopizza.com</a>' +
+          '<a href="mailto:xtopizza@gmail.com">xtopizza@gmail.com</a>' +
           '<a href="https://xtopizza.com" target="_blank" rel="noopener">xtopizza.com</a>' +
           '<p style="margin-top:10px">Dine-in and takeaway. UPI, cards and netbanking via Razorpay. GST and packaging charges extra.</p>' +
         '</div>' +

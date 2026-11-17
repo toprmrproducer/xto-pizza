@@ -10,7 +10,19 @@
     ]).then(function (a) { XPay.settings = a[0].settings; XPay.payments = a[0].payments; XPay.geo = a[1].outletsGeo || {}; return XPay; })
       .catch(function () { XPay.settings = XPay.settings || { deliveryEnabled: false }; return XPay; });
   };
-  XPay.deliveryFee = function (itemTotal) {
+  // GST 5% on top of menu prices (2.5% CGST + 2.5% SGST), same rounding as the server and the POS
+  XPay.gst = function (lines, discount) {
+    var itemTotal = lines.reduce(function (t, l) { return t + l.price * l.qty; }, 0);
+    var disc = Math.min(discount || 0, itemTotal), left = disc, paise = 0;
+    lines.forEach(function (l, k) {
+      var lineTotal = l.price * l.qty;
+      var share = k === lines.length - 1 ? left : Math.round((disc * lineTotal / itemTotal) * 100) / 100;
+      left = Math.round((left - share) * 100) / 100;
+      paise += 2 * Math.round((lineTotal - share) * 2.5);
+    });
+    return paise / 100;
+  };
+  XPay.deliveryFee = function (itemTotal) { // pass the amount including GST, after any coupon
     var s = XPay.settings; if (!s || !s.deliveryEnabled) return null;
     return (s.freeDeliveryAbove > 0 && itemTotal >= s.freeDeliveryAbove) ? 0 : s.deliveryFee;
   };

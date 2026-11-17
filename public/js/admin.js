@@ -128,7 +128,7 @@ const COLS = [
 ];
 function nextAction(o) {
   switch (o.status) {
-    case 'PLACED': return { next: 'ACCEPTED', label: 'Accept Order', cls: '' };
+    case 'PLACED': return { next: 'ACCEPTED', label: (o.pos && o.pos.status === 'held') ? 'Accept and print' : 'Accept Order', cls: '' };
     case 'ACCEPTED': return { next: 'PREPARING', label: 'Start Cooking', cls: '' };
     case 'PREPARING': return { next: 'READY', label: 'Mark Ready', cls: '' };
     case 'READY':
@@ -154,6 +154,8 @@ function cardHTML(o) {
     <div class="oc-items">
       ${o.items.map((i) => `<div class="oi"><span>${i.qty} x ${i.name}</span><span>${INR(i.price * i.qty)}</span></div>`).join('')}
     </div>
+    ${o.pos && o.pos.status === 'held' && o.acceptBy ? `<div class="oc-hold" data-by="${o.acceptBy}" style="margin:6px 0;padding:8px 10px;border-radius:10px;background:#fff3cd;color:#7a4b00;font-weight:700;font-size:.85rem">Awaiting your decision. Not printed yet. Auto-rejects with full refund in <span class="hold-left">--</span></div>` : ''}
+    ${o.status === 'CANCELLED' && o.refund ? `<div style="margin:6px 0;font-size:.85rem;color:${o.refund.status === 'done' ? '#1c7c31' : '#b3271e'}">${o.refund.status === 'done' ? 'Refunded in full' : 'Refund failed, retrying automatically'}${o.cancelReason ? ' - ' + o.cancelReason : ''}</div>` : ''}
     <div class="oc-meta">
       <span class="meta-chip mode">${o.mode === 'dinein' ? ('🍽 Dine-in' + (o.customer.tableNumber ? ' - T' + o.customer.tableNumber : '')) : o.mode === 'delivery' ? '🛵 Delivery' : '🥡 Takeaway'}</span>
       <span class="meta-chip">${outlet}</span>
@@ -163,7 +165,7 @@ function cardHTML(o) {
     ${riderBox}
     <div class="oc-actions">
       ${act ? `<button class="btn-adv ${act.cls}" data-advance="${o.id}" data-next="${act.next}">${act.label}</button>` : ''}
-      <button class="btn-cancel" data-cancel="${o.id}">Cancel order</button>
+      <button class="btn-cancel" data-cancel="${o.id}" data-held="${o.pos && o.pos.status === 'held' ? 1 : 0}">${o.pos && o.pos.status === 'held' ? 'Reject and refund' : 'Cancel order'}</button>
     </div>
   </div>`;
 }
@@ -198,8 +200,10 @@ function bindBoard() {
     toast(id + ': ' + statusMini(next));
   }));
   $$('[data-cancel]').forEach((b) => b.addEventListener('click', async () => {
-    if (!confirm('Cancel ' + b.dataset.cancel + '?')) return;
-    await api(`/api/admin/orders/${b.dataset.cancel}/status`, { method: 'POST', body: JSON.stringify({ status: 'CANCELLED' }) });
+    const held = b.dataset.held === '1';
+    const why = held ? prompt('Reject ' + b.dataset.cancel + ' and refund the customer in full. Reason (shown to the customer):', 'Item not available right now') : (confirm('Cancel ' + b.dataset.cancel + '?') ? 'Cancelled by outlet' : null);
+    if (why === null) return;
+    await api(`/api/admin/orders/${b.dataset.cancel}/status`, { method: 'POST', body: JSON.stringify({ status: 'CANCELLED', reason: why }) });
     await refreshOrders(); refreshStats();
     toast(b.dataset.cancel + ' cancelled');
   }));
@@ -540,7 +544,7 @@ async function loadSettings() {
   const s = d.settings;
   $('#stDelOn').checked = !!s.deliveryEnabled;
   $('#stOutNanded').checked = s.outletsOpen.nanded !== false; $('#stOutShivane').checked = s.outletsOpen.shivane !== false;
-  $('#stFee').value = s.deliveryFee; $('#stFree').value = s.freeDeliveryAbove; $('#stRadius').value = s.deliveryRadiusKm;
+  $('#stFee').value = s.deliveryFee; $('#stFree').value = s.freeDeliveryAbove; $('#stRadius').value = s.deliveryRadiusKm; $('#stManual').checked = s.manualAccept !== false; $('#stWindow').value = s.acceptWindowMin || 5;
   $('#stMinDel').value = s.minOrderDelivery; $('#stMin').value = s.minOrderValue;
   const p = d.payments || {};
   $('#stPay').innerHTML = p.configured ? 'Cashfree is connected (' + p.env + ' mode). Customers pay by UPI, cards and netbanking.'
@@ -552,7 +556,7 @@ $('#stSave').addEventListener('click', async () => {
     const r = await api('/api/admin/settings', { method: 'POST', body: JSON.stringify({
       outletsOpen: { nanded: $('#stOutNanded').checked, shivane: $('#stOutShivane').checked },
       deliveryEnabled: $('#stDelOn').checked, deliveryFee: $('#stFee').value, freeDeliveryAbove: $('#stFree').value,
-      deliveryRadiusKm: $('#stRadius').value, minOrderDelivery: $('#stMinDel').value, minOrderValue: $('#stMin').value
+      manualAccept: $('#stManual').checked, acceptWindowMin: $('#stWindow').value, deliveryRadiusKm: $('#stRadius').value, minOrderDelivery: $('#stMinDel').value, minOrderValue: $('#stMin').value
     }) });
     msg.style.color = '#1c7c31'; msg.textContent = r.ok ? 'Saved. Live on the website and app now.' : 'Could not save.';
   } catch (e) { msg.style.color = '#b3271e'; msg.textContent = 'Could not save.'; }
@@ -565,3 +569,12 @@ $('#toGo').addEventListener('click', async () => {
     msg.style.color = '#1c7c31'; msg.textContent = r.ok ? 'Test order ' + r.order.id + ' is on the Orders board.' : 'Could not create.';
   } catch (e) { msg.style.color = '#b3271e'; msg.textContent = 'Could not create.'; }
 });
+
+// countdown on held orders
+setInterval(function () {
+  document.querySelectorAll('.oc-hold').forEach(function (el) {
+    var ms = new Date(el.dataset.by).getTime() - Date.now();
+    var s = el.querySelector('.hold-left'); if (!s) return;
+    s.textContent = ms <= 0 ? 'moments' : Math.floor(ms / 60000) + ':' + String(Math.floor(ms / 1000) % 60).padStart(2, '0');
+  });
+}, 1000);

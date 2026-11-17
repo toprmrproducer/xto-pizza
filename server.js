@@ -49,7 +49,7 @@ function saveDb() { writeJSON(path.join(DATA, 'db.json'), db); }
 // ---------------------------------------------------------------------------
 // Admin-editable store settings (delivery fee, radius, minimum order)
 // ---------------------------------------------------------------------------
-const DEFAULT_SETTINGS = { outletsOpen: { shivane: false, nanded: true }, deliveryEnabled: true, deliveryFee: 40, freeDeliveryAbove: 0, deliveryRadiusKm: 5, minOrderValue: 0, minOrderDelivery: 199 };
+const DEFAULT_SETTINGS = { outletsOpen: { shivane: false, nanded: true }, deliveryEnabled: true, deliveryFee: 50, freeDeliveryAbove: 250, deliveryRadiusKm: 5, minOrderValue: 0, minOrderDelivery: 199, manualAccept: true, acceptWindowMin: 5 };
 db.settings = Object.assign({}, DEFAULT_SETTINGS, db.settings || {});
 db.settings.outletsOpen = Object.assign({}, DEFAULT_SETTINGS.outletsOpen, db.settings.outletsOpen || {});
 function posStoreOff(id) { const o = (db.settings.posStoreOff || {})[id]; if (!o) return false; if (o.until && Date.now() >= o.until) { delete db.settings.posStoreOff[id]; saveDb(); return false; } return true; }
@@ -68,7 +68,9 @@ function sanitizeSettings(b) {
     freeDeliveryAbove: Math.round(num(b.freeDeliveryAbove, 0, 10000, s.freeDeliveryAbove)),
     deliveryRadiusKm: Math.round(num(b.deliveryRadiusKm, 0.5, 50, s.deliveryRadiusKm) * 10) / 10,
     minOrderValue: Math.round(num(b.minOrderValue, 0, 10000, s.minOrderValue)),
-    minOrderDelivery: Math.round(num(b.minOrderDelivery, 0, 10000, s.minOrderDelivery))
+    minOrderDelivery: Math.round(num(b.minOrderDelivery, 0, 10000, s.minOrderDelivery)),
+    manualAccept: b.manualAccept === undefined ? s.manualAccept : !!b.manualAccept,
+    acceptWindowMin: Math.round(num(b.acceptWindowMin, 1, 30, s.acceptWindowMin))
   };
 }
 function distanceKm(a, b) {
@@ -148,7 +150,24 @@ function isToday(isoLike) {
   try { return todayKey(new Date(isoLike)) === todayKey(); } catch (e) { return false; }
 }
 function itemById(id) { return menu.items.find((i) => i.id === id) || null; }
-function isAvailable(id) { return !db.unavailable.includes(id); }
+function isAvailable(id) {
+  if (db.unavailable.includes(id)) return false;
+  const mi = itemById(id);
+  return !mi || pp.orderable(mi); // never sell an item the POS cannot take at the same price
+}
+// GST 5% (2.5% CGST + 2.5% SGST) is added on top of menu-card prices, exactly as the Petpooja POS bills them (see petpooja.js buildOrder, same rounding).
+function gstFor(items, discount) {
+  const itemTotal = items.reduce((t, i) => t + i.price * i.qty, 0);
+  const disc = Math.min(discount || 0, itemTotal);
+  let left = disc, paise = 0;
+  items.forEach((li, k) => {
+    const lineTotal = li.price * li.qty;
+    const share = k === items.length - 1 ? left : Math.round((disc * lineTotal / itemTotal) * 100) / 100;
+    left = Math.round((left - share) * 100) / 100;
+    paise += 2 * Math.round((lineTotal - share) * 2.5);
+  });
+  return paise / 100;
+}
 
 function priceOrder(lines) {
   let itemTotal = 0;
@@ -179,8 +198,8 @@ function publicOrder(o) {
   return {
     id: o.id, createdAt: o.createdAt, status: o.status, mode: o.mode, outlet: o.outlet,
     customer: { name: o.customer.name, phone: o.customer.phone, tableNumber: o.customer.tableNumber || null },
-    items: o.items, itemTotal: o.itemTotal, deliveryFee: o.deliveryFee, coupon: o.coupon || null, total: o.total,
-    payment: o.payment, rider: o.rider || null, history: o.history, etaMin: o.etaMin || null, address: o.address ? { line: o.address.line, landmark: o.address.landmark } : null
+    items: o.items, itemTotal: o.itemTotal, deliveryFee: o.deliveryFee, gst: o.gst || 0, coupon: o.coupon || null, total: o.total,
+    payment: o.payment, rider: o.rider || null, history: o.history, etaMin: o.etaMin || null, awaitingOutlet: !!(o.pos && o.pos.status === 'held'), cancelReason: o.cancelReason || null, refund: o.refund ? { status: o.refund.status, amount: o.refund.amount || o.total } : null, address: o.address ? { line: o.address.line, landmark: o.address.landmark } : null
   };
 }
 function adminOrder(o) {
@@ -517,13 +536,78 @@ function buildDraft(body, req) {
     const geo = RIDER_HOME[outlet.id] || RIDER_HOME.shivane;
     const d = distanceKm(geo, [lat, lng]);
     if (d > S.deliveryRadiusKm) return { error: outlet.name + ' delivers within ' + S.deliveryRadiusKm + ' km. Your location is ' + d.toFixed(1) + ' km away.' };
-    deliveryFee = (S.freeDeliveryAbove > 0 && priced.itemTotal >= S.freeDeliveryAbove) ? 0 : S.deliveryFee;
+    deliveryFee = null; // priced below, once GST is known
     address = { line, landmark, lat, lng, distanceKm: Math.round(d * 10) / 10 };
   }
-  const total = priced.itemTotal - (coupon ? coupon.discount : 0) + deliveryFee;
+  const gst = gstFor(priced.items, coupon ? coupon.discount : 0);
+  if (deliveryFee === null) deliveryFee = (S.freeDeliveryAbove > 0 && (priced.itemTotal - (coupon ? coupon.discount : 0) + gst) >= S.freeDeliveryAbove) ? 0 : S.deliveryFee; // free delivery threshold is on the amount including GST
+  const total = Math.round((priced.itemTotal - (coupon ? coupon.discount : 0) + gst + deliveryFee) * 100) / 100;
   if (total < 1) return { error: 'Invalid total' };
-  return { draft: { mode, outlet: outlet.id, customer: { name, phone, tableNumber: String(c.tableNumber || '').trim() }, items: priced.items, itemTotal: priced.itemTotal, deliveryFee, coupon, total, address, source: orderSource(body, req) } };
+  return { draft: { mode, outlet: outlet.id, customer: { name, phone, tableNumber: String(c.tableNumber || '').trim() }, items: priced.items, itemTotal: priced.itemTotal, deliveryFee, gst, coupon, total, address, source: orderSource(body, req) } };
 }
+
+// ---------------------------------------------------------------------------
+// Outlet acceptance gate + automatic Cashfree refunds
+// ---------------------------------------------------------------------------
+// A paid order is HELD (not sent to the POS, nothing prints) until staff accept it in the admin
+// board. Reject, or no answer inside the window, cancels it and refunds the customer in full.
+async function refundOrder(order) {
+  const pay = order.payment || {};
+  if (pay.status !== 'paid' || pay.method === 'test') { order.refundDue = false; return { skipped: true }; }
+  if (order.refund && order.refund.status === 'done') { order.refundDue = false; return order.refund; }
+  const refundId = 'rf_' + order.id.replace(/[^A-Za-z0-9]/g, '');
+  if (pay.method === 'mock') { order.refund = { id: refundId, status: 'done', at: new Date().toISOString(), amount: order.total, simulated: true }; order.refundDue = false; return order.refund; }
+  if (!cashfree.configured) { order.refund = { id: refundId, status: 'failed', error: 'Cashfree not configured', at: new Date().toISOString(), tries: ((order.refund && order.refund.tries) || 0) + 1 }; return order.refund; }
+  const tries = ((order.refund && order.refund.tries) || 0) + 1;
+  try {
+    const r = await cfFetch('/orders/' + encodeURIComponent(pay.gatewayOrderId) + '/refunds', { method: 'POST', body: JSON.stringify({ refund_amount: order.total, refund_id: refundId, refund_note: String(order.cancelReason || 'Order cancelled by outlet').slice(0, 100), refund_speed: 'STANDARD' }) });
+    const j = await r.json().catch(() => ({}));
+    const dup = !r.ok && /already|exist|duplicate/i.test(String(j.message || ''));
+    if (r.ok || dup) { order.refund = { id: refundId, status: 'done', cfStatus: j.refund_status || null, at: new Date().toISOString(), amount: order.total, tries }; order.refundDue = false; }
+    else order.refund = { id: refundId, status: 'failed', error: String(j.message || r.status).slice(0, 200), at: new Date().toISOString(), tries };
+  } catch (e) { order.refund = { id: refundId, status: 'failed', error: String(e.message || e).slice(0, 200), at: new Date().toISOString(), tries }; }
+  return order.refund;
+}
+async function cancelAndRefund(order, reason, by) {
+  if (['CANCELLED', 'DELIVERED', 'SERVED'].includes(order.status)) return;
+  if (order.pos && order.pos.status === 'pushed') pp.cancelOnPos(order, reason).catch(() => {});
+  order.status = 'CANCELLED';
+  order.cancelReason = reason || 'Cancelled by outlet';
+  order.refundDue = !order.test;
+  order.history.push({ status: 'CANCELLED', at: new Date().toISOString(), by: by || 'admin', reason: order.cancelReason });
+  if (order.pos && order.pos.status === 'held') order.pos = { status: 'rejected', at: new Date().toISOString() };
+  saveDb();
+  broadcast('order:update', adminOrder(order));
+  await refundOrder(order);
+  saveDb();
+  broadcast('order:update', adminOrder(order));
+  if (db.pushSubs.some((x) => x.phone === order.customer.phone)) {
+    const refundLine = order.refund && order.refund.status === 'done' ? ' Your full refund of Rs ' + order.total + ' has been started and reaches you in 5 to 7 working days.' : ' Your refund is being processed.';
+    pushTarget(order.customer.phone, { title: 'XTO Pizza', body: 'Sorry, we could not take order ' + order.id + ' (' + order.cancelReason + ').' + refundLine, url: '/track?order=' + order.id }).catch(() => {});
+  }
+}
+async function acceptHeld(order, by) {
+  if (!(order.pos && order.pos.status === 'held')) return false;
+  order.pos = { status: 'queued' };
+  order.status = 'ACCEPTED';
+  order.history.push({ status: 'ACCEPTED', at: new Date().toISOString(), by: by || 'admin' });
+  saveDb();
+  broadcast('order:update', adminOrder(order));
+  pp.pushOrder(order).catch((e) => console.error('petpooja push', e));
+  return true;
+}
+async function acceptanceSweep() {
+  const now = Date.now();
+  for (const o of db.orders) {
+    if (o.status === 'PLACED' && o.pos && o.pos.status === 'held' && o.acceptBy && now > new Date(o.acceptBy).getTime()) {
+      await cancelAndRefund(o, 'The outlet could not accept your order in time', 'auto-timeout');
+    } else if (o.status === 'CANCELLED' && o.refundDue && !(o.refund && o.refund.status === 'done') && (!o.refund || now - new Date(o.refund.at).getTime() > 60000)) {
+      await refundOrder(o); saveDb(); broadcast('order:update', adminOrder(o));
+    }
+  }
+}
+setInterval(() => { acceptanceSweep().catch((e) => console.error('acceptance sweep', e)); }, 20000);
+
 // Turn a paid pending checkout into a real order. Idempotent: webhook and browser can both call it.
 async function settlePending(orderId) {
   const existing = db.orders.find((o) => o.payment && o.payment.gatewayOrderId === orderId);
@@ -554,10 +638,11 @@ async function settlePending(orderId) {
   db.orderSeq += 1;
   const order = {
     id: 'XT-' + db.orderSeq, createdAt: new Date().toISOString(), status: 'PLACED',
-    mode: d.mode, outlet: d.outlet, customer: d.customer, items: d.items, itemTotal: d.itemTotal, deliveryFee: d.deliveryFee,
+    mode: d.mode, outlet: d.outlet, customer: d.customer, items: d.items, itemTotal: d.itemTotal, deliveryFee: d.deliveryFee, gst: d.gst || 0,
     coupon: d.coupon, total: d.total, address: d.address || null,
     payment: { method: cashfree.configured ? 'cashfree' : 'mock', status: 'paid', paymentId, gatewayOrderId: orderId },
-    source: d.source, rider: null, posMenuReceivedAt: d.posMenuReceivedAt || null, pos: { status: "queued" },
+    source: d.source, rider: null, posMenuReceivedAt: d.posMenuReceivedAt || null, pos: { status: db.settings.manualAccept ? 'held' : 'queued' },
+    acceptBy: db.settings.manualAccept ? new Date(Date.now() + db.settings.acceptWindowMin * 60000).toISOString() : null,
     etaMin: d.mode === 'delivery' ? 40 : d.mode === 'dinein' ? 20 : 15,
     history: [{ status: 'PLACED', at: new Date().toISOString() }]
   };
@@ -565,7 +650,7 @@ async function settlePending(orderId) {
   delete db.pending[orderId];
   saveDb();
   broadcast('order:new', adminOrder(order));
-  pp.pushOrder(order).catch((e) => console.error("petpooja push", e));
+  if (!db.settings.manualAccept) pp.pushOrder(order).catch((e) => console.error("petpooja push", e));
   return { order };
 }
 
@@ -598,9 +683,16 @@ async function handleRequest(req, res) {
   if (method === 'POST' && p.startsWith('/api/petpooja/')) {
     const parts = p.split('/');
     const name = parts[3] || '';
-    const hdr = String(req.headers['x-xto-token'] || '').trim() || String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
-    const tok = hdr || url.searchParams.get('t') || parts[4] || '';
+    const ALT = ['x-xto-token', 'xto-token', 'token', 'x-token', 'x-api-key', 'access-token', 'x-access-token'];
+    const altHdr = ALT.map((h) => String(req.headers[h] || '').trim()).find(Boolean) || '';
+    const hdr = altHdr || String(req.headers.authorization || '').replace(/^Bearer\s+/i, '').trim();
+    const tok = hdr || url.searchParams.get('t') || url.searchParams.get('token') || parts[4] || '';
     const body = await readBody(req);
+    // diagnostic only: header NAMES and token length, never values (shows how Petpooja actually sends the token)
+    try {
+      const quiet = ['host', 'content-length', 'content-type', 'connection', 'accept', 'accept-encoding', 'user-agent', 'x-forwarded-for', 'x-forwarded-proto'];
+      pp.log({ type: 'pp-in', endpoint: name, authed: !!pp.cfg.pushToken && tok === pp.cfg.pushToken, tokenLen: tok.length, hdrs: Object.keys(req.headers).filter((h) => !quiet.includes(h)).slice(0, 12), restID: body && body.restID ? String(body.restID).slice(0, 24) : '' });
+    } catch (e) { /* never block a webhook on logging */ }
     if (['pushmenu', 'pushmenu_endpoint', 'menu'].includes(name)) {
       if (!pp.cfg.pushToken || tok !== pp.cfg.pushToken) {
         pp.log({ type: "menu-auth", status: "rejected", endpoint: name, tokenProvided: !!tok });
@@ -885,7 +977,15 @@ async function handleRequest(req, res) {
       const legacyDone = next === 'DELIVERED' && order.status === 'READY' && order.mode !== 'delivery'; // accept the old label as SERVED
       const valid = next === 'CANCELLED' || legacyDone || (idx > -1 && (idx === curIdx + 1 || idx === curIdx));
       if (!valid) return json(res, 400, { error: 'Bad status transition' });
-      if (next === 'CANCELLED' && order.status !== 'CANCELLED') pp.cancelOnPos(order, body.reason).catch(() => {});
+      if (next === 'CANCELLED') {
+        if (order.status === 'CANCELLED') return json(res, 200, { ok: true, order: adminOrder(order) });
+        await cancelAndRefund(order, String(body.reason || 'Cancelled by outlet').slice(0, 120), 'admin');
+        return json(res, 200, { ok: true, order: adminOrder(order) });
+      }
+      if (next === 'ACCEPTED' && order.pos && order.pos.status === 'held') {
+        await acceptHeld(order, 'admin');
+        return json(res, 200, { ok: true, order: adminOrder(order) });
+      }
       order.status = next;
       if (body.rider !== undefined) order.rider = body.rider || order.rider;
       order.history.push({ status: next, at: new Date().toISOString() });

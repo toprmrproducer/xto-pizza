@@ -36,7 +36,8 @@ function cartTotals() {
   const lines = cartLines();
   const itemTotal = lines.reduce((s, l) => s + l.price * l.qty, 0);
   const discount = state.coupon ? Math.min(state.coupon.discount, itemTotal) : 0;
-  return { lines, itemTotal, deliveryFee: 0, discount, total: itemTotal - discount };
+  const gst = XPay.gst(lines, discount);
+  return { lines, itemTotal, deliveryFee: 0, discount, gst, total: Math.round((itemTotal - discount + gst) * 100) / 100 };
 }
 function checkedMode() { return ($('input[name="mode"]:checked') || {}).value || 'dinein'; }
 function addLine(id, addons, qty) {
@@ -287,7 +288,7 @@ function updateCartUI() {
   const n = cartCount();
   $('#cartCount').textContent = n;
   const box = $('#cartItems');
-  const { lines, itemTotal, total } = cartTotals();
+  const { lines, itemTotal, gst, total } = cartTotals();
   if (!lines.length) {
     box.innerHTML = '<div class="cart-empty"><b>Your cart is empty</b>The oven is hot. Add something delicious.</div>';
     $('#cartFoot').innerHTML = '';
@@ -295,7 +296,7 @@ function updateCartUI() {
   }
   box.innerHTML = lines.map((l) => `<div class="cart-line">
       <img src="/images/${l.img}.jpg" alt="" onerror="this.onerror=null;this.src='/images/pizza-cheese.jpg'" />
-      <div><h4>${l.name}</h4><div class="cl-price">${INR(l.price)} each</div></div>
+      <div><h4>${l.name}</h4>${l.cat === 'combo' && l.desc ? `<div class="cl-desc">Includes: ${l.desc}</div>` : ''}<div class="cl-price">${INR(l.price)} each</div></div>
       <div class="cl-stepper">
         <button data-cdec="${l.key}" aria-label="Less">&minus;</button><span class="cl-qty">${l.qty}</span><button data-cinc="${l.key}" aria-label="More">+</button>
       </div>
@@ -308,6 +309,7 @@ function updateCartUI() {
   }));
   $('#cartFoot').innerHTML = `
     <div class="cart-row"><span>Item total</span><span>${INR(itemTotal)}</span></div>
+    <div class="cart-row"><span>GST (5%)</span><span>${INR(gst)}</span></div>
     <div class="cart-row total"><span>To pay</span><span>${INR(total)}</span></div>
     <button class="btn btn-primary btn-block" id="checkoutBtn">Checkout ${INR(total)}</button>`;
   $('#checkoutBtn').addEventListener('click', openCheckout);
@@ -319,23 +321,24 @@ function closeCart() { $('#cartDrawer').classList.remove('show'); $('#scrim').cl
 
 /* ---------------- checkout + mock razorpay ---------------- */
 function updateBill() {
-  const { lines, itemTotal, discount } = cartTotals();
+  const { lines, itemTotal, discount, gst } = cartTotals();
   if (!lines.length) return;
   const mode = checkedMode();
-  const fee = mode === 'delivery' ? XPay.deliveryFee(itemTotal) : 0;
+  const fee = mode === 'delivery' ? XPay.deliveryFee(itemTotal - discount + gst) : 0;
   const S = XPay.settings || {};
   let hint = '';
   if (mode === 'delivery') {
     if (fee === null) hint = 'Delivery is not available right now.';
     else if (S.minOrderDelivery && itemTotal < S.minOrderDelivery) hint = 'Minimum order for delivery is ' + INR(S.minOrderDelivery) + '. Add ' + INR(S.minOrderDelivery - itemTotal) + ' more.';
-    else if (S.freeDeliveryAbove > 0 && fee > 0) hint = 'Free delivery above ' + INR(S.freeDeliveryAbove) + '.';
+    else if (S.freeDeliveryAbove > 0 && fee > 0) hint = 'Free delivery on orders of ' + INR(S.freeDeliveryAbove) + ' or more including GST.';
   }
   if (!hint && S.minOrderValue && itemTotal < S.minOrderValue) hint = 'Minimum order is ' + INR(S.minOrderValue) + '.';
   $('#ckHint').textContent = hint;
-  const total = itemTotal - discount + (fee || 0);
+  const total = Math.round((itemTotal - discount + gst + (fee || 0)) * 100) / 100;
   $('#billBox').innerHTML = `
     <div class="cart-row"><span>Items (${lines.reduce((s, l) => s + l.qty, 0)})</span><span>${INR(itemTotal)}</span></div>
     ${discount ? `<div class="cart-row"><span>Coupon</span><span>-${INR(discount)}</span></div>` : ''}
+    <div class="cart-row"><span>GST (5%)</span><span>${INR(gst)}</span></div>
     ${mode === 'delivery' && fee !== null ? `<div class="cart-row"><span>Delivery fee</span><span>${fee === 0 ? 'Free' : INR(fee)}</span></div>` : ''}
     <div class="cart-row total"><span>To pay</span><span>${INR(total)}</span></div>`;
 }
@@ -494,7 +497,8 @@ function renderTimeline(el, order) {
           <div><b>${s[1]}</b><span>${current ? 'Happening right now' : done ? 'Done' : 'Pending'}</span></div>
         </div>`;
       }).join('')}
-      ${cancelled ? '<div class="tl-step cancelled"><div class="tl-dot">✕</div><div><b>Order cancelled</b><span>Contact the outlet for help</span></div></div>' : ''}
+      ${cancelled ? '<div class="tl-step cancelled"><div class="tl-dot">✕</div><div><b>Order cancelled</b><span>' + (order.cancelReason ? String(order.cancelReason).replace(/</g, '&lt;') + '. ' : '') + (order.refund && order.refund.status === 'done' ? 'Full refund of ' + INR(order.total) + ' started, it reaches you in 5 to 7 working days.' : 'Your refund is being processed automatically.') + '</span></div></div>' : ''}
+      ${order.awaitingOutlet ? '<div class="tl-step current"><div class="tl-dot">!</div><div><b>Waiting for the outlet to confirm</b><span>You are only charged if they accept. Otherwise you get a full refund automatically.</span></div></div>' : ''}
     </div>
     <div class="cart-row total" style="padding-top:6px"><span>${order.id} \u2022 ${order.items.reduce((s, i) => s + i.qty, 0)} items</span><span>${INR(order.total)}</span></div>`;
 }

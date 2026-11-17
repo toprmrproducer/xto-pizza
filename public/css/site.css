@@ -182,9 +182,9 @@ h1, h2, h3, h4 { font-family: 'Sora', sans-serif; line-height: 1.05; letter-spac
 .footer-base { border-top: 1px solid rgba(255,246,233,.12); padding: 22px 0; font-size: .82rem; opacity: .6; }
 
 /* DRAWER (cart) */
-.scrim { position: fixed; inset: 0; background: rgba(10,8,4,.55); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 80; }
+.scrim { position: fixed; inset: 0; background: rgba(10,8,4,.55); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity .25s; z-index: 2100; }
 .scrim.show { opacity: 1; pointer-events: auto; }
-.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(430px, 100%); background: var(--paper); z-index: 90; transform: translateX(102%); transition: transform .3s cubic-bezier(.2,.8,.25,1); display: flex; flex-direction: column; box-shadow: -30px 0 80px rgba(0,0,0,.3); }
+.drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(430px, 100%); background: var(--paper); z-index: 2110; transform: translateX(102%); transition: transform .3s cubic-bezier(.2,.8,.25,1); display: flex; flex-direction: column; box-shadow: -30px 0 80px rgba(0,0,0,.3); }
 .drawer.show { transform: translateX(0); }
 .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 22px 24px; border-bottom: 1px solid var(--line); }
 .drawer-head h3 { font-size: 1.2rem; }
@@ -206,7 +206,7 @@ h1, h2, h3, h4 { font-family: 'Sora', sans-serif; line-height: 1.05; letter-spac
 .free-del-note { font-size: .8rem; color: #1a8a3c; margin-top: 8px; text-align: center; }
 
 /* MODALS */
-.modal { position: fixed; inset: 0; z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(10,8,4,.6); backdrop-filter: blur(4px); }
+.modal { position: fixed; inset: 0; z-index: 2120; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(10,8,4,.6); backdrop-filter: blur(4px); }
 .modal.show { display: flex; }
 .modal-card { background: var(--paper); border-radius: 26px; width: min(480px, 100%); max-height: min(88vh, 760px); overflow-y: auto; padding: 26px; animation: pop .25s cubic-bezier(.2,.9,.3,1.4); }
 @keyframes pop { from { transform: scale(.94); opacity: 0; } }
@@ -228,7 +228,7 @@ h1, h2, h3, h4 { font-family: 'Sora', sans-serif; line-height: 1.05; letter-spac
 .pay-note { text-align: center; font-size: .78rem; color: var(--muted); }
 
 /* MOCK RAZORPAY */
-.rzp-wrap { position: fixed; inset: 0; z-index: 120; display: none; align-items: flex-end; justify-content: center; }
+.rzp-wrap { position: fixed; inset: 0; z-index: 2130; display: none; align-items: flex-end; justify-content: center; }
 .rzp-wrap.show { display: flex; }
 .rzp-backdrop { position: absolute; inset: 0; background: rgba(10,14,30,.72); }
 .rzp { position: relative; width: min(420px, 100%); background: #fff; border-radius: 18px 18px 0 0; overflow: hidden; animation: rzpUp .3s cubic-bezier(.2,.8,.3,1); margin-bottom: 0; max-height: 92vh; }
@@ -409,3 +409,5 @@ h1, h2, h3, h4 { font-family: 'Sora', sans-serif; line-height: 1.05; letter-spac
 /* toast: fully hidden unless showing (was only slid 90px, so an empty pill stayed visible) */
 .toast { opacity: 0; visibility: hidden; pointer-events: none; transition: transform .3s cubic-bezier(.2,.9,.3,1.3), opacity .25s ease, visibility 0s linear .3s; }
 .toast.show { opacity: 1; visibility: visible; pointer-events: auto; transition: transform .3s cubic-bezier(.2,.9,.3,1.3), opacity .2s ease, visibility 0s; }
+
+.cl-desc { font-size: .78rem; line-height: 1.35; color: #6b5a4a; margin: 2px 0 4px; max-width: 230px; }
